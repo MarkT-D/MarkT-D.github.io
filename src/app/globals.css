@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+/* Palette, radii and motion are Pesto's (qr-menu/src/app/globals.css):
+   stone neutrals at hue 152, one green ramp, red only for alarms. */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-brand: var(--acc-6);
+  --color-gr-1: var(--gr-1);
+  --color-gr-2: var(--gr-2);
+  --color-gr-3: var(--gr-3);
+  --color-gr-4: var(--gr-4);
+  --color-gr-5: var(--gr-5);
+  --color-gr-6: var(--gr-6);
+  --color-gr-7: var(--gr-7);
+  --color-gr-8: var(--gr-8);
+  --color-gr-9: var(--gr-9);
+  --color-gr-10: var(--gr-10);
+  --color-acc-1: var(--acc-1);
+  --color-acc-2: var(--acc-2);
+  --color-acc-3: var(--acc-3);
+  --color-acc-4: var(--acc-4);
+  --color-acc-5: var(--acc-5);
+  --color-acc-6: var(--acc-6);
+  --color-acc-7: var(--acc-7);
+  --color-acc-8: var(--acc-8);
+  --color-acc-9: var(--acc-9);
+  --color-acc-10: var(--acc-10);
+  --color-red-6: var(--red-6);
+  --color-red-8: var(--red-8);
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display Variable", Georgia, serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius-card: 1.5rem;
+}
+
+:root {
+  color-scheme: light;
+  --gr-1: oklch(0.985 0.003 152);
+  --gr-2: oklch(0.955 0.004 152);
+  --gr-3: oklch(0.915 0.005 152);
+  --gr-4: oklch(0.86 0.006 152);
+  --gr-5: oklch(0.78 0.006 152);
+  --gr-6: oklch(0.69 0.006 152);
+  --gr-7: oklch(0.53 0.006 152);
+  --gr-8: oklch(0.39 0.006 152);
+  --gr-9: oklch(0.31 0.005 152);
+  --gr-10: oklch(0.2 0.004 152);
+  --acc-1: oklch(0.954 0.010 155);
+  --acc-2: oklch(0.837 0.037 152);
+  --acc-3: oklch(0.738 0.057 152);
+  --acc-4: oklch(0.647 0.077 152);
+  --acc-5: oklch(0.585 0.090 152);
+  --acc-6: oklch(0.539 0.108 152);
+  --acc-7: oklch(0.505 0.109 152);
+  --acc-8: oklch(0.411 0.104 152);
+  --acc-9: oklch(0.337 0.077 152);
+  --acc-10: oklch(0.245 0.058 152);
+  --red-6: oklch(0.664 0.223 25);
+  --red-8: oklch(0.522 0.170 25);
+
+  --background: var(--gr-1);
+  --foreground: oklch(0.298 0.005 152);
+  --card: oklch(1 0 0);
+  --muted: var(--gr-2);
+  --muted-foreground: oklch(0.52 0.005 152);
+  --border: var(--gr-3);
+  --primary: var(--acc-6);
+  --primary-foreground: oklch(1 0 0);
+  --shadow-card: 0 2px 21px rgb(21 23 21 / 0.02), 0 1px 9px rgb(21 23 21 / 0.03), 0 2px 4px rgb(21 23 21 / 0.04);
+}
+
+@layer base {
+  * { border-color: var(--border); }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--acc-2); }
+  :focus-visible { outline: 2px solid var(--acc-6); outline-offset: 3px; border-radius: 6px; }
+}
+
+/* ── layout atoms ─────────────────────────────────────────────────────────── */
+.wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--acc-7); }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--card);
+  font-size: 12px; font-weight: 500; color: var(--gr-8); white-space: nowrap;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 44px; padding: 0 18px; border-radius: 12px; font-size: 15px; font-weight: 600;
+  transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--acc-6); color: #fff; }
+.btn-primary:hover { background: var(--acc-7); }
+.btn-ghost { background: var(--card); border: 1px solid var(--gr-4); color: var(--foreground); }
+.btn-ghost:hover { background: var(--gr-2); }
+.dot { width: 6px; height: 6px; border-radius: 999px; background: var(--acc-6); flex: none; }
+
+/* ── motion (Pesto's kit) ─────────────────────────────────────────────────── */
+@keyframes rise-in { from { opacity: 0; transform: translate3d(0, 22px, 0); } to { opacity: 1; transform: none; } }
+@keyframes sheen {
+  0% { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  12% { opacity: 0.55; }
+  40%, 100% { transform: translateX(230%) skewX(-18deg); opacity: 0; }
+}
+@keyframes scan-line { 0% { transform: translateY(-8%); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateY(108%); opacity: 0; } }
+@keyframes rc-pop { from { opacity: 0; transform: scale(0.4); } }
+@keyframes rc-rise { from { opacity: 0; transform: translateY(8px); } }
+@keyframes pulse-ring { 0% { transform: scale(0.6); opacity: 0.7; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes caret { 50% { opacity: 0; } }
+@keyframes float-y-soft { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -8px, 0); } }
+
+.animate-rise-in { animation: rise-in 800ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.animate-sheen { animation: sheen 6s ease-in-out infinite; }
+.reveal { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 700ms cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal[data-visible="true"] { opacity: 1; transform: none; }
+.motion-rise { animation: rc-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards; animation-delay: calc(min(var(--i, 0), 12) * 45ms); }
+.caret::after { content: ""; display: inline-block; width: 7px; height: 1.05em; margin-left: 2px; vertical-align: -2px; background: var(--acc-6); animation: caret 1s steps(1) infinite; }
+.float-soft { animation: float-y-soft 7s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .animate-rise-in, .animate-sheen, .motion-rise, .float-soft { animation: none !important; }
+  .caret::after { animation: none; }
+}
+
+/* Faint 64px grid, the Pesto marketing backdrop. */
+.grid-backdrop {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0.55;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--border) 80%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--border) 80%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+}
