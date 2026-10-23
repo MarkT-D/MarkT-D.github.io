@@ -30,7 +30,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
             b.h ? (
               <h2 key={i} className="pt-4 text-[21px] font-semibold text-foreground">{b.h}</h2>
             ) : b.code ? (
-              <pre key={i} className="overflow-x-auto rounded-xl bg-gr-10 p-4 font-mono text-[13px] leading-relaxed text-gr-2">{b.code}</pre>
+              <pre key={i} className="overflow-x-auto rounded-xl bg-term p-4 font-mono text-[13px] leading-relaxed text-term-fg">{b.code}</pre>
             ) : (
               <p key={i}>{b.p}</p>
             ),

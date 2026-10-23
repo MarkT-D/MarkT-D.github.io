@@ -9,7 +9,7 @@ const MODELS = [
 ];
 
 export function ModelBars() {
-  const [ref, inView] = useInView<HTMLDivElement>();
+  const [ref, inView] = useInView<HTMLDivElement>(undefined, true);
   return (
     <div ref={ref} className="space-y-3">
       {MODELS.map((m, i) => (

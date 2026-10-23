@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Dark mode follows data-theme on <html>, set before paint by the inline script
+   in layout.tsx (stored choice, else the system setting). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Palette, radii and motion are Pesto's (qr-menu/src/app/globals.css):
    stone neutrals at hue 152, one green ramp, red only for alarms. */
 
@@ -12,6 +16,12 @@
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-term: var(--term-bg);
+  --color-term-fg: var(--term-fg);
+  --color-term-key: var(--term-key);
+  --color-term-ok: var(--term-ok);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
   --color-brand: var(--acc-6);
   --color-gr-1: var(--gr-1);
   --color-gr-2: var(--gr-2);
@@ -75,11 +85,108 @@
   --primary: var(--acc-6);
   --primary-foreground: oklch(1 0 0);
   --shadow-card: 0 2px 21px rgb(21 23 21 / 0.02), 0 1px 9px rgb(21 23 21 / 0.03), 0 2px 4px rgb(21 23 21 / 0.04);
+  --shadow-lift: 0 12px 36px -18px rgb(0 0 0 / 0.25);
+  /* The terminal and code panels stay dark in both themes. */
+  --term-bg: oklch(0.2 0.004 152);
+  --term-fg: oklch(0.92 0.004 152);
+  --term-key: oklch(0.78 0.11 152);
+  --term-ok: oklch(0.86 0.09 152);
+  /* Chart series, validated against the card in each mode (dataviz validator). */
+  --series-1: #22864a;
+  --series-2: #0060c1;
+  --grid-opacity: 0.55;
 }
+
+/* Dark: Pesto's stone ramp inverted, green moved up the ramp so it still reads
+   on a dark ground. Its own steps, not an automatic flip. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --gr-1: oklch(0.2 0.004 152);
+  --gr-2: oklch(0.255 0.005 152);
+  --gr-3: oklch(0.32 0.005 152);
+  --gr-4: oklch(0.4 0.006 152);
+  --gr-5: oklch(0.5 0.006 152);
+  --gr-6: oklch(0.6 0.006 152);
+  --gr-7: oklch(0.7 0.006 152);
+  --gr-8: oklch(0.8 0.005 152);
+  --gr-9: oklch(0.9 0.004 152);
+  --gr-10: oklch(0.97 0.003 152);
+  --acc-1: oklch(0.27 0.03 152);
+  --acc-2: oklch(0.33 0.045 152);
+  --acc-3: oklch(0.42 0.07 152);
+  --acc-4: oklch(0.52 0.09 152);
+  --acc-5: oklch(0.62 0.11 152);
+  --acc-6: oklch(0.7 0.13 152);
+  --acc-7: oklch(0.76 0.12 152);
+  --acc-8: oklch(0.83 0.1 152);
+  --acc-9: oklch(0.89 0.07 152);
+  --acc-10: oklch(0.95 0.035 152);
+  --red-6: oklch(0.68 0.19 25);
+  --red-8: oklch(0.76 0.14 25);
+  --background: var(--gr-1);
+  --foreground: oklch(0.93 0.004 152);
+  --card: oklch(0.235 0.004 152);
+  --muted: var(--gr-2);
+  --muted-foreground: oklch(0.72 0.005 152);
+  --border: var(--gr-3);
+  --primary: var(--acc-6);
+  --primary-foreground: oklch(0.2 0.03 152);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 2px 12px rgb(0 0 0 / 0.25);
+  --shadow-lift: 0 14px 40px -18px rgb(0 0 0 / 0.7);
+  --term-bg: oklch(0.165 0.004 152);
+  --term-fg: oklch(0.92 0.004 152);
+  --series-1: #3fa96a;
+  --series-2: #4b8de6;
+  --grid-opacity: 0.35;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --gr-1: oklch(0.2 0.004 152);
+  --gr-2: oklch(0.255 0.005 152);
+  --gr-3: oklch(0.32 0.005 152);
+  --gr-4: oklch(0.4 0.006 152);
+  --gr-5: oklch(0.5 0.006 152);
+  --gr-6: oklch(0.6 0.006 152);
+  --gr-7: oklch(0.7 0.006 152);
+  --gr-8: oklch(0.8 0.005 152);
+  --gr-9: oklch(0.9 0.004 152);
+  --gr-10: oklch(0.97 0.003 152);
+  --acc-1: oklch(0.27 0.03 152);
+  --acc-2: oklch(0.33 0.045 152);
+  --acc-3: oklch(0.42 0.07 152);
+  --acc-4: oklch(0.52 0.09 152);
+  --acc-5: oklch(0.62 0.11 152);
+  --acc-6: oklch(0.7 0.13 152);
+  --acc-7: oklch(0.76 0.12 152);
+  --acc-8: oklch(0.83 0.1 152);
+  --acc-9: oklch(0.89 0.07 152);
+  --acc-10: oklch(0.95 0.035 152);
+  --red-6: oklch(0.68 0.19 25);
+  --red-8: oklch(0.76 0.14 25);
+  --background: var(--gr-1);
+  --foreground: oklch(0.93 0.004 152);
+  --card: oklch(0.235 0.004 152);
+  --muted: var(--gr-2);
+  --muted-foreground: oklch(0.72 0.005 152);
+  --border: var(--gr-3);
+  --primary: var(--acc-6);
+  --primary-foreground: oklch(0.2 0.03 152);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 2px 12px rgb(0 0 0 / 0.25);
+  --shadow-lift: 0 14px 40px -18px rgb(0 0 0 / 0.7);
+  --term-bg: oklch(0.165 0.004 152);
+  --term-fg: oklch(0.92 0.004 152);
+  --series-1: #3fa96a;
+  --series-2: #4b8de6;
+  --grid-opacity: 0.35;
+  }
+}
+
 
 @layer base {
   * { border-color: var(--border); }
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html.theme-switching * { transition: none !important; }
   body {
     background: var(--background);
     color: var(--foreground);
@@ -106,7 +213,7 @@
   transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 .btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--acc-6); color: #fff; }
+.btn-primary { background: var(--acc-6); color: var(--primary-foreground); }
 .btn-primary:hover { background: var(--acc-7); }
 .btn-ghost { background: var(--card); border: 1px solid var(--gr-4); color: var(--foreground); }
 .btn-ghost:hover { background: var(--gr-2); }
@@ -143,7 +250,7 @@
 
 /* Faint 64px grid, the Pesto marketing backdrop. */
 .grid-backdrop {
-  position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0.55;
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: var(--grid-opacity);
   background-image:
     linear-gradient(to right, color-mix(in oklab, var(--border) 80%, transparent) 1px, transparent 1px),
     linear-gradient(to bottom, color-mix(in oklab, var(--border) 80%, transparent) 1px, transparent 1px);

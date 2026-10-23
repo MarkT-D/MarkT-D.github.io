@@ -9,6 +9,7 @@ import { MenuPipeline } from "@/components/MenuPipeline";
 import { AttentionDemo } from "@/components/AttentionDemo";
 import { TracPipeline } from "@/components/TracPipeline";
 import { ModelBars } from "@/components/ModelBars";
+import { GpuSpeedup } from "@/components/GpuSpeedup";
 import { LaptopFrame } from "@/components/LaptopFrame";
 import { Reveal } from "@/components/Reveal";
 import { NOTES } from "@/lib/notes";
@@ -42,6 +43,28 @@ const HOW = [
     title: "Test the real thing",
     body: "Pesto's end-to-end suite runs a whole restaurant shift in a real browser against the real database. Only the OCR and the LLM are faked, at the network boundary. The app has no test mode.",
   },
+];
+
+const COURSES = [
+  {
+    name: "Distributed & Parallel Programming",
+    body: "CUDA in C on the DAS-5 supercomputer's GPUs, plus pthreads, OpenMP, MPI across nodes and a Spark cluster in Docker.",
+  },
+  { name: "Advanced Calculus", body: "The analysis under optimisation and gradient-based learning." },
+  { name: "Probability Theory", body: "Stochastic processes and sampling distributions, the base for evaluation and uncertainty." },
+];
+
+const PARALLEL_FACTS = [
+  { value: "2.6 s", label: "a 10-million-point wave equation, 1,000 steps, on one GPU" },
+  { value: "7× slower", label: "a 1,000-point wave split over 8 MPI nodes vs one: messages cost more than the maths" },
+];
+
+const TOOLBOX = [
+  { group: "LLMs & ML", items: ["OpenAI · Claude · Gemini APIs", "Structured output", "LLM-as-judge", "PyTorch", "Hugging Face", "scikit-learn", "Whisper", "Google Vision OCR"] },
+  { group: "Product engineering", items: ["TypeScript", "React", "Next.js", "Node.js", "NestJS", "FastAPI", "Flask", "PostgreSQL", "Supabase"] },
+  { group: "Infrastructure", items: ["Docker", "AWS: S3, RDS, API Gateway", "Vercel", "CI pipelines", "Linux"] },
+  { group: "Parallel & systems", items: ["C", "CUDA", "OpenMP", "pthreads", "MPI", "Spark"] },
+  { group: "How I work", items: ["Claude Code agents", "git worktrees", "Playwright", "Vitest"] },
 ];
 
 const EARLIER = [
@@ -228,6 +251,49 @@ export default function Home() {
           </CaseStudy>
         </div>
 
+        {/* Foundations */}
+        <section id="foundations" className="scroll-mt-16 border-t border-border py-16 sm:py-20">
+          <div className="wrap">
+            <p className="eyebrow">Beyond the degree</p>
+            <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
+            <div className="mt-10 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+              <Reveal>
+                <ul className="space-y-5">
+                  {COURSES.map((c) => (
+                    <li key={c.name} className="border-l-2 border-acc-3 pl-4">
+                      <div className="text-[16px] font-semibold">{c.name}</div>
+                      <p className="mt-1 text-[14.5px] leading-[1.6] text-gr-8">{c.body}</p>
+                    </li>
+                  ))}
+                </ul>
+                <dl className="mt-8 grid grid-cols-2 gap-3">
+                  {PARALLEL_FACTS.map((f) => (
+                    <div key={f.label} className="card p-4">
+                      <dd className="font-display text-[22px] font-semibold">{f.value}</dd>
+                      <dt className="mt-1 text-[12.5px] leading-snug text-muted-foreground">{f.label}</dt>
+                    </div>
+                  ))}
+                </dl>
+              </Reveal>
+              <Reveal delay={120}>
+                <GpuSpeedup />
+              </Reveal>
+            </div>
+
+            <div className="mt-14">
+              <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Toolbox</h3>
+              <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+                {TOOLBOX.map((t) => (
+                  <div key={t.group}>
+                    <div className="mb-2 text-[14px] font-semibold">{t.group}</div>
+                    <div className="flex flex-wrap gap-1.5">{t.items.map((i) => <span key={i} className="chip">{i}</span>)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* How I build */}
         <section id="how" className="scroll-mt-16 border-t border-border bg-gr-2 py-16 sm:py-20">
           <div className="wrap">
@@ -255,7 +321,7 @@ export default function Home() {
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {NOTES.map((n, i) => (
                 <Reveal key={n.slug} delay={i * 80}>
-                  <Link href={`/notes/${n.slug}/`} className="card group flex h-full flex-col p-6 transition-shadow hover:shadow-[0_12px_36px_-18px_rgba(0,0,0,0.25)]">
+                  <Link href={`/notes/${n.slug}/`} className="card group flex h-full flex-col p-6 transition-shadow hover:shadow-[var(--shadow-lift)]">
                     <div className="flex flex-wrap gap-1.5">{n.tags.map((t) => <span key={t} className="chip h-6">{t}</span>)}</div>
                     <h3 className="mt-4 text-[18px] font-semibold leading-snug group-hover:text-acc-7">{n.title}</h3>
                     <p className="mt-2 flex-1 text-[14.5px] leading-[1.6] text-gr-8">{n.teaser}</p>
@@ -281,7 +347,7 @@ export default function Home() {
               ))}
             </ol>
             <p className="mt-8 text-[14px] text-muted-foreground">
-              BSc Computational Social Science, University of Amsterdam, 2026 · GPA 8.0/9 · Mathematics of ML, Probability Theory, Parallel Programming (CUDA in C)
+              BSc Computational Social Science, University of Amsterdam, 2026 · GPA 8.0/9 · Mathematics of ML, plus the master&apos;s-level courses above
             </p>
           </div>
         </section>

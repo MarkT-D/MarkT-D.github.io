@@ -25,7 +25,7 @@ export function DeckBuilder() {
       <ul className="space-y-2.5">
         {SOURCES.map(({ icon: Icon, label, detail }, i) => (
           <li key={label} className={cn("flex items-center gap-3 rounded-xl border p-3 transition-all duration-500", filled(i) ? "border-acc-3 bg-acc-1" : "border-border bg-card")}>
-            <span className={cn("grid size-9 place-items-center rounded-lg", filled(i) ? "bg-acc-6 text-white" : "bg-gr-2 text-gr-7")}><Icon className="size-4" /></span>
+            <span className={cn("grid size-9 place-items-center rounded-lg", filled(i) ? "bg-acc-6 text-primary-foreground" : "bg-gr-2 text-gr-7")}><Icon className="size-4" /></span>
             <div>
               <div className="text-[13.5px] font-semibold">{label}</div>
               <div className="text-[12px] text-muted-foreground">{detail}</div>

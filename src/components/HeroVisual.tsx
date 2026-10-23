@@ -35,11 +35,11 @@ export function HeroVisual() {
           <span className="size-2.5 rounded-full bg-gr-4" />
           <span className="ml-3 font-mono text-[12px] text-muted-foreground">runs.log</span>
         </div>
-        <ol className="min-h-[296px] space-y-2 bg-gr-10 px-4 py-4 font-mono text-[12.5px] leading-relaxed text-gr-3" aria-label="Example pipeline log">
+        <ol className="min-h-[296px] space-y-2 bg-term px-4 py-4 font-mono text-[12.5px] leading-relaxed text-term-fg" aria-label="Example pipeline log">
           {LINES.slice(0, shown).map((l, i) => (
             <li key={i} className={cn("motion-rise flex gap-3", i === shown - 1 && shown < LINES.length && "caret")}>
-              <span className="w-16 shrink-0 text-acc-3">{l.t}</span>
-              <span className={cn(l.t === "judge" && "text-[#f4a6a0]", l.t === "ship" && "text-acc-2")}>{l.m}</span>
+              <span className="w-16 shrink-0 text-term-key">{l.t}</span>
+              <span className={cn(l.t === "judge" && "text-[#f4a6a0]", l.t === "ship" && "text-term-ok")}>{l.m}</span>
             </li>
           ))}
         </ol>

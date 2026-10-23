@@ -46,7 +46,7 @@ export function TracPipeline() {
           {towns.map(([key, [x, y]], i) => (
             <g key={key}>
               <circle cx={x} cy={y} r={9} fill="var(--acc-6)" opacity={0.35} style={{ transformOrigin: `${x}px ${y}px`, animation: `pulse-ring 2.4s ease-out ${i * 0.4}s infinite` }} className="motion-reduce:hidden" />
-              <circle cx={x} cy={y} r={7} fill="var(--acc-6)" stroke="#fff" strokeWidth={2.5} />
+              <circle cx={x} cy={y} r={7} fill="var(--acc-6)" stroke="var(--card)" strokeWidth={2.5} />
               <text x={x + 12} y={y + 4} fontSize={15} fontWeight={600} fill="var(--gr-9)">{TOWN_NAMES[key]}</text>
             </g>
           ))}

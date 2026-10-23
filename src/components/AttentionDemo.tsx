@@ -22,7 +22,7 @@ export function AttentionDemo() {
     <div className="card p-5">
       <div className="mb-3 flex flex-wrap gap-1.5">
         {Object.keys(FRAMES).map((f) => (
-          <button key={f} onClick={() => setFrame(f)} className={cn("h-8 rounded-lg px-3 text-[12.5px] font-semibold transition-colors", f === frame ? "bg-acc-6 text-white" : "bg-gr-2 text-gr-8 hover:bg-gr-3")}>
+          <button key={f} onClick={() => setFrame(f)} className={cn("h-8 rounded-lg px-3 text-[12.5px] font-semibold transition-colors", f === frame ? "bg-acc-6 text-primary-foreground" : "bg-gr-2 text-gr-8 hover:bg-gr-3")}>
             {f} <span className="ml-1 font-normal opacity-80 tabular-nums">{Math.round(PROBS[f] * 100)}%</span>
           </button>
         ))}

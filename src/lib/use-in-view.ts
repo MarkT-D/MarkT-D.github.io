@@ -3,16 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 
 /** True while the element is on screen. Loops only run while someone can see them. */
-export function useInView<T extends Element>(margin = "0px 0px -10% 0px") {
+export function useInView<T extends Element>(margin = "0px 0px -10% 0px", once = false) {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: margin, threshold: 0.15 });
+    const io = new IntersectionObserver(([e]) => {
+      setInView(e.isIntersecting);
+      // A one-shot reveal (a chart drawing in) stays drawn once it has been seen.
+      if (once && e.isIntersecting) io.disconnect();
+    }, { rootMargin: margin, threshold: 0.15 });
     io.observe(node);
     return () => io.disconnect();
-  }, [margin]);
+  }, [margin, once]);
   return [ref, inView] as const;
 }
 

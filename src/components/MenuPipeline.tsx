@@ -58,12 +58,12 @@ export function MenuPipeline() {
           <span>2 · Vision OCR → Claude, structured output</span>
           <span className="chip h-6">schema ✓</span>
         </div>
-        <pre className="min-h-[178px] overflow-x-auto bg-gr-10 px-4 py-3 font-mono text-[12px] leading-[1.6] text-gr-2">
+        <pre className="min-h-[178px] overflow-x-auto bg-term px-4 py-3 font-mono text-[12px] leading-[1.6] text-term-fg">
           {JSON_LINES.slice(0, lines).map((l, i) => (
             <div key={i} className={cn(i === lines - 1 && lines < JSON_LINES.length && "caret")}>
               {l.split(/("[^"]*")/).map((part, j, all) =>
                 part.startsWith('"') ? (
-                  <span key={j} className={all[j + 1]?.startsWith(":") ? "text-acc-3" : "text-[#e9c46a]"}>{part}</span>
+                  <span key={j} className={all[j + 1]?.startsWith(":") ? "text-term-key" : "text-[#e9c46a]"}>{part}</span>
                 ) : (
                   <span key={j}>{part}</span>
                 ),
@@ -91,7 +91,7 @@ export function MenuPipeline() {
                   role="tab"
                   aria-selected={l === lang}
                   onClick={() => setPicked(l)}
-                  className={cn("h-7 flex-1 rounded-md text-[11px] font-semibold transition-colors", l === lang ? "bg-acc-6 text-white" : "bg-gr-2 text-gr-8 hover:bg-gr-3")}
+                  className={cn("h-7 flex-1 rounded-md text-[11px] font-semibold transition-colors", l === lang ? "bg-acc-6 text-primary-foreground" : "bg-gr-2 text-gr-8 hover:bg-gr-3")}
                 >
                   {l}
                 </button>
