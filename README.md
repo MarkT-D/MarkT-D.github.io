@@ -4,6 +4,8 @@ My portfolio site: case studies of the LLM and ML systems I've built, how I buil
 
 **Stack:** Next.js 16 (static export) · React 19 · TypeScript · Tailwind CSS v4. Deployed to GitHub Pages by `.github/workflows/pages.yml`.
 
+On Windows, double-click `start-dev.cmd`. Otherwise:
+
 ```bash
 npm install
 npm run dev     # http://localhost:3100
