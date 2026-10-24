@@ -1,50 +1,185 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
-/** A run log that types itself: the kind of system the rest of the page shows. */
-const LINES = [
-  { t: "parse", m: "grant call → 9 sections, 4,800 words max" },
-  { t: "context", m: "salesforce: 312 records · bynder: 41 assets" },
-  { t: "draft", m: "9/9 sections in 1m 54s" },
-  { t: "judge", m: "work plan 6/10: milestones have no dates" },
-  { t: "ocr", m: "menu photo → 38 dishes, 6 sections" },
-  { t: "check", m: "expected JSON: 38/38 dishes match" },
-  { t: "classify", m: "~20k articles, 781 outlets · F1 macro 0.82 (FR)" },
-  { t: "ship", m: "ready for expert review" },
+/**
+ * A Konsole window (KDE Plasma, Breeze Dark) running an nmap scan whose open
+ * ports are me. Commands type themselves, output streams in, the window keeps
+ * a fixed height and scrolls like a real terminal, then it clears and loops.
+ */
+
+// Breeze terminal colour scheme.
+const C = {
+  fg: "#fcfcfc",
+  dim: "#7f8c8d",
+  red: "#ed1515",
+  green: "#11d116",
+  green2: "#1cdc9a",
+  yellow: "#fdbc4b",
+  blue: "#1d99f3",
+  blue2: "#3daee9",
+  cyan: "#1abc9c",
+  magenta: "#9b59b6",
+};
+
+type Seg = [string, string?];
+type Line = { segs: Seg[]; type?: boolean; wait?: number };
+
+const prompt = (cmd: string, wait = 500): Line[] => [
+  { segs: [["┌──(", C.blue], ["mark㉿kali", C.green], [")-[", C.blue], ["~", C.fg], ["]", C.blue]] },
+  { segs: [["└─", C.blue], ["$ ", C.blue2], [cmd, C.fg]], type: true, wait },
 ];
 
-export function HeroVisual() {
-  const [n, setN] = useState(LINES.length);
+const port = (p: string, svc: string, ver: string): Line => ({
+  segs: [[p.padEnd(10), C.fg], ["open  ", C.green2], [svc.padEnd(11), C.fg], [ver, C.fg]],
+});
+
+const SCRIPT: Line[] = [
+  ...prompt("nmap -sV -sC mark-temchenko.dev"),
+  { segs: [["Starting Nmap 7.95 ( https://nmap.org )", C.fg]], wait: 700 },
+  { segs: [["Nmap scan report for ", C.fg], ["mark-temchenko.dev", C.blue2], [" (Barcelona, ES)", C.fg]] },
+  { segs: [["Host is up (0.0021s latency).", C.fg]] },
+  { segs: [["Not shown: 993 closed tcp ports (reset)", C.dim]], wait: 300 },
+  { segs: [["PORT      STATE SERVICE    VERSION", C.yellow]] },
+  port("22/tcp", "lang", "ru · en (C1) · de (A1)"),
+  port("80/tcp", "http", "AI Engineer / FDE"),
+  port("443/tcp", "ssl/llm", "OpenAI · Claude · Gemini"),
+  port("3000/tcp", "nextjs", "TypeScript · React 19"),
+  port("5432/tcp", "postgres", "PostgreSQL · Supabase"),
+  port("8000/tcp", "fastapi", "PyTorch · Hugging Face"),
+  port("11434/tcp", "ollama", "local models, for fun"),
+  { segs: [["| whoami:", C.cyan]], wait: 250 },
+  { segs: [["|   role: ", C.cyan], ["AI Engineer", C.fg]] },
+  { segs: [["|   recent_work:", C.cyan]] },
+  { segs: [["|     - ", C.cyan], ["LLM grant platform, 4 enterprise clients", C.fg]] },
+  { segs: [["|     - ", C.cyan], ["XLM-RoBERTa classifiers, ~20k articles", C.fg]] },
+  { segs: [["|     - ", C.cyan], ["GenAI product shipped end to end", C.fg]] },
+  { segs: [["|_  fun_fact: ", C.cyan], ['"It worked in the demo, I swear."', C.yellow]] },
+  { segs: [["Service Info: OS: Linux (Arch, Ubuntu)", C.fg]] },
+  { segs: [["Nmap done: 1 IP address (1 host up) scanned in 2.71s", C.fg]], wait: 900 },
+  { segs: [["", C.fg]] },
+  ...prompt('searchsploit "AI Engineer" barcelona'),
+  { segs: [["--------------------------------------------------", C.dim]], wait: 500 },
+  { segs: [[" Exploit Title              | Path", C.fg]] },
+  { segs: [["--------------------------------------------------", C.dim]] },
+  { segs: [[" Hire Mark: AI / FDE roles  | ", C.fg], ["mailto/mstemchenko.dev", C.red]] },
+  { segs: [["--------------------------------------------------", C.dim]] },
+  { segs: [["", C.fg]], wait: 300 },
+  ...prompt("", 0),
+];
+
+const TYPE_MS = 38;
+const LINE_MS = 85;
+const HOLD_MS = 5200;
+
+/** How far into the script we are: whole lines shown, and characters typed of the next command. */
+function useScript(reduced: boolean) {
+  const [state, setState] = useState({ line: SCRIPT.length, chars: 0 });
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setN(1);
-    const id = setInterval(() => setN((v) => (v >= LINES.length + 3 ? 1 : v + 1)), 900);
-    return () => clearInterval(id);
-  }, []);
-  const shown = Math.min(n, LINES.length);
+    if (reduced) return;
+    let line = 0, chars = 0, timer = 0;
+    const step = () => {
+      if (line >= SCRIPT.length) {
+        setState({ line, chars: 0 });
+        timer = window.setTimeout(() => { line = 0; chars = 0; step(); }, HOLD_MS);
+        return;
+      }
+      const l = SCRIPT[line];
+      if (l.type) {
+        const cmd = l.segs[l.segs.length - 1][0];
+        if (chars < cmd.length) {
+          chars++;
+          setState({ line, chars });
+          timer = window.setTimeout(step, TYPE_MS + (Math.random() < 0.1 ? 120 : 0));
+          return;
+        }
+        // Enter pressed.
+        chars = 0;
+        line++;
+        setState({ line, chars });
+        timer = window.setTimeout(step, l.wait ?? LINE_MS);
+        return;
+      }
+      line++;
+      setState({ line, chars: 0 });
+      timer = window.setTimeout(step, l.wait ?? LINE_MS);
+    };
+    setState({ line: 0, chars: 0 });
+    timer = window.setTimeout(step, 600);
+    return () => clearTimeout(timer);
+  }, [reduced]);
+  return state;
+}
+
+function Segs({ segs, cut }: { segs: Seg[]; cut?: number }) {
+  return <>
+    {segs.map(([text, color], i) => {
+      const last = i === segs.length - 1;
+      const shown = last && cut !== undefined ? text.slice(0, cut) : text;
+      return <span key={i} style={{ color }}>{shown}</span>;
+    })}
+  </>;
+}
+
+/** Breeze window buttons: minimise, maximise, close. */
+function WinButtons() {
+  return <div className="flex items-center gap-1.5" aria-hidden>
+    {["min", "max", "close"].map((k) => (
+      <span key={k} className={`grid size-[18px] place-items-center rounded-full ${k === "close" ? "bg-[#da4453] text-white" : "text-[#fcfcfc]/80"}`}>
+        <svg viewBox="0 0 10 10" className="size-2.5" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+          {k === "min" && <path d="M2 3.8 L5 6.8 L8 3.8" />}
+          {k === "max" && <path d="M2 6.2 L5 3.2 L8 6.2" />}
+          {k === "close" && <path d="M2.8 2.8 L7.2 7.2 M7.2 2.8 L2.8 7.2" />}
+        </svg>
+      </span>
+    ))}
+  </div>;
+}
+
+export function HeroVisual() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches), []);
+  const { line, chars } = useScript(reduced);
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  const typing = line < SCRIPT.length && !!SCRIPT[line].type;
+  const visible = typing ? SCRIPT.slice(0, line + 1) : SCRIPT.slice(0, line);
 
   return (
     <div className="relative">
       <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(60%_60%_at_60%_40%,var(--acc-1),transparent_70%)]" />
-      <div className="card float-soft overflow-hidden">
-        <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
-          <span className="size-2.5 rounded-full bg-gr-4" />
-          <span className="size-2.5 rounded-full bg-gr-4" />
-          <span className="size-2.5 rounded-full bg-gr-4" />
-          <span className="ml-3 font-mono text-[12px] text-muted-foreground">runs.log</span>
+      <div
+        className="float-soft overflow-hidden rounded-[10px] border border-black/60 bg-[#232627] shadow-[0_30px_70px_-30px_rgba(0,0,0,0.55),0_8px_20px_-10px_rgba(0,0,0,0.35)]"
+        role="img"
+        aria-label="A Konsole terminal running nmap against mark-temchenko.dev. Open ports list languages, roles and stack; the whoami script lists recent work."
+      >
+        {/* Breeze title bar */}
+        <div className="relative flex h-8 items-center justify-between bg-[#2a2e32] px-2.5">
+          <div className="flex items-center gap-2">
+            <span className="grid size-[18px] place-items-center rounded-[4px] bg-[#31363b] font-mono text-[9px] font-bold text-[#3daee9]">&gt;_</span>
+          </div>
+          <span className="pointer-events-none absolute inset-x-0 text-center text-[12px] font-medium text-[#fcfcfc]/90">~ : zsh — Konsole</span>
+          <WinButtons />
         </div>
-        <ol className="min-h-[296px] space-y-2 bg-term px-4 py-4 font-mono text-[12.5px] leading-relaxed text-term-fg" aria-label="Example pipeline log">
-          {LINES.slice(0, shown).map((l, i) => (
-            <li key={i} className={cn("motion-rise flex gap-3", i === shown - 1 && shown < LINES.length && "caret")}>
-              <span className="w-16 shrink-0 text-term-key">{l.t}</span>
-              <span className={cn(l.t === "judge" && "text-[#f4a6a0]", l.t === "ship" && "text-term-ok")}>{l.m}</span>
-            </li>
+        {/* Menu bar */}
+        <div className="flex h-6 items-center gap-3.5 border-b border-black/40 bg-[#31363b] px-3 text-[11.5px] text-[#fcfcfc]/85" aria-hidden>
+          {["File", "Edit", "View", "Bookmarks", "Plugins", "Settings", "Help"].map((m, i) => (
+            <span key={m} className={i > 4 ? "hidden sm:inline" : undefined}>{m}</span>
           ))}
-        </ol>
+        </div>
+        {/* Terminal */}
+        <div ref={bodyRef} className="flex h-[340px] flex-col justify-end overflow-hidden px-3 py-2.5 font-mono text-[10.5px] leading-[1.5] sm:h-[372px] sm:text-[11.5px]">
+          {visible.map((l, i) => {
+            const current = i === line && typing;
+            return (
+              <div key={i} className="min-h-[1.5em] whitespace-pre">
+                <Segs segs={l.segs} cut={current ? chars : undefined} />
+                {(current || (i === visible.length - 1 && line >= SCRIPT.length)) && <span className="ml-px inline-block h-[1.1em] w-[0.6em] translate-y-[2px] animate-pulse bg-[#fcfcfc]/85" />}
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <p className="mt-3 text-center text-[12px] text-muted-foreground">Illustrative log. Real systems, invented numbers.</p>
     </div>
   );
 }

@@ -9,6 +9,7 @@ const config: NextConfig = {
   trailingSlash: true,
   basePath,
   images: { unoptimized: true },
+  agentRules: false,
   env: { NEXT_PUBLIC_BASE_PATH: basePath },
 };
 

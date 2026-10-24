@@ -46,8 +46,11 @@ export function GpuSpeedup() {
   const narrow = W < 480;
   const H = narrow ? 260 : 300;
   const M = { l: 40, r: narrow ? 76 : 112, t: 16, b: 40 };
-  const x = (bytes: number) => M.l + ((Math.log10(bytes) - X0) / (X1 - X0)) * (W - M.l - M.r);
-  const y = (v: number) => H - M.b - ((Math.log10(v) - Y0) / (Y1 - Y0)) * (H - M.t - M.b);
+  // Rounded: Math.log10 can differ in the last bit between Node and the browser,
+  // which made the server HTML and the client disagree on hydration.
+  const r2 = (v: number) => Math.round(v * 100) / 100;
+  const x = (bytes: number) => r2(M.l + ((Math.log10(bytes) - X0) / (X1 - X0)) * (W - M.l - M.r));
+  const y = (v: number) => r2(H - M.b - ((Math.log10(v) - Y0) / (Y1 - Y0)) * (H - M.t - M.b));
   const ticks = narrow ? [1e4, 1e6, 1e8] : [1e4, 1e5, 1e6, 1e7, 1e8];
   const path = (k: "kernelX" | "e2eX") => RUNS.map((r, i) => `${i ? "L" : "M"}${x(r.bytes).toFixed(1)},${y(r[k]).toFixed(1)}`).join(" ");
   const h = hover === null ? null : RUNS[hover];
@@ -111,9 +114,9 @@ export function GpuSpeedup() {
             return (
               <rect
                 key={i}
-                x={(prev + cx) / 2}
+                x={r2((prev + cx) / 2)}
                 y={M.t}
-                width={(cx + next) / 2 - (prev + cx) / 2}
+                width={r2((cx + next) / 2 - (prev + cx) / 2)}
                 height={H - M.t - M.b}
                 fill="transparent"
                 onMouseEnter={() => setHover(i)}

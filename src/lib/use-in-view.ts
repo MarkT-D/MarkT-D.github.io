@@ -47,3 +47,33 @@ export function useLoop(steps: number, ms: number, active: boolean) {
   }, [active, ms, steps, reduced]);
   return step;
 }
+
+/** True after the first client render. Scenes drawn from floating-point maths render only then, so server and browser never disagree. */
+export function useMounted() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted;
+}
+
+/**
+ * Seconds into a loop of `loop` seconds, advancing every frame while `running`.
+ * Starts where it last stopped; under reduced motion it stays at `still`.
+ */
+export function useSceneClock(loop: number, running: boolean, still: number) {
+  const reduced = useReducedMotion();
+  const [t, setT] = useState(still);
+  const offset = useRef(0);
+  useEffect(() => {
+    if (!running || reduced) return;
+    const start = performance.now() - offset.current * 1000;
+    let frame = requestAnimationFrame(function tick(now) {
+      // rAF can stamp a frame slightly before `start`; keep the clock inside [0, loop).
+      const s = ((((now - start) / 1000) % loop) + loop) % loop;
+      offset.current = s;
+      setT(s);
+      frame = requestAnimationFrame(tick);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [running, reduced, loop]);
+  return reduced ? still : t;
+}

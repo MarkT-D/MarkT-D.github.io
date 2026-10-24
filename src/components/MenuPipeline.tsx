@@ -97,12 +97,12 @@ export function MenuPipeline() {
                 </button>
               ))}
             </div>
-            <div key={lang} className="motion-rise">
+            <div key={lang} className="motion-rise h-[204px]">
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-acc-7">{t.section}</div>
               {[[t.name, t.desc, "9,00"], [t.second, t.desc2, "13,50"]].map(([n, d, p]) => (
-                <div key={n} className="mb-2.5 rounded-lg border border-border p-2.5">
-                  <div className="flex justify-between gap-2 text-[12.5px] font-semibold"><span>{n}</span><span className="tabular-nums">€{p}</span></div>
-                  <div className="mt-0.5 text-[11px] text-muted-foreground">{d}</div>
+                <div key={n} className="mb-2.5 flex h-[84px] flex-col rounded-lg border border-border p-2.5">
+                  <div className="flex justify-between gap-2 text-[12.5px] font-semibold leading-snug"><span className="line-clamp-2">{n}</span><span className="tabular-nums">€{p}</span></div>
+                  <div className="mt-auto line-clamp-1 text-[11px] text-muted-foreground">{d}</div>
                 </div>
               ))}
             </div>

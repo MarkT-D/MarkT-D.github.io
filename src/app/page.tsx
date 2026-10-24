@@ -3,23 +3,25 @@ import { ArrowRight, Bot, FlaskConical, ShieldCheck, TestTubes } from "lucide-re
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { HeroVisual } from "@/components/HeroVisual";
 import { CaseStudy } from "@/components/CaseStudy";
-import { GrantPipeline } from "@/components/GrantPipeline";
-import { DeckBuilder } from "@/components/DeckBuilder";
+import { GrantFactory } from "@/components/iso/GrantFactory";
+import { AskScene } from "@/components/iso/ask-scene";
+import { DeckGenerator } from "@/components/DeckGenerator";
 import { MenuPipeline } from "@/components/MenuPipeline";
 import { AttentionDemo } from "@/components/AttentionDemo";
 import { TracPipeline } from "@/components/TracPipeline";
 import { ModelBars } from "@/components/ModelBars";
 import { GpuSpeedup } from "@/components/GpuSpeedup";
+import { GpuNode } from "@/components/iso/GpuNode";
 import { LaptopFrame } from "@/components/LaptopFrame";
 import { Reveal } from "@/components/Reveal";
 import { NOTES } from "@/lib/notes";
 import { asset } from "@/lib/utils";
 
 const STATS = [
-  { value: "4", label: "enterprise clients on my grant platform" },
-  { value: "days → 2 min", label: "per submission-ready application" },
-  { value: "~€360k/yr", label: "estimated labour saved" },
-  { value: "2 awards", label: "1st and 2nd place, research projects" },
+  { value: "1.5 yrs", label: "shipping LLM systems at an AI startup, promoted to FDE" },
+  { value: "~€360k/yr", label: "labour saved for clients by my grant platform (est.)" },
+  { value: "Teams of 5 & 4", label: "led on partner projects, both awarded" },
+  { value: "EU citizen", label: "based in Barcelona, no visa or sponsorship needed" },
 ];
 
 const HOW = [
@@ -129,16 +131,18 @@ export default function Home() {
             role="AI Automation Engineer"
             period="Mar – Oct 2025"
             title="Grant applications in two minutes, not days"
-            lede="Enterprise clients had teams of grant writers drafting by hand. I built the LLM platform that now writes submission-ready applications from each client's own data, with an expert review as the only manual step."
+            lede="Enterprise clients had grant writers drafting by hand for days. I built the LLM platform that writes submission-ready applications from the grant's own rules and the client's documents, with an expert review as the only manual step."
             points={[
-              "Owned the pipeline end to end: requirement parsing, task decomposition, context injection, per-section drafting.",
-              "Built the Salesforce and Bynder integrations from their API docs, so drafts come from the client's source of truth.",
-              "Added an LLM-as-judge stage that derives criteria from the grant's requirements and internal metrics and scores every section 1 to 10 with notes.",
-              "Live with 4 enterprise clients. Reused the architecture for an HR screening system on a client's ATS. It now powers the company's main product.",
+              "Owned the pipeline end to end: parse the grant call, split it into its sections, draft each one with its own prompt.",
+              "Context from two sides: the grant's guidelines and EU or scheme rules, and RAG over the client's documents through whatever they used, plus partner sources when there were any.",
+              "Added an LLM-as-judge stage that scores every section 1 to 10 against the grant rules and the company's internal metrics, and flags where company guidelines pull against a grant requirement.",
+              "Model-agnostic: GPT variants per stage, or Azure-hosted EU models for clients with data-residency needs. Live with 4 enterprise clients, and reused for HR screening on a client's ATS.",
             ]}
-            stack={["Python", "TypeScript", "OpenAI / Claude / Gemini APIs", "Salesforce API", "Bynder API"]}
+            stack={["Python", "TypeScript", "OpenAI / Claude / Gemini APIs", "Azure OpenAI (EU)", "RAG"]}
           >
-            <GrantPipeline />
+            <div className="card overflow-hidden p-3 sm:p-6">
+              <div className="overflow-x-auto"><div className="min-w-[600px] sm:min-w-0"><GrantFactory /></div></div>
+            </div>
           </CaseStudy>
 
           <CaseStudy
@@ -150,13 +154,15 @@ export default function Home() {
             title="A pitch deck from partner data, on demand"
             lede="Embedded with a major international food producer selling in 100+ countries, I owned a presentation generator from discovery to build as the client's primary technical contact."
             points={[
-              "Turned a 4 to 5 hour manual workflow into on-demand generation: partner data from several sources, products to pitch, key points, the template filled.",
+              "Turned a 4 to 5 hour manual workflow into on-demand generation: partner data from the CRM and brand assets from the DAM, the model picks the products to pitch and the key points, the template fills itself.",
               "Made the build-vs-extend call: prototyped on Twin's workflow engine, found where its grant assumptions broke, rebuilt standalone as sole developer.",
               "Ran weekly releases and client demos, and onboarded the engineer who took over my previous role.",
             ]}
-            stack={["Next.js", "TypeScript", "LLM pipelines", "Client discovery"]}
+            stack={["Next.js", "TypeScript", "Salesforce API", "Bynder API", "LLM pipelines", "Client discovery"]}
           >
-            <DeckBuilder />
+            <div className="card overflow-visible p-4 sm:p-7">
+              <DeckGenerator />
+            </div>
           </CaseStudy>
 
           <CaseStudy
@@ -171,11 +177,18 @@ export default function Home() {
             points={[
               "Google Vision OCR, then Claude with structured output to a strict schema: sections, dishes, prices, allergens, nutrition.",
               "The OCR stage and the LLM stage are each tested on their own against expected JSON for a set of menu photos.",
-              "Translation into any language, up to 10 per menu, batched, with the quoting bug in the notes below fixed for good.",
+              "Translation into any language, up to 10 per menu, batched through structured output and tested on awkward names: quotes, Cyrillic, accents.",
             ]}
             stack={["Next.js 16", "TypeScript", "Supabase / Postgres", "Google Vision", "Claude API", "Playwright"]}
           >
             <MenuPipeline />
+            <div className="card mt-6 overflow-hidden p-3 sm:p-6">
+              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
+                <span className="text-[15px] font-semibold">One evening on Pesto</span>
+                <span className="text-[12.5px] text-muted-foreground">Order from the table, at the register or to take away. The kitchen screen, the waiter, the receipt filed.</span>
+              </div>
+              <div className="overflow-x-auto"><div className="min-w-[600px] sm:min-w-0"><AskScene /></div></div>
+            </div>
           </CaseStudy>
 
           <CaseStudy
@@ -256,7 +269,7 @@ export default function Home() {
           <div className="wrap">
             <p className="eyebrow">Beyond the degree</p>
             <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
-            <div className="mt-10 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="mt-10 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] [&>*]:min-w-0">
               <Reveal>
                 <ul className="space-y-5">
                   {COURSES.map((c) => (
@@ -276,9 +289,16 @@ export default function Home() {
                 </dl>
               </Reveal>
               <Reveal delay={120}>
-                <GpuSpeedup />
+                <div className="card p-3 sm:p-5">
+                  <div className="mb-1 px-1 text-[15px] font-semibold">One DAS-5 node, a 525 MB job</div>
+                  <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Data crosses PCIe, the GPU&apos;s thread blocks run the kernel, the result comes back. Timed like the real run.</p>
+                  <div className="overflow-x-auto"><div className="min-w-[600px] sm:min-w-0"><GpuNode /></div></div>
+                </div>
               </Reveal>
             </div>
+            <Reveal className="mt-8">
+              <GpuSpeedup />
+            </Reveal>
 
             <div className="mt-14">
               <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Toolbox</h3>
@@ -317,7 +337,7 @@ export default function Home() {
         <section id="notes" className="scroll-mt-16 border-t border-border py-16 sm:py-20">
           <div className="wrap">
             <p className="eyebrow">Notes</p>
-            <h2 className="mt-2 font-display text-[34px] font-semibold sm:text-[40px]">Bugs worth writing down</h2>
+            <h2 className="mt-2 font-display text-[34px] font-semibold sm:text-[40px]">What went wrong, and what I changed</h2>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {NOTES.map((n, i) => (
                 <Reveal key={n.slug} delay={i * 80}>

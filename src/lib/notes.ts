@@ -13,88 +13,92 @@ export type Note = {
 
 export const NOTES: Note[] = [
   {
-    slug: "curly-quotes-broke-structured-output",
-    title: "A quoted dish name broke every translation batch",
-    date: "October 2026",
-    tags: ["LLMs", "structured output", "evals"],
+    slug: "guidelines-vs-grant-rules",
+    title: "When company guidelines pull against grant rules",
+    date: "2025",
+    tags: ["LLMs", "RAG", "evals"],
     teaser:
-      "One menu item with quotes in its name took down a whole batch of translations. Switching to structured output fixed the parse and broke the name in a new way.",
+      "Two good sources of context, one awkward draft. The model quietly picked a side, and the output felt off whichever side it picked.",
     body: [
       {
-        p: "Pesto translates a restaurant's whole menu in batches: one request to Claude per group of dishes, JSON back, rows written. One day a single dish failed every batch it was in. Its name was Шоколад \"Вдохновение\", a chocolate dessert with its name in quotes.",
+        p: "At Twin AI the grant pipeline's writing stage pulled context from two places. One was RAG over the client's own documents: Salesforce and Bynder for one client, drives and APIs for the others. The other was a separate module that injected the EU and scheme-specific rules for the grant being written.",
       },
       { h: "What went wrong" },
       {
-        p: "In German the model wrote the name with German quotation marks, opening with „ as German does. It then closed with a plain straight quote. That straight quote ended the JSON string one character early, and the parse of the entire batch failed. One dish, forty dishes lost.",
+        p: "Sometimes a company's own guidelines pulled against a specific grant requirement. The model never said so. It leaned one way, quietly, and wrote a fluent section. Either the draft stopped sounding like the company, or it stopped fitting the grant.",
       },
       {
-        code: `"name": "Schokolade „Vdochnovenie""\n                               ^ the string ends here`,
+        p: "That was worse than a plain error. Even when a draft was right, nobody could tell which side it had taken or why it read slightly off, so reviewers second-guessed good drafts as well as bad ones.",
       },
-      { h: "Fix one: structured output" },
+      { h: "The fix: judge outside the model" },
       {
-        p: "I moved the call to structured output with a strict schema, so the reply is valid JSON by construction. A strict schema cannot have keys named after data, so the shape became arrays, and a small fold puts them back into the id-keyed maps the app reads.",
+        p: "We added an automated assessment after drafting. Its criteria came from both sides: the grant's rules and the company's internal metrics. It scored each section from 1 to 10, named the weak spots, and flagged the sections where the two sides pulled apart.",
       },
       {
-        p: "That made the reply parseable, and then lost the name a different way. Asked for Schokolade „Inspiration“, the closing “ reached the decoder as a bare quote. The JSON was valid. The dish name was cut short.",
-      },
-      { h: "Fix two: ask for the quotes that survive" },
-      {
-        p: "I tested each quote style through the same path. „ “ ” ‟ were all unsafe. A straight quote came back correctly escaped, and « » came back intact. So the prompt now asks for those and forbids the curly ones, and a unit test fails if anyone makes the prompt typographically nicer again.",
+        p: "The flag went to the user, not back into the prompt. They made the call: accept the draft, or adjust the source documents. A draft that felt wrong for unclear reasons became a clear decision with a reason attached.",
       },
       { h: "What I took from it" },
       {
-        p: "Structured output solves syntax, not content. The test that matters is the round trip of real, awkward data: names with quotes, Cyrillic, accents. That is why the fix ships with a unit test on the prompt and not only on the parser.",
+        p: "More context is not automatically better context. When two sources can disagree, the disagreement has to be detected and shown to a person, because the model will resolve it on its own, silently and fluently.",
       },
     ],
   },
   {
-    slug: "chrome-translate-crashes-react",
-    title: "Chrome's page translation crashes React, on the one button that matters",
-    date: "October 2026",
-    tags: ["React", "frontend", "production bugs"],
+    slug: "blame-in-every-article",
+    title: "Our classifier saw blame in almost every article",
+    date: "June 2026",
+    tags: ["NLP", "LLM labelling", "calibration"],
     teaser:
-      "A guest's phone offered to translate the menu. They accepted, pressed Send, and the order silently never reached the kitchen.",
+      "LLM labels taught our model to find 'attribution of responsibility' nearly everywhere. The fix went on top of the model, not inside it.",
     body: [
       {
-        p: "Tourists read Pesto's public menu on their own phones, and Chrome offers to translate it. That is the normal case on a menu, not an edge case. Some orders never arrived, and the restaurant saw nothing: no order, no error.",
+        p: "For QuotaClimat we classified about 20,000 climate articles into five news frames. GPT-5-mini labelled the training data, and we distilled those labels into multilingual XLM-RoBERTa classifiers.",
       },
-      { h: "The cause" },
+      { h: "What we saw" },
       {
-        p: "Chrome does not translate text in place. It replaces each text node with a <font> element that wraps the translation. React still holds a reference to the original text node, which now has a different parent.",
-      },
-      {
-        p: "When the Send button's label changed from \"Send to the kitchen\" to \"Sending…\", React called removeChild on a node that was no longer a child of that element. The tree unmounted with \"The node to be removed is not a child of this node\", and the order request never fired.",
-      },
-      { h: "The fix" },
-      {
-        p: "The surfaces React re-renders under a guest's hands, the basket, the checkout sheet and the live order page, carry translate=\"no\". The restaurant's own words inside them get translate=\"yes\" back, and dynamic text lives in its own <span> rather than as a bare child, so a swap replaces an element React owns.",
+        p: "One frame, attribution of responsibility, dominated: about 62.5% of articles. Checked against human annotators, the LLM labels caught 91% of the real cases, but agreement was poor: Krippendorff's α of 0.28, against 0.62 to 0.69 for the other frames. The labeller was not missing responsibility. It was seeing it where people did not.",
       },
       {
-        p: "Nothing is lost for the guest: those strings were already localised by the app. The menu content itself stays translatable, which is the part a guest reading in a fifth language needs.",
+        p: "The classifier learned exactly that lean. A model trained on an LLM's labels inherits the LLM's habits, and a high recall number hides them.",
+      },
+      { h: "Filters on top of the model" },
+      {
+        p: "We did not retrain around it. Each frame's output was calibrated separately with Platt scaling, fitted against the human-labelled set. Responsibility got the strongest correction of the five, a slope of 0.44 against 1.12 for conflict, so a high score now means what it says.",
+      },
+      {
+        p: "For shares across the whole corpus we used prediction-powered inference, which uses the human-labelled set to correct the bias in the model's counts. The dashboard shows calibrated probabilities rather than hard labels.",
+      },
+      { h: "What I took from it" },
+      {
+        p: "Check agreement per class, not overall. One frame can undermine a whole typology while the average looks fine.",
       },
     ],
   },
   {
-    slug: "never-void-work-in-serverless",
-    title: "Never void the work a serverless route starts",
-    date: "September 2026",
-    tags: ["Next.js", "serverless", "reliability"],
+    slug: "benchmark-before-model",
+    title: "Pick the benchmark before the model",
+    date: "2026",
+    tags: ["speech", "evaluation", "system design"],
     teaser:
-      "Fiscal receipts for card payments were filed 10 to 20 seconds late, and once not at all. The code looked fine. The platform froze it.",
+      "Radio call-ins in Ugandan languages break speech models in different ways. So the first thing I designed for TRAC FM was the test, not the pipeline.",
     body: [
       {
-        p: "When a card payment lands, a Stripe webhook records it and files the fiscal receipt with the tax authority. The filing was started with void and not awaited, so the webhook could answer Stripe quickly.",
+        p: "TRAC FM runs radio polls in Uganda. Listeners call in and answer in their own languages, often switching between them mid-sentence, over noisy phone and radio lines. The partner wanted those answers as English text, grouped by theme for each question.",
       },
-      { h: "What actually happened" },
+      { h: "The problem with choosing a model" },
       {
-        p: "On Vercel the function is frozen as soon as the response goes out. A promise still running does not keep going. It resumes only when another request happens to land on the same instance. Receipts were filed whenever the next event thawed the function, usually 10 to 20 seconds later. On one day nothing thawed it in time and the receipt was never queued.",
+        p: "Every stage had several candidates. Cleaning: FFmpeg loudness, voice activity detection, noise suppression. Transcription: Whisper, or models built for low-resource languages. Translation: an LLM or dedicated MT. Grouping: embeddings with clustering, or an LLM. New models in this space ship every few months, so any choice made once would be stale by launch.",
       },
-      { h: "The fix" },
+      { h: "The design: a harness first" },
       {
-        p: "Background work now goes through one helper built on Next's after(), which keeps the function alive until the work finishes. No route starts work it does not either await or hand to that helper.",
+        p: "The anthropologists already had the most valuable thing: original audio, transcripts in the original languages, and English translations they had validated. That became the gold set.",
       },
       {
-        p: "And because a missed job should not depend on luck, the guest's order page now checks for a missing receipt on its own poll and queues it. The daily drain only ever sees rows that exist, so the gap had to be closed from the side that notices it.",
+        p: "The harness takes a provider and a model, runs the gold set, and appends a column: word error rate for transcripts, translations side by side for human rating, and a notes column for failure modes. Cleaning is judged the same way, by what it does to the error rate downstream. The pipeline itself is containerised stage by stage, so swapping in the winner is a configuration change.",
+      },
+      { h: "Where it ended" },
+      {
+        p: "The partnership ended at the design stage, before we built it. What I would keep is the order: agree on the gold set and the metric first, and make the model the part you expect to replace.",
       },
     ],
   },

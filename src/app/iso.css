@@ -1,0 +1,265 @@
+/* Pesto's isometric drawing kit (qr-menu/src/app/prezentation/investor.css),
+   shared by the restaurant loop, the grant pipeline and the GPU node. White
+   is a token so the drawings dim with the page in dark mode. */
+:root { --iso-white: #fff; --iso-ink: var(--gr-9); }
+:root[data-theme="dark"] { --iso-white: oklch(0.42 0.005 152); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --iso-white: oklch(0.42 0.005 152); } }
+.ask3d { width: 100%; }
+.iso-paint { font-family: var(--font-sans); }
+.iso-ticket { animation: ask-ticket 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+@keyframes ask-ticket { from { opacity: 0; translate: 0 -10px; } }
+.ask3d { position: relative; flex: 1; min-height: 0; max-width: 100%; align-self: center; }
+.ask3d > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ask3d polygon { stroke-linejoin: round; }
+/* The room: stone floor and walls, white counters, the brand's green where Pesto is. */
+.iso-floor .top { fill: var(--gr-1); stroke: var(--gr-3); stroke-width: 1.5; }
+.iso-floor .front { fill: var(--gr-3); }
+.iso-floor .side { fill: var(--gr-4); }
+.iso-tile { stroke: var(--gr-3); stroke-width: 1; }
+.iso-kitchen-floor { fill: var(--gr-2); }
+.iso-mat { fill: var(--gr-3); }
+.iso-wall .front { fill: var(--gr-2); }
+.iso-wall .side { fill: var(--gr-3); }
+.iso-wall .top { fill: var(--gr-4); }
+.iso-sign { fill: var(--acc-6); }
+.iso-sign-text { fill: #fff; font-family: var(--font-display); font-size: 25px; font-weight: 700; }
+.iso-window { fill: var(--acc-1); stroke: var(--gr-4); stroke-width: 3; }
+.iso-window-bar { stroke: var(--gr-4); stroke-width: 3; }
+.iso-door { fill: var(--gr-4); stroke: var(--gr-5); stroke-width: 1.2; }
+.iso-door-glass { fill: var(--gr-2); }
+/* The kitchen's screen and its tickets, each with a green head. */
+.iso-screen { fill: var(--gr-7); }
+.iso-screen-glass { fill: var(--gr-1); }
+.iso-ticket polygon { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 0.8; }
+.iso-ticket .head { fill: var(--acc-6); stroke: none; }
+.iso-ticket .line { fill: var(--gr-4); stroke: none; }
+.iso-counter .top { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 1; }
+.iso-counter .front { fill: var(--gr-2); stroke: var(--gr-4); stroke-width: 1; }
+.iso-counter .side { fill: var(--gr-3); stroke: var(--gr-4); stroke-width: 1; }
+/* The takeaway shelf, in Pesto's green, so it reads across the room. */
+.iso-shelf .top { fill: var(--acc-1); stroke: var(--acc-3); stroke-width: 1; }
+.iso-shelf .front { fill: var(--acc-6); }
+.iso-shelf .side { fill: var(--acc-7); }
+.iso-stove .top { fill: var(--gr-5); }
+.iso-stove .front { fill: var(--gr-4); }
+.iso-stove .side { fill: var(--gr-5); }
+.iso-pan { fill: var(--gr-9); }
+.iso-pan-handle { stroke: var(--gr-9); stroke-width: 3; stroke-linecap: round; }
+.ask-steam circle { fill: var(--iso-white); stroke: var(--gr-3); stroke-width: 1; }
+.iso-tablet { fill: var(--gr-8); }
+.iso-tablet-screen { fill: var(--acc-2); }
+.iso-tablet-screen.lit { fill: var(--acc-5); }
+.iso-table .top { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 1; }
+.iso-table .front { fill: var(--gr-3); }
+.iso-table .side { fill: var(--gr-4); }
+.iso-foot polygon { fill: var(--gr-5); }
+.iso-seat .top { fill: var(--gr-3); }
+.iso-seat .front { fill: var(--gr-4); }
+.iso-seat .side { fill: var(--gr-5); }
+.iso-chair-back .top, .iso-chair-back .front { fill: var(--gr-4); }
+.iso-chair-back .side { fill: var(--gr-5); }
+.iso-code { fill: var(--iso-white); stroke: var(--gr-7); stroke-width: 1.2; }
+.iso-code.lit { fill: var(--acc-2); stroke: var(--acc-6); }
+.iso-code-marks polygon { fill: var(--gr-9); }
+.iso-pot .top { fill: var(--gr-6); }
+.iso-pot .front { fill: var(--gr-3); }
+.iso-pot .side { fill: var(--gr-4); }
+.iso-leaves { fill: var(--acc-6); }
+.iso-leaves.dark { fill: var(--acc-7); }
+.iso-leaves.light { fill: var(--acc-4); }
+/* The people: a tone each, set as three colours a figure draws its body, its arms and its legs in. */
+.fig { --body: var(--gr-6); --limb: var(--gr-7); --legs: var(--gr-8); --hair: var(--gr-8); }
+.fig .shadow { fill: rgb(21 23 21 / 0.1); }
+.fig .leg { fill: none; stroke: var(--legs); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.fig .arm { fill: none; stroke: var(--limb); stroke-width: 5; stroke-linecap: round; }
+.fig :is(.leg, .arm).back { opacity: 0.8; }
+.fig .torso { fill: var(--body); }
+.fig .apron { fill: var(--iso-white); }
+.fig .head { fill: var(--gr-2); stroke: var(--gr-4); stroke-width: 1; }
+.fig .hair { fill: var(--hair); }
+.fig .toque { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 1; }
+.fig.guest-a { --body: var(--acc-4); --limb: var(--acc-5); --legs: var(--gr-7); --hair: var(--gr-8); }
+.fig.guest-b { --body: var(--gr-6); --limb: var(--gr-7); --legs: var(--gr-8); --hair: var(--gr-9); }
+.fig.guest-c { --body: var(--gr-8); --limb: var(--gr-9); --legs: var(--gr-6); --hair: var(--gr-6); }
+.fig:is(.waiter, .cashier) { --body: var(--acc-6); --limb: var(--acc-7); --legs: var(--gr-8); --hair: var(--gr-9); }
+.fig.cashier { --hair: var(--gr-7); }
+.fig.cook { --body: var(--iso-white); --limb: var(--gr-3); --legs: var(--gr-7); }
+.fig.cook .torso { stroke: var(--gr-4); stroke-width: 1; }
+.ask-phone rect { fill: var(--gr-9); }
+.ask-phone .screen { fill: var(--gr-6); }
+.ask-phone .screen.lit { fill: var(--acc-4); }
+.ask-dish .plate { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 1; }
+.ask-dish .food { fill: var(--acc-5); }
+.ask-dish .leaf { fill: var(--acc-8); }
+.ask-bag .body { fill: var(--acc-6); }
+.ask-bag .fold { fill: var(--acc-7); }
+.ask-bag .handle { fill: none; stroke: var(--acc-8); stroke-width: 1.6; stroke-linecap: round; }
+/* Over a guest's head: what they are doing, white; done, green with a tick. */
+.ask-bubble circle { fill: var(--iso-white); stroke: var(--gr-3); stroke-width: 1; filter: drop-shadow(0 3px 5px rgb(21 23 21 / 0.14)); }
+.ask-bubble .tail { fill: var(--iso-white); }
+.ask-bubble svg { color: var(--acc-7); }
+.ask-bubble.done :is(circle, .tail) { fill: var(--acc-6); stroke: none; }
+.ask-bubble.done svg { color: #fff; }
+/* A receipt flying to the tax office, the way it came drawn behind it. */
+.ask-receipt .trail { fill: none; stroke: var(--acc-5); stroke-width: 1.6; stroke-linecap: round; opacity: 0.6; }
+.ask-receipt .paper { fill: var(--iso-white); stroke: var(--gr-5); stroke-width: 1; }
+.ask-receipt line { stroke: var(--gr-5); stroke-width: 1.1; }
+.ask-office circle { fill: var(--acc-6); filter: drop-shadow(0 6px 10px color-mix(in oklab, var(--acc-6) 40%, transparent)); }
+.ask-office .ring { fill: none; stroke: var(--acc-5); stroke-width: 2; filter: none; }
+.ask-office svg { color: #fff; }
+/* What each part is, painted on it in quiet capitals; the tax office's over its badge, in HTML. */
+.iso-paint { fill: var(--gr-6); font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; }
+.iso-paint.floor { font-size: 12px; }
+.ask3d-label { position: absolute; transform: translate(0, -50%); color: var(--acc-8); font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
+
+/* ── the grant line (GrantFactory.tsx) ── */
+.gp { position: relative; width: 100%; }
+.gp > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.gp polygon { stroke-linejoin: round; }
+.gp-floor .top { fill: var(--gr-1); stroke: var(--gr-3); stroke-width: 1.5; }
+.gp-floor .front { fill: var(--gr-3); }
+.gp-floor .side { fill: var(--gr-4); }
+.gp-belt .top { fill: var(--gr-7); }
+.gp-belt .front { fill: var(--gr-6); }
+.gp-belt .side { fill: var(--gr-7); }
+.gp-tread { stroke: var(--gr-6); stroke-width: 1.4; }
+.gp-gate .top { fill: var(--gr-3); }
+.gp-gate .front { fill: var(--gr-4); }
+.gp-gate .side { fill: var(--gr-5); }
+.gp-gate.scan .front { fill: var(--acc-5); }
+.gp-scan { stroke: var(--acc-5); stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 4px var(--acc-5)); }
+.gp-module .top { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 1; }
+.gp-module .front { fill: var(--gr-2); stroke: var(--gr-4); stroke-width: 1; }
+.gp-module .side { fill: var(--gr-3); stroke: var(--gr-4); stroke-width: 1; }
+.gp-module.rules .front { fill: var(--acc-1); }
+.gp-module.rules .side { fill: var(--acc-2); }
+.gp-module.partner :is(.top, .front, .side) { stroke-dasharray: 3 3; fill-opacity: 0.6; }
+.gp-stack .top { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 1; }
+.gp-stack .front { fill: var(--gr-3); }
+.gp-stack .side { fill: var(--gr-4); }
+.gp-page-lines line { stroke: var(--gr-4); stroke-width: 1.4; stroke-linecap: round; }
+.gp-llm .top { fill: var(--acc-6); }
+.gp-llm .front { fill: var(--acc-7); }
+.gp-llm .side { fill: var(--acc-8); }
+.gp-llm.on .top { fill: var(--acc-5); }
+.gp-glow { fill: var(--acc-4); opacity: 0.45; filter: blur(4px); }
+.gp-pipe line { stroke: var(--gr-4); stroke-width: 4; stroke-linecap: round; }
+.gp-pipe circle { fill: var(--acc-6); }
+.gp-pipe.faint { opacity: 0.6; }
+.gp-pipe.faint line { stroke-dasharray: 4 4; }
+.gp-doc .top { fill: var(--iso-white); stroke: var(--gr-5); stroke-width: 1; }
+.gp-doc .front { fill: var(--gr-3); }
+.gp-doc .side { fill: var(--gr-4); }
+.gp-card .top { fill: var(--iso-white); stroke: var(--gr-5); stroke-width: 0.8; }
+.gp-card .front { fill: var(--acc-3); }
+.gp-card .side { fill: var(--acc-4); }
+.gp-card.flagged .front { fill: color-mix(in oklab, var(--red-6) 70%, var(--gr-3)); }
+.gp-card.flagged .side { fill: var(--red-6); }
+.gp-badge circle { fill: var(--acc-6); stroke: var(--card); stroke-width: 1.5; }
+.gp-badge.bad circle { fill: var(--red-6); }
+.gp-badge svg { color: #fff; }
+.gp-screen { fill: var(--gr-8); }
+.gp-screen-glass { fill: var(--gr-7); transition: fill 200ms; }
+.gp-screen-glass.ok { fill: var(--acc-5); }
+.gp-screen-glass.bad { fill: var(--red-6); }
+.gp-label { position: absolute; transform: translate(-50%, -50%); color: var(--muted-foreground); font-size: 11px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; pointer-events: none; }
+.gp-label.strong { color: var(--acc-7); }
+.gp-score { position: absolute; transform: translate(10px, -50%); padding: 4px 9px; border-radius: 8px; background: var(--card); box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--acc-3); color: var(--foreground); font-size: 12px; line-height: 16px; white-space: nowrap; animation: rc-pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.gp-score b { font-weight: 700; }
+.gp-score.bad { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--red-6); color: var(--red-8); }
+@media (max-width: 640px) { .gp-label { font-size: 9px; letter-spacing: 0.04em; } .gp-score { font-size: 10.5px; } }
+.ask3d-label.under { transform: translate(-50%, 0); }
+/* People keep daylight colours in dark mode: inverted faces and white hair read as ghosts. */
+:root[data-theme="dark"] .fig .head { fill: oklch(0.88 0.02 60); stroke: oklch(0.7 0.02 60); }
+:root[data-theme="dark"] .fig { --hair: oklch(0.28 0.01 60); }
+:root[data-theme="dark"] .fig.guest-c { --hair: oklch(0.45 0.01 60); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .fig .head { fill: oklch(0.88 0.02 60); stroke: oklch(0.7 0.02 60); }
+  :root:not([data-theme="light"]) .fig { --hair: oklch(0.28 0.01 60); }
+  :root:not([data-theme="light"]) .fig.guest-c { --hair: oklch(0.45 0.01 60); }
+}
+
+/* ── the GPU node (GpuNode.tsx) ── */
+/* Hardware is dark in both themes. */
+.gn-rack .top { fill: oklch(0.5 0.005 152); }
+.gn-rack .front { fill: oklch(0.3 0.005 152); }
+.gn-rack .side { fill: oklch(0.38 0.005 152); }
+.gn-led { fill: oklch(0.55 0.005 152); }
+.gn-led.on { fill: oklch(0.75 0.13 152); }
+.gn-mpi { fill: var(--acc-5); filter: drop-shadow(0 0 4px var(--acc-4)); }
+.gn-board .top { fill: var(--acc-1); stroke: var(--acc-3); stroke-width: 1; }
+.gn-board .front { fill: var(--acc-3); }
+.gn-board .side { fill: var(--acc-4); }
+.gn-ram .top { fill: oklch(0.45 0.005 152); }
+.gn-ram .front { fill: oklch(0.33 0.005 152); }
+.gn-ram .side { fill: oklch(0.38 0.005 152); }
+.gn-cpu .top { fill: oklch(0.62 0.005 152); stroke: oklch(0.5 0.005 152); stroke-width: 1; }
+.gn-cpu .front { fill: oklch(0.45 0.005 152); }
+.gn-cpu .side { fill: oklch(0.38 0.005 152); }
+.gn-cpu.busy .top { fill: var(--acc-4); }
+.gn-bus { fill: var(--gr-4); }
+.gn-packet .top { fill: #4b8de6; }
+.gn-packet .front { fill: #2f6fc4; }
+.gn-packet .side { fill: #1f5aa6; }
+.gn-gpu .top { fill: oklch(0.27 0.005 152); }
+.gn-gpu .front { fill: oklch(0.33 0.005 152); }
+.gn-gpu .side { fill: oklch(0.4 0.005 152); }
+.gn-fan { fill: oklch(0.42 0.005 152); }
+.gn-sm .top { fill: oklch(0.44 0.005 152); transition: fill 120ms; }
+.gn-sm .front { fill: oklch(0.34 0.005 152); }
+.gn-sm .side { fill: oklch(0.3 0.005 152); }
+.gn-sm.done .top { fill: oklch(0.5 0.1 152); }
+.gn-sm.lit .top { fill: oklch(0.85 0.1 152); }
+.gn-sm.lit .front, .gn-sm.lit .side { fill: oklch(0.62 0.13 152); }
+.gn-phase { position: absolute; transform: translate(-50%, -50%); padding: 3px 9px; border-radius: 8px; background: var(--card); box-shadow: inset 0 0 0 1px #4b8de6; color: var(--foreground); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.gn-phase.kernel { box-shadow: inset 0 0 0 1px var(--acc-6); color: var(--acc-8); }
+.gn-seg { display: block; opacity: 0.45; transition: opacity 200ms; }
+.gn-seg.copy { background: #4b8de6; }
+.gn-seg.kernel { background: var(--acc-6); }
+.gn-seg.now { opacity: 1; }
+
+/* ── the generated slide (DeckGenerator.tsx), laid out like Pesto's deck ──
+   A slide is light in both themes, as a real one is. */
+.dg-slide { transform-origin: 0 0; background: #f8faf8; color: #2b2e2c; font-family: var(--font-sans); }
+.dg-inner { display: flex; flex-direction: column; height: 100%; padding: 40px 48px 26px; }
+.dg-top { display: flex; justify-content: space-between; align-items: center; }
+.dg-eyebrow { color: #2f7a4a; font-size: 15px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.dg-eyebrow b { color: #1f5a36; animation: rc-rise 400ms backwards; }
+.dg-brand { display: inline-flex; align-items: center; gap: 8px; color: #2f7a4a; font-size: 15px; font-weight: 700; }
+.dg-brand svg { width: 20px; height: 20px; }
+.dg-title { margin: 14px 0 0; min-height: 62px; font-family: var(--font-display); font-size: 46px; line-height: 1.12; font-weight: 700; letter-spacing: -0.01em; color: #1f2320; }
+.dg-title.empty { display: flex; flex-direction: column; gap: 12px; }
+.dg-title.empty span { display: block; height: 22px; width: 70%; border-radius: 6px; background: #e4e9e5; }
+.dg-title.empty span + span { width: 45%; }
+.dg-caret { display: inline-block; width: 4px; height: 0.9em; margin-left: 3px; vertical-align: -4px; background: #2f8a52; animation: caret 0.9s steps(1) infinite; }
+.dg-ai { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; margin-top: 12px; padding: 6px 12px; border-radius: 999px; background: #e3f1e7; color: #1f6a3c; font-size: 14px; font-weight: 700; animation: rc-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.dg-ai svg { width: 16px; height: 16px; }
+.dg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; flex: 1; margin-top: 22px; min-height: 0; }
+.dg-card { display: flex; flex-direction: column; padding: 16px 18px 18px; border-radius: 22px; background: #fff; box-shadow: 0 2px 21px rgb(21 23 21 / 0.03), inset 0 0 0 1px #e1e6e2; }
+.dg-card > * { opacity: 0.08; transform: translateY(6px); transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.22, 1, 0.36, 1); }
+.dg-card.in > * { opacity: 1; transform: none; }
+.dg-card.in > :nth-child(2) { transition-delay: 90ms; }
+.dg-card.in > :nth-child(3) { transition-delay: 160ms; }
+.dg-card.in > :nth-child(4) { transition-delay: 220ms; }
+.dg-pic { display: flex; align-items: center; justify-content: center; gap: 10px; height: 88px; border-radius: 16px; background: #e8f3eb; color: #2f7a4a; }
+.dg-pic.regions { flex-wrap: wrap; align-content: center; gap: 6px; padding: 0 18px; }
+.dg-pic.regions b { display: grid; place-items: center; width: 40px; height: 28px; border-radius: 7px; background: #fff; box-shadow: inset 0 0 0 1px #c9dccf; color: #6a756e; font-size: 12px; font-weight: 800; }
+.dg-pic.regions b.on { background: #2f8a52; box-shadow: none; color: #fff; }
+.dg-pic.packs { gap: 12px; }
+.dg-pic .pack { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 70px; border-radius: 10px 10px 6px 6px; background: var(--c); color: #fff; box-shadow: 0 6px 12px rgb(21 23 21 / 0.15); }
+.dg-card.in .pack { animation: rc-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; animation-delay: calc(var(--k) * 90ms); }
+.dg-pic .pack svg { width: 24px; height: 24px; }
+.dg-pic .pack small { font-size: 9.5px; font-weight: 700; letter-spacing: 0.02em; }
+.dg-pic.chart svg { width: 150px; height: 70px; }
+.dg-pic.chart path { fill: none; stroke: #2f8a52; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 900ms ease 100ms; }
+.dg-card.in .dg-pic.chart path { stroke-dashoffset: 0; }
+.dg-pic.chart circle { fill: #2f8a52; }
+.dg-metric { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
+.dg-metric strong { flex: none; color: #2f8a52; font-family: var(--font-display); font-size: 40px; line-height: 1; font-weight: 700; }
+.dg-metric span { color: #6a756e; font-size: 14px; line-height: 1.3; font-weight: 600; }
+.dg-card h3 { margin: 10px 0 4px; font-size: 19px; line-height: 1.25; font-weight: 700; color: #1f2320; }
+.dg-card p { margin: 0; color: #6a756e; font-size: 14px; line-height: 1.45; }
+.dg-foot { display: flex; justify-content: space-between; margin-top: 14px; color: #8a948d; font-size: 12px; }
+.dg-wire .base { fill: none; stroke: var(--gr-4); stroke-width: 2; stroke-dasharray: 4 5; }
+.dg-wire .flow { fill: none; stroke: var(--acc-6); stroke-width: 2.5; stroke-linecap: round; }
+.dg-wire .dot { fill: var(--acc-6); stroke: var(--card); stroke-width: 2; filter: drop-shadow(0 0 6px var(--acc-4)); }
