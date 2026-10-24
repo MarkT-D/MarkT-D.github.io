@@ -16,6 +16,15 @@ export function CaseStudy({
   side?: boolean;
   children: React.ReactNode;
 }) {
+  /** "Full story" and any outside links: under the stack when the text is a column, under the title otherwise. */
+  const more = (gap: string) => <>
+    <Link href={`/work/${c.id}/`} className={`${gap} text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6`}>Full story →</Link>
+    {c.links?.map((l) => (
+      <a key={l.href} href={l.href} className={`${gap} text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6`} target="_blank" rel="noreferrer">
+        {l.label} →
+      </a>
+    ))}
+  </>;
   const head = (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -25,6 +34,7 @@ export function CaseStudy({
       </div>
       <h3 className="font-display text-[26px] font-semibold leading-[1.15] tracking-[-0.01em] sm:text-[32px]">{c.title}</h3>
       <p className="mt-2 text-[14px] text-muted-foreground">{c.role} · {c.period}</p>
+      {!side && <div className="mt-4 flex flex-wrap gap-4">{more("")}</div>}
     </div>
   );
   const body = (
@@ -41,12 +51,7 @@ export function CaseStudy({
       </dl>
       <div className="mt-4 flex flex-wrap items-center gap-1.5">
         {c.stack.map((s) => <span key={s} className="chip h-6 text-[12px]">{s}</span>)}
-        <Link href={`/work/${c.id}/`} className="ml-2 text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6">Full story →</Link>
-        {c.links?.map((l) => (
-          <a key={l.href} href={l.href} className="ml-2 text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6" target="_blank" rel="noreferrer">
-            {l.label} →
-          </a>
-        ))}
+        {side && more("ml-2")}
       </div>
     </div>
   );

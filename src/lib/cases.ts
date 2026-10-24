@@ -222,7 +222,7 @@ export const CASES: Case[] = [
     id: "tracfm",
     index: "05",
     org: "TRAC FM × University of Amsterdam",
-    label: "System design · proof of concept",
+    label: "Proof of concept",
     role: "Pipeline design",
     period: "2026",
     title: "Radio call-ins in Ugandan languages, as themes on a dashboard",
