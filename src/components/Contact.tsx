@@ -6,7 +6,7 @@ import card from "@/lib/card.json";
 import { ContactScene } from "./iso/ContactScene";
 import { asset, cn } from "@/lib/utils";
 
-const CURL = "curl -sL markt-d.github.io/card";
+const CURL = "curl -sL temchenko.dev/card";
 
 function CopyButton({ text, label }: { text: string; label: string }) {
   const [done, setDone] = useState(false);

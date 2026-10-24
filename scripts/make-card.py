@@ -1,4 +1,4 @@
-"""Writes public/card: the terminal card `curl -sL markt-d.github.io/card` prints.
+"""Writes public/card: the terminal card `curl -sL temchenko.dev/card` prints.
 
 GitHub Pages serves a file with no extension as it is, so curl gets the raw
 ANSI text. Run again after changing anything below: python3 scripts/make-card.py
@@ -36,7 +36,7 @@ ROWS = [
     ("mail", "mstemchenko.dev@gmail.com"),
     ("in", "linkedin.com/in/mark-the-artichoke"),
     ("gh", "github.com/MarkT-D"),
-    ("web", "markt-d.github.io"),
+    ("web", "temchenko.dev"),
 ]
 W = 74  # inside the border
 

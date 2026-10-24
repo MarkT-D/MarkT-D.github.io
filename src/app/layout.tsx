@@ -6,6 +6,8 @@ import "./iso.css";
 import "./pesto.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://temchenko.dev"),
+  alternates: { canonical: "/" },
   title: "Mark Temchenko · AI Engineer",
   description:
     "AI Engineer in Barcelona. LLM pipelines for enterprise clients, NLP and ML research projects, and how I build them.",
@@ -13,6 +15,7 @@ export const metadata: Metadata = {
     title: "Mark Temchenko · AI Engineer",
     description: "LLM systems, from a client's problem to production.",
     type: "website",
+    url: "https://temchenko.dev",
   },
 };
 
