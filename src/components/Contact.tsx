@@ -41,7 +41,7 @@ const CHANNELS = [
 
 export function Contact() {
   return (
-    <section id="contact" className="scroll-mt-16 border-t border-border bg-gr-2 py-16 sm:py-20">
+    <section id="contact" className="scroll-mt-14 border-t border-border bg-gr-2 py-12 sm:py-14">
       <div className="wrap grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] [&>*]:min-w-0">
         <div>
           <p className="eyebrow">Contact</p>

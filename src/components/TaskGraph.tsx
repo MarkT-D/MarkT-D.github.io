@@ -62,6 +62,7 @@ const INTRO = Math.max(...Object.entries(REVEAL).map(([i, s]) => s + GROW[graph.
 const HOLD = 2.6;
 const FOLD = INTRO + HOLD;
 const LOOP = FOLD + 7.5;
+export const TG_LOOP = LOOP;
 const STILL = INTRO + 0.5;
 
 function position(n: Node, index: number, t: number) {
@@ -94,10 +95,11 @@ function boundary(from: { x: number; y: number; s: number }, n: Node, to: { x: n
 
 const KIND = ["root", "hub", "sub", "leaf"] as const;
 
-export function TaskGraph() {
+export function TaskGraph({ time }: { time?: number } = {}) {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const mounted = useMounted();
-  const t = useSceneClock(LOOP, inView, STILL);
+  const own = useSceneClock(LOOP, inView && time === undefined, STILL);
+  const t = time ?? own;
   const states = useMemo(() => graph.nodes.map((n, i) => position(n, i, t)), [t]);
   const shown = graph.nodes.filter((_, i) => states[i].a > 0.5).length;
   const local = t - FOLD;

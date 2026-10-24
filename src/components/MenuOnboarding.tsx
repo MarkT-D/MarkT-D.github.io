@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Camera, Check, QrCode, RefreshCw, ScanText, Sparkles, Languages, Braces } from "lucide-react";
+import { Camera, Check, GripVertical, Hand, QrCode, RefreshCw, ScanText, Sparkles, Languages, Braces } from "lucide-react";
 import { PhoneFrame } from "./PhoneFrame";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
@@ -14,21 +14,22 @@ import { cn } from "@/lib/utils";
  * owner edits, an edited dish being translated again. The menu is invented.
  */
 
-const LOOP = 19.5;
-const STILL = 12.2;
+export const MO_LOOP = 20.5;
+const LOOP = MO_LOOP;
+const STILL = 14.6;
 
 type Seg = { key: string; from: number; to: number; label: string };
 const OWNER: Seg[] = [
   { key: "shoot", from: 0, to: 3.2, label: "Photographs 3 pages" },
   { key: "onboard", from: 3.2, to: 9.6, label: "Onboarding: name, hours, tables, payments" },
-  { key: "edit", from: 9.6, to: 15.8, label: "Checks the dishes, edits one" },
-  { key: "live", from: 15.8, to: 18.8, label: "Publishes" },
+  { key: "edit", from: 9.6, to: 16.8, label: "Checks the dishes: reorders, renames, picks a style" },
+  { key: "live", from: 16.8, to: 19.8, label: "Publishes" },
 ];
 const AI: Seg[] = [
   { key: "upload", from: 0.4, to: 3.2, label: "Upload" },
   { key: "ocr", from: 3.2, to: 6.3, label: "Vision OCR" },
   { key: "parse", from: 6.3, to: 9.4, label: "Claude → structured menu" },
-  { key: "translate", from: 9.6, to: 15.4, label: "Translations, while you edit" },
+  { key: "translate", from: 9.6, to: 16.4, label: "Translations, while you edit" },
 ];
 const at = (segs: Seg[], t: number) => segs.find((s) => t >= s.from && t < s.to)?.key ?? null;
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
@@ -40,7 +41,9 @@ const PAGES = [
   { head: "Dolci", dishes: [["Tiramisù", "7"], ["Panna cotta", "6,5"], ["Cannoli siciliani", "6"], ["Affogato", "5"]] },
 ];
 const LANGS = ["EN", "IT", "ES", "DE", "FR", "RU"];
-const EDIT = { start: 11.4, end: 12.6 };
+const EDIT = { start: 12.5, end: 13.6 };
+const DRAG = { start: 10.7, end: 11.9 };
+const STYLES = [{ name: "Classic", at: 0 }, { name: "Bistro", at: 14.3 }, { name: "Night", at: 15.3 }];
 const EDIT_FROM = "Carpaccio", EDIT_TO = "Carpaccio di manzo";
 
 /** When dish d's translation into language l lands. The edited dish goes again after the edit. */
@@ -53,10 +56,11 @@ function cellAt(d: number, l: number, t: number): "empty" | "done" | "redo" {
   return t >= first ? "done" : "empty";
 }
 
-export function MenuOnboarding() {
+export function MenuOnboarding({ time }: { time?: number } = {}) {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const mounted = useMounted();
-  const t = useSceneClock(LOOP, inView, STILL);
+  const own = useSceneClock(LOOP, inView && time === undefined, STILL);
+  const t = time ?? own;
   const owner = at(OWNER, t) ?? "live";
   const ai = at(AI, t);
   const fade = t > LOOP - 0.5 ? (LOOP - t) / 0.5 : 1;
@@ -127,16 +131,33 @@ function OwnerScreen({ step, t }: { step: string; t: number }) {
   }
 
   if (step === "edit") {
-    return <div className="mo-ed">
-      <div className="mo-ed-head"><b>Antipasti</b><span>4 dishes</span></div>
-      {PAGES[0].dishes.map(([name, price], d) => {
-        const editing = d === 1 && t >= EDIT.start && t < EDIT.end + 0.3;
-        const shown = d === 1 ? (t < EDIT.start ? EDIT_FROM : t < EDIT.end ? EDIT_FROM + EDIT_TO.slice(EDIT_FROM.length, EDIT_FROM.length + Math.round((EDIT_TO.length - EDIT_FROM.length) * prog(t, EDIT.start + 0.2, EDIT.end))) : EDIT_TO) : name;
-        return <div key={name} className={cn("mo-dish", editing && "editing")}>
-          <div className="mo-dish-top"><span>{shown}{editing && t < EDIT.end && <i className="mo-caret" />}</span><b>€{price}</b></div>
-          <div className="mo-langs">{LANGS.map((l, li) => { const c = cellAt(d, li, t); return <span key={l} className={c}>{l}</span>; })}</div>
-        </div>;
-      })}
+    // Burrata is dragged from third to first; the rest close up behind it.
+    const order = t < (DRAG.start + DRAG.end) / 2 ? [0, 1, 2, 3] : [2, 0, 1, 3];
+    const ROW = 66;
+    const dragging = t >= DRAG.start && t < DRAG.end + 0.2;
+    const dragY = ROW * 2 * (1 - prog(t, DRAG.start + 0.25, DRAG.end - 0.15));
+    const style = [...STYLES].reverse().find((st) => t >= st.at)!.name;
+    const pressing = STYLES.find((st) => st.at > 0 && t >= st.at - 0.35 && t < st.at + 0.1);
+    return <div className={cn("mo-ed", `style-${style.toLowerCase()}`)}>
+      <div className="mo-styles">{STYLES.map((st) => <span key={st.name} className={cn(st.name === style && "on", pressing?.name === st.name && "press")}>{st.name}</span>)}</div>
+      <div className="mo-ed-head"><b>Antipasti</b><span>drag to reorder</span></div>
+      <div className="mo-rows" style={{ height: ROW * 4 }}>
+        {PAGES[0].dishes.map(([name, price], d) => {
+          const editing = d === 1 && t >= EDIT.start && t < EDIT.end + 0.3;
+          const shown = d === 1 ? (t < EDIT.start ? EDIT_FROM : t < EDIT.end ? EDIT_FROM + EDIT_TO.slice(EDIT_FROM.length, EDIT_FROM.length + Math.round((EDIT_TO.length - EDIT_FROM.length) * prog(t, EDIT.start + 0.2, EDIT.end))) : EDIT_TO) : name;
+          const lifted = d === 2 && dragging;
+          const y = lifted ? dragY : order.indexOf(d) * ROW;
+          return <div key={name} className={cn("mo-dish", editing && "editing", lifted && "lifted")} style={{ transform: `translateY(${y.toFixed(1)}px)` }}>
+            <Dish kind={d} />
+            <div className="mo-dish-text">
+              <div className="mo-dish-top"><span>{shown}{editing && t < EDIT.end && <i className="mo-caret" />}</span><b>€{price}</b></div>
+              <div className="mo-langs">{LANGS.map((l, li) => { const c = cellAt(d, li, t); return <span key={l} className={c}>{l}</span>; })}</div>
+            </div>
+            <GripVertical className="mo-grip" />
+            {lifted && <Hand className="mo-hand" />}
+          </div>;
+        })}
+      </div>
       <div className="mo-ed-foot">Preview as a guest →</div>
     </div>;
   }
@@ -147,6 +168,19 @@ function OwnerScreen({ step, t }: { step: string; t: number }) {
     <span>34 dishes · 6 languages</span>
     <div className="mo-langs big">{LANGS.map((l) => <span key={l} className="done">{l}</span>)}</div>
   </div>;
+}
+
+/** A dish photo, drawn: a plate seen from above with what is on it. */
+function Dish({ kind }: { kind: number }) {
+  return <svg viewBox="0 0 48 48" className="mo-photo" aria-hidden>
+    <rect width="48" height="48" fill={["#e9dccb", "#d9e4dc", "#e4dcd2", "#dfe2e8"][kind]} />
+    <circle cx="24" cy="24" r="18" fill="#fbfaf7" />
+    <circle cx="24" cy="24" r="13.5" fill="#f1eee8" />
+    {kind === 0 && <>{[[-6, -3, -30], [3, -5, 20], [-1, 5, -60]].map(([x, y, a], i) => <ellipse key={i} cx={24 + x} cy={24 + y} rx="8" ry="3.4" fill={i === 1 ? "#f2a33a" : "#e7b54a"} transform={`rotate(${a} ${24 + x} ${24 + y})`} />)}<circle cx="31" cy="30" r="2" fill="#7aa35a" /></>}
+    {kind === 1 && <>{[0, 72, 144, 216, 288].map((a) => <ellipse key={a} cx={24 + Math.cos((a * Math.PI) / 180) * 6} cy={24 + Math.sin((a * Math.PI) / 180) * 6} rx="6" ry="4.2" fill="#c8424e" opacity="0.9" />)}<circle cx="24" cy="24" r="3.6" fill="#6aa04a" /><circle cx="27" cy="21" r="1.2" fill="#f3e6b0" /></>}
+    {kind === 2 && <><circle cx="22" cy="23" r="7.5" fill="#fffdf6" stroke="#e8e1d2" /><circle cx="31" cy="20" r="3" fill="#d8352f" /><circle cx="30" cy="29" r="3" fill="#e2483a" /><circle cx="18" cy="31" r="2.6" fill="#d8352f" /><path d="M14 18 q3 -3 6 0" stroke="#4f8d3a" strokeWidth="1.6" fill="none" /></>}
+    {kind === 3 && <>{[-5, 0, 5].map((y) => <ellipse key={y} cx="24" cy={24 + y} rx="10" ry="3.2" fill="#d9a59a" />)}<path d="M15 22 q9 6 18 0" stroke="#efe0b8" strokeWidth="3" fill="none" />{[[19, 20], [28, 27], [24, 23]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.1" fill="#5b7a32" />)}</>}
+  </svg>;
 }
 
 function Field({ label, value }: { label: string; value: string }) {

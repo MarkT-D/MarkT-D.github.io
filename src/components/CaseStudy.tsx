@@ -13,6 +13,7 @@ export function CaseStudy({
   links,
   label,
   side,
+  tight,
   children,
 }: {
   id: string;
@@ -28,6 +29,8 @@ export function CaseStudy({
   label?: string;
   /** Text on the left, the visual on the right, sized to fit one screen. */
   side?: boolean;
+  /** Text on top, visual under it, packed to fit one screen: the stack moves under the title. */
+  tight?: boolean;
   children: React.ReactNode;
 }) {
   const head = (
@@ -41,6 +44,7 @@ export function CaseStudy({
       <p className="mt-2 text-[14px] text-muted-foreground">
         {role} · {period}
       </p>
+      {tight && <div className="mt-4 flex flex-wrap gap-1.5">{stack.map((s) => <span key={s} className="chip">{s}</span>)}</div>}
     </div>
   );
   const body = (
@@ -54,7 +58,7 @@ export function CaseStudy({
           </li>
         ))}
       </ul>
-      <div className="mt-5 flex flex-wrap gap-1.5">
+      <div className={tight ? "hidden" : "mt-5 flex flex-wrap gap-1.5"}>
         {stack.map((s) => (
           <span key={s} className="chip">{s}</span>
         ))}
@@ -88,10 +92,10 @@ export function CaseStudy({
   }
 
   return (
-    <section id={id} className="scroll-mt-24 border-t border-border py-16 sm:py-20">
+    <section id={id} className={tight ? "scroll-mt-14 border-t border-border py-8 sm:py-9" : "scroll-mt-24 border-t border-border py-16 sm:py-20"}>
       <div className="wrap">
         <Reveal>
-          <div className="mb-8 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className={tight ? "mb-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8" : "mb-8 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]"}>
             {head}
             {body}
           </div>

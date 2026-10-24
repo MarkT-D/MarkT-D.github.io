@@ -1,6 +1,6 @@
 "use client";
 
-import { AudioLines, Check, Mic, Play, Sparkles, UserRound, X } from "lucide-react";
+import { AudioLines, Check, Mic, Ship, Sparkles, UserRound, X } from "lucide-react";
 import { Fit } from "./Fit";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * OceansX in one line of work: videos and interviews are collected, Whisper
  * turns them into text, the classifier sorts each into well-being or not
  * (and gets some wrong, which is why it is scored), and what it found goes to
- * the PhD researcher with LIME showing why. Clips and the sentence are made up;
+ * our supervising professor with LIME showing why. Clips and the sentence are made up;
  * the three F1 scores are the project's.
  */
 
@@ -19,13 +19,22 @@ const EVERY = 0.62, DUR = 4.6;
 const MODELS = [["BERT", 0.89], ["SVM", 0.86], ["Random forest", 0.77]] as const;
 
 /** One clip per slot: what it is, what it really is, and what the model said. */
+const noise = (i: number, k: number) => { const x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); };
 const ITEMS = Array.from({ length: Math.floor(LOOP / EVERY) }, (_, i) => {
   const truth = [0, 2, 3, 5, 7, 8, 10, 12, 13, 15, 17, 19, 21, 23].includes(i);
   const wrong = i % 9 === 4;
-  return { i, kind: i % 3 === 1 ? "interview" : "video", truth, said: wrong ? !truth : truth, mins: 4 + ((i * 7) % 23) };
+  // How sure each model is that this clip is about well-being. BERT decides;
+  // the other two are shown for comparison and wander further from the truth.
+  const sure = (k: number, spread: number) => {
+    const base = truth ? 0.8 : 0.2;
+    const v = base + (noise(i, k) - 0.5) * spread;
+    return Math.min(0.98, Math.max(0.03, wrong && k === 0 ? 1 - v : v));
+  };
+  const probs = [sure(0, 0.3), sure(1, 0.5), sure(2, 0.75)];
+  return { i, kind: i % 4 === 2 ? "ship" : "interview", truth, said: probs[0] >= 0.5, probs };
 });
 
-const X0 = 40, X_ASR = 270, X_CLS = 500, X_BIN = 690, Y = 150;
+const X0 = 132, X_ASR = 300, X_CLS = 500, X_BIN = 690, Y = 150;
 const BIN_Y = { yes: 80, no: 250 };
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
 const ease = (x: number) => { const p = clamp(x); return p * p * (3 - 2 * p); };
@@ -48,6 +57,8 @@ export function OceansScene() {
   const bin = (yes: boolean) => sorted.filter((it) => it.said === yes);
   const right = sorted.filter((it) => it.said === it.truth).length;
   const explain = t > 4 ? Math.floor((t - 4) / 4) % EXPLAINS.length : 0;
+  // The clip the classifier is reading right now.
+  const current = moving.filter((it) => it.s >= 0.4 && it.s < 0.62).sort((a, b) => b.s - a.s)[0];
 
   return (
     <div ref={ref}>
@@ -61,29 +72,29 @@ export function OceansScene() {
               <path d={`M ${X_BIN + 120} ${BIN_Y.yes} L 850 ${BIN_Y.yes}`} className="hand" />
             </svg>
 
-            <div className="ox-col" style={{ left: 0, top: 18, width: 170 }}>
-              <b>Collect</b><span>YouTube search and interviews, ~600 hours</span>
+            <div className="ox-col" style={{ left: 0, top: 6, width: 190 }}>
+              <b>Collect</b><span>Interviews with sailors, plus onboard video. ~600 hours</span>
             </div>
-            <div className="ox-pile" aria-hidden>
-              {[Play, Mic, Play, Mic, Play].map((I, i) => <span key={i} className="ox-clip" style={{ transform: `translate(${4 + (i % 2) * 22}px, ${Y + 40 + i * 9}px)` }}><I className="size-3.5" /></span>)}
-            </div>
+            <Boat t={t} />
             <div className="ox-gate" style={{ left: X_ASR - 54, top: Y - 46 }}>
               <AudioLines className="size-4" /><b>Whisper</b><span>audio to text</span>
             </div>
             <div className="ox-gate cls" style={{ left: X_CLS - 88, top: Y - 64 }}>
               <b>Classifier</b>
-              {MODELS.map(([m, f1], i) => (
-                <div key={m} className={cn("ox-model", i === 0 && "on")}>
-                  <span>{m}</span><i style={{ width: `${Math.round((f1 - 0.6) * 300)}%` }} /><em>{f1.toFixed(2)}</em>
-                </div>
-              ))}
-              <small>macro F1</small>
+              <small className="ox-sub">P(well-being), this clip</small>
+              {MODELS.map(([m], k) => {
+                const v = current ? current.probs[k] : 0;
+                return <div key={m} className={cn("ox-model", k === 0 && "on")}>
+                  <span>{m}</span><i style={{ width: `${Math.round(v * 100)}%`, opacity: current ? 1 : 0.2 }} /><em>{current ? v.toFixed(2) : "–"}</em>
+                </div>;
+              })}
+              <small>macro F1 on the test set: {MODELS.map(([m, f1]) => `${m === "Random forest" ? "RF" : m} ${f1.toFixed(2)}`).join(" · ")}</small>
             </div>
 
             {moving.map((it) => {
               const p = where(it.s, it.said);
               return <div key={it.i} className={cn("ox-clip", p.text && "text")} style={{ transform: `translate(${(p.x - 24).toFixed(1)}px, ${(p.y - 16).toFixed(1)}px)`, opacity: it.s < 0.04 ? it.s / 0.04 : it.s > 0.78 ? 1 - (it.s - 0.78) / 0.07 : 1 }}>
-                {p.text ? <><i /><i /><i /></> : it.kind === "video" ? <Play className="size-3.5" /> : <Mic className="size-3.5" />}
+                {p.text ? <><i /><i /><i /></> : it.kind === "ship" ? <Ship className="size-3.5" /> : <Mic className="size-3.5" />}
               </div>;
             })}
 
@@ -102,12 +113,12 @@ export function OceansScene() {
             </div>
 
             <div className="ox-desk" style={{ left: 850, top: 26 }}>
-              <div className="ox-person"><UserRound className="size-5" /><div><b>PhD researcher</b><span>gets the labelled corpus, with explanations</span></div></div>
+              <div className="ox-person"><UserRound className="size-5" /><div><b>Our supervisor</b><span>a professor of wellbeing research, gets the corpus and the reasons</span></div></div>
               <div key={explain} className="ox-lime">
                 <div className="ox-lime-head"><Sparkles className="size-3.5" /> LIME · why it said well-being</div>
                 <p>{EXPLAINS[explain].map(([w, s], i) => <span key={i} style={s ? { background: `color-mix(in oklab, var(--acc-5) ${Math.round(s * 45)}%, transparent)` } : undefined}>{w} </span>)}</p>
               </div>
-              <p className="ox-why">What the researcher needed: not just a label, but which expressions the model tied to well-being.</p>
+              <p className="ox-why">What she needed: not just a label, but which expressions the model tied to well-being.</p>
             </div>
           </>}
         </div>
@@ -121,3 +132,18 @@ const EXPLAINS: [string, number][][] = [
   [["Fishing", 0], ["with", 0], ["my", 0], ["son", 0.6], ["is", 0], ["the", 0], ["calmest", 1], ["part", 0], ["of", 0], ["my", 0], ["week.", 0.3]],
   [["We", 0], ["finally", 0.4], ["have", 0], ["time", 0.7], ["to", 0], ["just", 0], ["sit", 0.5], ["and", 0], ["talk", 0.9], ["together.", 0.6]],
 ];
+
+/** A sailing boat on a moving sea, where the interviews come from. */
+function Boat({ t }: { t: number }) {
+  const rock = Math.sin(t * 1.6) * 3;
+  const bob = Math.sin(t * 1.6 + 0.6) * 2;
+  return <svg className="ox-boat" width={130} height={150} viewBox="0 0 130 150" style={{ left: 0, top: 70 }} aria-hidden>
+    <g transform={`translate(0 ${bob.toFixed(1)}) rotate(${rock.toFixed(1)} 62 104)`}>
+      <path className="sail" d="M 64 22 L 64 92 L 24 92 Z" />
+      <path className="sail jib" d="M 68 34 L 68 92 L 98 92 Z" />
+      <line className="mast" x1="66" y1="16" x2="66" y2="98" />
+      <path className="hull" d="M 18 96 L 112 96 L 100 114 L 30 114 Z" />
+    </g>
+    {[0, 1].map((k) => <path key={k} className={`sea s${k}`} d={`M ${-40 + ((t * 18 + k * 20) % 40)} ${116 + k * 9} q 10 -6 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0`} />)}
+  </svg>;
+}

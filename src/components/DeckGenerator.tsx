@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
  */
 
 const SOURCES = [
-  { key: "dam", icon: Images, name: "Bynder", detail: "Approved product shots, with usage notes" },
-  { key: "pim", icon: Barcode, name: "Product catalogue", detail: "SKUs, EANs, pack sizes, prices" },
-  { key: "crm", icon: Building2, name: "Salesforce", detail: "The partner's account and order history" },
+  { key: "dam", icon: Images, name: "Bynder", detail: "Approved shots, usage notes" },
+  { key: "pim", icon: Barcode, name: "Product catalogue", detail: "SKUs, EANs, prices" },
+  { key: "crm", icon: Building2, name: "Salesforce", detail: "Partner account, orders" },
 ] as const;
 
 const LOOP = 15;
@@ -33,12 +33,12 @@ const TITLE_AT = { start: 1.8, end: 3.0 };
 const NOTE_AT = (k: number) => ({ start: 5.8 + k * 1.7, end: 5.8 + k * 1.7 + 1.4 });
 
 const W = 960, H = 690;
-const TITLE = "Oat & Berry Bar, for your better-for-you shelf";
+const TITLE = "Berry Oat Bar, for your better-for-you shelf";
 
 const NOTES = [
-  { tag: "Product", text: "Picked Oat & Berry Bar: Nordway's oat-bar orders grow 9% a year and they list none of ours. Salesforce opp. 0065g00000QK7Lm." },
+  { tag: "Product", text: "Berry Oat Bar: Nordway sold €412k of oat bars last year, up 9%, and lists none of ours. Opportunity 0065g00000QK7Lm." },
   { tag: "Image", text: "BYN-48213, the shelf shot with the Dutch pack: approved for retail. The studio shot is tagged trade-fair only." },
-  { tag: "Numbers", text: "6 of 8 regions: Nordway's store list matched against where SKU GH-OB-640 already ships." },
+  { tag: "Numbers", text: "214 of 260 stores: Nordway's planograms in Salesforce, matched to the DCs that already ship SKU GH-OB-640." },
 ];
 
 /** Scales the fixed-size screen to the width it is given. */
@@ -102,23 +102,23 @@ export function DeckGenerator() {
   return (
     <div ref={ref}>
       <div ref={wrapRef} className="dg relative">
-        <ul className="relative z-[1] mx-auto mb-12 grid max-w-[860px] grid-cols-3 gap-2 sm:gap-4">
+        <ul className="relative z-[1] mx-auto mb-6 grid max-w-[720px] grid-cols-3 gap-2 sm:gap-3">
           {SOURCES.map(({ key, icon: Icon, name, detail }, i) => (
             <li
               key={key}
               ref={(el) => { srcRefs.current[i] = el; }}
-              className={cn("flex flex-col items-center gap-1.5 rounded-xl border bg-card p-2.5 text-center transition-colors duration-300 sm:flex-row sm:gap-3 sm:p-3 sm:text-left", (flowing(i) || arrived(i)) ? "border-acc-3" : "border-border")}
+              className={cn("flex flex-col items-center gap-1.5 rounded-xl border bg-card p-2 text-center transition-colors duration-300 sm:flex-row sm:gap-2.5 sm:p-2.5 sm:text-left", (flowing(i) || arrived(i)) ? "border-acc-3" : "border-border")}
             >
-              <span className={cn("grid size-9 shrink-0 place-items-center rounded-lg transition-colors duration-300 sm:size-10", (flowing(i) || arrived(i)) ? "bg-acc-6 text-primary-foreground" : "bg-gr-2 text-gr-7")}><Icon className="size-[18px]" /></span>
+              <span className={cn("grid size-8 shrink-0 place-items-center rounded-lg transition-colors duration-300 sm:size-9", (flowing(i) || arrived(i)) ? "bg-acc-6 text-primary-foreground" : "bg-gr-2 text-gr-7")}><Icon className="size-[18px]" /></span>
               <div className="min-w-0">
                 <div className="text-[13px] font-semibold sm:text-[14px]">{name}</div>
-                <div className="hidden text-[12px] leading-snug text-muted-foreground sm:block">{detail}</div>
+                <div className="hidden truncate text-[12px] leading-snug text-muted-foreground sm:block">{detail}</div>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="mx-auto max-w-[860px]">
+        <div className="mx-auto max-w-[430px]">
           <LaptopFrame>
             <div ref={fitRef} className="relative w-full overflow-hidden" style={{ aspectRatio: `${W} / ${H}` }}>
               <div className="dg-screen absolute left-0 top-0" style={{ width: W, height: H, transform: `scale(${scale})` } as CSSProperties}>
@@ -127,7 +127,7 @@ export function DeckGenerator() {
             </div>
           </LaptopFrame>
         </div>
-        <p className="mt-4 text-center text-[12.5px] text-muted-foreground">4 to 5 hours by hand, now generated on demand and checked by the account manager. Partner, products and ids invented for this picture.</p>
+        <p className="mt-2 text-center text-[11.5px] text-muted-foreground">Partner, products and ids invented for this picture.</p>
 
         {mounted && box.w > 0 && (
           <svg className="pointer-events-none absolute inset-0 z-[2] overflow-visible" width={box.w} height={box.h} aria-hidden>
@@ -188,7 +188,7 @@ function Screen({ t, fade, arrived, dstRefs }: {
         {/* The catalogue: what exactly is being pitched */}
         <div ref={(el) => { dstRefs.current[1] = el; }} className={cn("dg-card", arrived(1) && "in")}>
           <span className="dg-label">Recommended product</span>
-          <h3>Oat &amp; Berry Bar</h3>
+          <h3>Berry Oat Bar</h3>
           <p className="dg-sub">Multipack, 6 × 40 g</p>
           <dl className="dg-ids">
             <div><dt>SKU</dt><dd>GH-OB-640</dd></div>
@@ -203,9 +203,9 @@ function Screen({ t, fade, arrived, dstRefs }: {
         {/* Salesforce: why this partner, why now */}
         <div ref={(el) => { dstRefs.current[2] = el; }} className={cn("dg-card", arrived(2) && "in")}>
           <span className="dg-label">Why Nordway</span>
-          <div className="dg-fact"><strong>+9%</strong><span>oat-bar sales a year in your stores</span></div>
-          <div className="dg-fact"><strong>6/8</strong><span>regions with a better-for-you shelf</span></div>
-          <div className="dg-fact"><strong>0</strong><span>Green Harvest bars listed today</span></div>
+          <div className="dg-fact"><strong>€412k</strong><span>oat-bar sales in your stores, last 12 months, up 9%</span></div>
+          <div className="dg-fact"><strong>214 of 260</strong><span>stores with a better-for-you shelf</span></div>
+          <div className="dg-fact"><strong>3 of 41</strong><span>of our snack SKUs you list today, and no bars</span></div>
           <span className="dg-acct">Account 0015g00000NWR42</span>
         </div>
       </div>
@@ -245,7 +245,7 @@ function ProductShot() {
       <rect x="-62" y="-46" width="124" height="86" rx="10" fill="#2f8a52" />
       <path d="M -62 -26 L -70 -22 L -70 22 L -62 26 Z M 62 -26 L 70 -22 L 70 22 L 62 26 Z" fill="#256e41" />
       <rect x="-52" y="-36" width="104" height="22" rx="5" fill="#fff" opacity="0.95" />
-      <text x="0" y="-21" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1f5a36" letterSpacing="0.06em">OAT &amp; BERRY</text>
+      <text x="0" y="-21" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1f5a36" letterSpacing="0.06em">BERRY OAT</text>
       <text x="-50" y="30" fontSize="9" fontWeight="700" fill="#e3f1e7">6 × 40 g</text>
       <circle cx="18" cy="8" r="9" fill="#b3263a" /><circle cx="32" cy="2" r="8" fill="#7a2a6a" /><circle cx="28" cy="18" r="7.5" fill="#c23a4e" />
       {[[-30, 4], [-18, 12], [-36, 18], [-8, 2]].map(([x, y]) => <ellipse key={`${x}${y}`} cx={x} cy={y} rx="7" ry="3.6" fill="#e9d6a6" transform={`rotate(-30 ${x} ${y})`} />)}

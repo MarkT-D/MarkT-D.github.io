@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* Playfair's ampersand is a flourish that reads as a mistake at heading sizes.
+   This face covers only "&" and comes first in the display stack, so every
+   heading sets its ampersand in Manrope and everything else in Playfair. */
+@font-face {
+  font-family: "Display Amp";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("./fonts/manrope-latin.woff2") format("woff2-variations");
+  unicode-range: U+0026;
+}
+
 /* Dark mode follows data-theme on <html>, set before paint by the inline script
    in layout.tsx (stored choice, else the system setting). */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -46,7 +58,7 @@
   --color-red-6: var(--red-6);
   --color-red-8: var(--red-8);
   --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Playfair Display Variable", Georgia, serif;
+  --font-display: "Display Amp", "Playfair Display Variable", Georgia, serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
   --radius-card: 1.5rem;
 }

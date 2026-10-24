@@ -5,12 +5,10 @@ import { HeroVisual } from "@/components/HeroVisual";
 import { CaseStudy } from "@/components/CaseStudy";
 import { GrantFactory } from "@/components/iso/GrantFactory";
 import { DeckGenerator } from "@/components/DeckGenerator";
-import { MenuOnboarding } from "@/components/MenuOnboarding";
-import { TaskGraph } from "@/components/TaskGraph";
+import { PestoStory } from "@/components/PestoStory";
 import { QuotaShots } from "@/components/QuotaShots";
 import { TracScene } from "@/components/TracScene";
 import { OceansScene } from "@/components/OceansScene";
-import { GpuSpeedup } from "@/components/GpuSpeedup";
 import { GpuNode } from "@/components/iso/GpuNode";
 import { Reveal } from "@/components/Reveal";
 import { Fit } from "@/components/Fit";
@@ -21,7 +19,7 @@ import { asset } from "@/lib/utils";
 const STATS = [
   { value: "1.5 yrs", label: "shipping LLM systems at an AI startup, promoted to FDE" },
   { value: "~€360k/yr", label: "labour saved for clients by my grant platform (est.)" },
-  { value: "Teams of 5 & 4", label: "led on partner projects, both awarded" },
+  { value: "Teams of 5 and 4", label: "led on partner projects, both awarded" },
   { value: "EU citizen", label: "based in Barcelona, no visa or sponsorship needed" },
 ];
 
@@ -79,7 +77,7 @@ export default function Home() {
         {/* Hero */}
         <section className="relative overflow-hidden">
           <div className="grid-backdrop" />
-          <div className="wrap grid items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:pb-24">
+          <div className="wrap grid items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[0.9fr_1.1fr] lg:pb-24">
             <div className="animate-rise-in">
               <div className="mb-5 flex flex-wrap items-center gap-2">
                 <span className="chip"><span className="dot" /> Open to AI Engineer roles</span>
@@ -149,16 +147,16 @@ export default function Home() {
             role="Forward Deployed Engineer"
             period="Nov 2025 – Feb 2026"
             title="A pitch deck from partner data, on demand"
-            lede="Embedded with a major international food producer selling in 100+ countries, I owned a presentation generator from discovery to build as the client's primary technical contact."
+            lede="Embedded with a major international food producer selling in 100+ countries, I owned their presentation generator from discovery to build, as the main technical contact."
             points={[
-              "Turned a 4 to 5 hour manual workflow into on-demand generation. The model picks what to pitch from the partner's account and orders in Salesforce, pulls the SKU, EAN and price from the catalogue and an approved shot from Bynder.",
-              "Every slide carries speaker notes saying why each part was chosen, with the record ids to check it by, so the account manager can trust it or fix it fast.",
-              "Made the build-vs-extend call: prototyped on Twin's workflow engine, found where its grant assumptions broke, rebuilt standalone as sole developer.",
-              "Ran weekly releases and client demos, and onboarded the engineer who took over my previous role.",
+              "Took a 4 to 5 hour manual job to on-demand. The model picks the product from the partner's Salesforce account, then pulls SKU and price from the catalogue and an approved shot from Bynder.",
+              "Speaker notes give the reason for every choice, with the record ids, so the account manager can check it in a minute.",
+              "Made the build-vs-extend call: prototyped on Twin's workflow engine, then rebuilt it standalone as sole developer, with weekly releases and demos.",
             ]}
             stack={["Next.js", "TypeScript", "Salesforce API", "Bynder API", "LLM pipelines", "Client discovery"]}
+            tight
           >
-            <div className="card overflow-visible p-4 sm:p-7">
+            <div className="card overflow-visible p-4 sm:p-5">
               <DeckGenerator />
             </div>
           </CaseStudy>
@@ -180,10 +178,7 @@ export default function Home() {
             stack={["Next.js 16", "TypeScript", "Supabase / Postgres", "Google Vision", "Claude API", "Playwright"]}
           >
             <div className="card p-4 sm:p-7">
-              <TaskGraph />
-            </div>
-            <div className="card mt-6 p-4 sm:p-7">
-              <MenuOnboarding />
+              <PestoStory />
             </div>
           </CaseStudy>
 
@@ -236,11 +231,11 @@ export default function Home() {
             label="Partner project"
             role="Machine Learning Engineer"
             period="Sep 2024 – Feb 2025"
-            title="What well-being sounds like, in 600 hours of video"
-            lede="With a supervising PhD researcher, my team of four turned ~600 hours of interviews and YouTube videos into a labelled corpus and compared three model families on it."
+            title="What well-being sounds like, in 600 hours of interviews"
+            lede="Supervised by a professor of wellbeing research, my team of four turned ~600 hours of interviews, mostly with sailors, into a labelled corpus and compared three model families on it."
             points={[
               "Scraping and transcription pipeline: BeautifulSoup, Selenium, OpenAI Whisper.",
-              "LIME and SHAP to show which expressions the models tied to well-being, the deliverable the researcher needed.",
+              "LIME and SHAP to show which expressions the models tied to well-being, the deliverable our supervisor needed.",
               "Hosted on Hugging Face with an interactive demo. 1st place in the Well-Being track.",
             ]}
             stack={["PyTorch", "Hugging Face", "scikit-learn", "Whisper", "LIME", "SHAP"]}
@@ -273,16 +268,12 @@ export default function Home() {
               </Reveal>
               <Reveal delay={120}>
                 <div className="card p-3 sm:p-5">
-                  <div className="mb-1 px-1 text-[15px] font-semibold">One DAS-5 node, a 525 MB job</div>
-                  <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Data crosses PCIe, the GPU&apos;s thread blocks run the kernel, the result comes back. Timed like the real run.</p>
+                  <div className="mb-1 px-1 text-[15px] font-semibold">A GPU node in a cluster</div>
+                  <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Host memory, PCIe, the GPU&apos;s thread blocks, MPI between nodes. Pick an input size: each phase plays for its share of the measured time.</p>
                   <Fit width={600}><GpuNode /></Fit>
                 </div>
               </Reveal>
             </div>
-            <Reveal className="mt-8">
-              <GpuSpeedup />
-            </Reveal>
-
             <div className="mt-14">
               <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Toolbox</h3>
               <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">

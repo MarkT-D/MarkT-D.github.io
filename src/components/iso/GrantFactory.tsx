@@ -23,19 +23,19 @@ const STILL = 13.1;
 // ── the line ──
 const BELT_Y = 125, BELT_D = 30, BELT_TOP = 14;
 const CY = BELT_Y + BELT_D / 2;
-const FLOOR: Box = { x: -24, y: -6, w: 540, d: 286, z0: -10, z1: 0 };
+const FLOOR: Box = { x: -24, y: -20, w: 540, d: 300, z0: -10, z1: 0 };
 const BELT: Box = { x: -10, y: BELT_Y, w: 400, d: BELT_D, z0: 0, z1: BELT_TOP };
 const LLM: Box = { x: 218, y: BELT_Y - 12, w: 50, d: BELT_D + 24, z0: 0, z1: 50 };
-const RULES: Box = { x: 140, y: 8, w: 54, d: 50, z0: 0, z1: 40 };
+const RULES: Box = { x: 150, y: -12, w: 46, d: 40, z0: 0, z1: 40 };
 const DOCS: Box = { x: 216, y: 214, w: 54, d: 46, z0: 0, z1: 40 };
-const PARTNER: Box = { x: 292, y: 222, w: 34, d: 32, z0: 0, z1: 24 };
+const PARTNER: Box = { x: 300, y: 218, w: 34, d: 32, z0: 0, z1: 24 };
 const TRAY: Box = { x: 396, y: BELT_Y - 4, w: 62, d: BELT_D + 8, z0: 0, z1: 22 };
 const STACK: Box = { x: -50, y: BELT_Y - 2, w: 34, d: BELT_D + 4, z0: 0, z1: 26 };
 
 /** A gate over the belt: two posts and a beam. */
 const gate = (x: number) => ({
-  back: { x, y: BELT_Y - 10, w: 10, d: 8, z0: 0, z1: 50 } as Box,
-  front: { x, y: BELT_Y + BELT_D + 2, w: 10, d: 8, z0: 0, z1: 50 } as Box,
+  back: { x, y: BELT_Y - 10, w: 10, d: 8, z0: 0, z1: 44 } as Box,
+  front: { x, y: BELT_Y + BELT_D + 2, w: 10, d: 8, z0: 0, z1: 44 } as Box,
   beam: { x, y: BELT_Y - 10, w: 10, d: BELT_D + 20, z0: 44, z1: 54 } as Box,
 });
 const PARSE_X = 70, SPLIT_X = 150, JUDGE_X = 336;
@@ -82,7 +82,7 @@ function cardAt(i: number, t: number) {
 
 /** The expert's part: read the stack, settle the flag, approve, send. */
 const REVIEW = 10.8, RESOLVE = 12.6, APPROVE = 13.6, SUBMIT = 14.4;
-const REVIEWER = { x: 446, y: BELT_Y - 34 };
+const REVIEWER = { x: 482, y: BELT_Y + 22 };
 
 /** Has card i been judged yet. */
 const judged = (i: number, t: number) => cardAt(i, t).x >= JUDGE_X + 5 || t >= 9.6;
@@ -122,8 +122,8 @@ const BOUNDS = (() => {
 })();
 const at = (p: Point) => ({ left: `${((p.x - BOUNDS.x) / BOUNDS.w) * 100}%`, top: `${((p.y - BOUNDS.y) / BOUNDS.h) * 100}%` });
 
-function Label({ p, children, strong }: { p: Point; children: ReactNode; strong?: boolean }) {
-  return <span className={cn("gp-label", strong && "strong")} style={at(p)}>{children}</span>;
+function Label({ p, children, strong, right, left, paint }: { p: Point; children: ReactNode; strong?: boolean; right?: boolean; left?: boolean; paint?: boolean }) {
+  return <span className={cn("gp-label", strong && "strong", right && "right", left && "left", paint && "paint")} style={at(p)}>{children}</span>;
 }
 
 export function GrantFactory() {
@@ -172,14 +172,22 @@ export function GrantFactory() {
 
   return <div><div ref={ref} className="gp" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }}>
     <svg viewBox={`${BOUNDS.x} ${BOUNDS.y} ${BOUNDS.w} ${BOUNDS.h}`} aria-hidden="true">
+      <defs><filter id="gp-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5" /></filter></defs>
       <Prism b={FLOOR} className="gp-floor" />
+      {/* Contact shadows, so nothing floats: each block's footprint, pushed away from the light and blurred. */}
+      <g className="gp-shadows" filter="url(#gp-soft)">
+        {[STACK, RULES, DOCS, PARTNER, LLM, TRAY, BELT, ...[g1, g2, g3].flatMap((g) => [g.back, g.front])].map((b, i) => {
+          const k = Math.min(14, b.z1 * 0.22);
+          return <polygon key={i} points={pts([iso(b.x + 2, b.y + 2, 0), iso(b.x + b.w + k, b.y + 2, 0), iso(b.x + b.w + k, b.y + b.d + k * 0.6, 0), iso(b.x + 2, b.y + b.d + k * 0.6, 0)])} />;
+        })}
+      </g>
 
       {/* Sources behind and in front of the writer, and their pipes into it. */}
       <Prism b={STACK} className="gp-stack" />
       <PageLines b={STACK} />
       <Prism b={RULES} className="gp-module rules" />
       <PageLines b={RULES} n={4} />
-      <Pipe a={[RULES.x + RULES.w / 2, RULES.y + RULES.d, 24]} b={[LLM.x + 14, LLM.y, 24]} t={t} on={writing} />
+      <Pipe a={[RULES.x + RULES.w, RULES.y + RULES.d - 8, 24]} b={[LLM.x + 12, LLM.y, 24]} t={t} on={writing} />
 
       {/* The belt, its tread moving. */}
       <Prism b={BELT} className="gp-belt" />
@@ -190,6 +198,7 @@ export function GrantFactory() {
       })}
 
       {/* The judge's screen stands behind the belt. */}
+      <Prism b={{ x: JUDGE_X + 3, y: BELT_Y - 22, w: 5, d: 5, z0: 0, z1: 62 }} className="gp-gate" />
       <polygon className="gp-screen" points={pts(facingY(JUDGE_X - 22, JUDGE_X + 34, BELT_Y - 12, 58, 92))} />
       <polygon className={cn("gp-screen-glass", showScore && (current.flag ? "bad" : "ok"))} points={pts(facingY(JUDGE_X - 19, JUDGE_X + 31, BELT_Y - 11.5, 61, 89))} />
 
@@ -202,18 +211,18 @@ export function GrantFactory() {
       </g>
 
       <Prism b={LLM} className={cn("gp-llm", writing && "on")} />
-      {writing && (() => { const top = iso(LLM.x + LLM.w / 2, LLM.y + LLM.d / 2, LLM.z1); return <circle className="gp-glow" cx={top.x} cy={top.y} r={14 + Math.sin(t * 8) * 3} />; })()}
-      {/* The expert stands behind the tray: the one manual step. */}
+      <Prism b={TRAY} className="gp-module" />
+      {/* The expert stands beside the tray: the one manual step. */}
       <Figure x={REVIEWER.x} y={REVIEWER.y} tone="waiter" hair="short" face={-1} scale={1.1} t={t}
         pose={t >= RESOLVE && t < APPROVE + 0.6 ? "point" : t >= REVIEW && t < SUBMIT ? "hold" : "idle"} />
-      <Prism b={TRAY} className="gp-module" />
+
 
       <g opacity={fade}>
         {afterLlm.filter((c) => !onTray(c)).map(card)}
         {afterLlm.filter(onTray).map(card)}
       </g>
 
-      {[g1, g2, g3].map((g, i) => <g key={i}><Prism b={g.beam} className={cn("gp-gate", i === 0 && scanning && "scan")} /><Prism b={g.front} className="gp-gate" /></g>)}
+      {[g1, g2, g3].map((g, i) => <g key={i}><Prism b={g.front} className="gp-gate" /><Prism b={g.beam} className={cn("gp-gate", i === 0 && scanning && "scan")} /></g>)}
       {scanning && (() => {
         const a = iso(PARSE_X + 5, BELT_Y, BELT_TOP + 4), b = iso(PARSE_X + 5, BELT_Y + BELT_D, BELT_TOP + 4);
         return <line className="gp-scan" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />;
@@ -228,13 +237,13 @@ export function GrantFactory() {
     </svg>
 
     <Label p={iso(STACK.x + 17, STACK.y + 10, 50)}>Grant call</Label>
-    <Label p={iso(PARSE_X + 5, BELT_Y - 10, 72)}>Parse</Label>
-    <Label p={iso(SPLIT_X + 5, BELT_Y - 10, 72)}>Sections</Label>
-    <Label p={iso(RULES.x + 27, RULES.y + 10, 64)}>Grant &amp; EU rules</Label>
-    <Label p={iso(LLM.x + 25, LLM.y + 27, 74)} strong>LLM drafts</Label>
-    <Label p={iso(JUDGE_X - 6, BELT_Y - 12, 104)} strong>LLM-as-judge</Label>
-    <Label p={iso(DOCS.x + 26, DOCS.y + DOCS.d, -22)}>Client docs · RAG</Label>
-    <Label p={iso(PARTNER.x + 20, PARTNER.y + PARTNER.d, -16)}>Partner sources, sometimes</Label>
+    <Label p={iso(PARSE_X + 5, BELT_Y + BELT_D + 22, -6)}>Parse</Label>
+    <Label p={iso(SPLIT_X + 5, BELT_Y - 10, 70)}>Sections</Label>
+    <Label p={iso(LLM.x + LLM.w / 2, LLM.y + LLM.d / 2, 84)} strong>LLM drafts</Label>
+    <Label p={iso(RULES.x + 23, RULES.y + 10, 60)}>Grant &amp; EU rules</Label>
+    <Label p={iso(JUDGE_X + 6, BELT_Y - 12, 110)} strong>LLM-as-judge</Label>
+    <Label p={iso(DOCS.x - 6, DOCS.y + DOCS.d, -4)} right>Client docs · RAG</Label>
+    <Label p={iso(PARTNER.x + 17, PARTNER.y + PARTNER.d, -16)}>Partner sources, sometimes</Label>
 
     {t >= REVIEW - 0.2 && t < SUBMIT + 1.2 && (
       <div className="gp-review" style={{ opacity: Math.min(1, (SUBMIT + 1.2 - t) / 0.3) }}>
@@ -246,9 +255,8 @@ export function GrantFactory() {
             {sec.flag && !resolved ? <Flag className="size-3" strokeWidth={2.6} /> : <Check className="size-3" strokeWidth={3} />}
             {sec.flag && <div className="gp-review-choice">
               {resolved ? <em>Kept the grant rule, client told</em> : <>
-                <span className="q">Guidelines vs grant rule</span>
                 <span className={cn("opt", t >= RESOLVE - 0.45 && "press")}>Keep grant rule</span>
-                <span className="opt">Fix source doc</span>
+                <span className="opt">Fix source</span>
               </>}
             </div>}
           </div>

@@ -6,11 +6,11 @@ import { useInView } from "@/lib/use-in-view";
 import { asset, cn } from "@/lib/utils";
 
 /** The QuotaClimat dashboard's four screens, the same set as on GitHub. Demo data. */
-const SHOTS = [
+const SHOTS: { key: string; label: string; alt: string; contain?: boolean }[] = [
   { key: "dashboard", label: "Dashboard", alt: "Dashboard: coverage over time, frame distribution, editorial angles and sectors" },
   { key: "article", label: "Article", alt: "One article with the words behind its frame highlighted, and its frame and angle probabilities" },
   { key: "reader", label: "Reader", alt: "The reader: articles filtered by frame, angle, sector and outlet" },
-  { key: "discrepancy-desk", label: "Discrepancy desk", alt: "Frame coverage ranked by outlet and by country of origin" },
+  { key: "discrepancy-desk", label: "Discrepancy desk", alt: "Frame coverage ranked by outlet and by country of origin", contain: true },
 ];
 
 export function QuotaShots() {
@@ -49,7 +49,7 @@ export function QuotaShots() {
               src={asset(`/img/quota-${s.key}.webp`)}
               alt={s.alt}
               loading="lazy"
-              className={cn("absolute inset-0 block h-full w-full object-cover object-top transition-opacity duration-500", n === i ? "opacity-100" : "opacity-0")}
+              className={cn("absolute inset-0 block h-full w-full transition-opacity duration-500", s.contain ? "object-contain object-center p-2" : "object-cover object-top", n === i ? "opacity-100" : "opacity-0")}
             />
           ))}
         </div>

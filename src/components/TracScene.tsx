@@ -35,7 +35,7 @@ const CALLS = (() => {
   let seed = 7;
   const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   const out: { tower: number; x: number; y: number; at: number; secs: number; mixed: boolean }[] = [];
-  for (let at = 0.1; at < LOOP - 0.8; at += 0.12 + rnd() * 0.2) {
+  for (let at = 0.2; at < LOOP - 1.5; at += 0.55 + rnd() * 0.6) {
     const tower = Math.floor(rnd() * TOWERS.length);
     const [tx, ty] = TOWN[TOWERS[tower].key];
     const a = rnd() * Math.PI * 2, r = 26 + rnd() * 44;
@@ -43,7 +43,7 @@ const CALLS = (() => {
   }
   return out;
 })();
-const TRAVEL = 0.7;
+const TRAVEL = 1.4;
 
 const STAGES = [
   { icon: PhoneIncoming, name: "Ingest", models: ["partner API", "queue"] },
@@ -69,10 +69,10 @@ export function TracScene() {
   const k = held === "field" ? 0 : held === "system" ? 1 : auto;
   const view = k > 0.5 ? "system" : "field";
 
-  const live = CALLS.filter((c) => t >= c.at && t < c.at + TRAVEL + 0.6);
+  const live = CALLS.filter((c) => t >= c.at && t < c.at + TRAVEL + 1.0);
   const feed = CALLS.filter((c) => t >= c.at + TRAVEL).slice(-5).reverse();
   const today = 1240 + CALLS.filter((c) => t >= c.at + TRAVEL).length;
-  const hot = new Set(CALLS.filter((c) => t >= c.at + TRAVEL && t < c.at + TRAVEL + 0.35).map((c) => c.tower));
+  const hot = new Set(CALLS.filter((c) => t >= c.at + TRAVEL && t < c.at + TRAVEL + 0.7).map((c) => c.tower));
 
   const mapX = 40 + (14 - 40) * k, mapY = 14 + (92 - 14) * k, mapS = 0.86 - 0.42 * k;
 
@@ -98,12 +98,12 @@ export function TracScene() {
                 {uganda.dots.map(([x, y], i) => <circle key={i} cx={x} cy={y} r={4.4} className="tf-land" />)}
                 {live.map((c) => {
                   const [tx, ty] = TOWN[TOWERS[c.tower].key];
-                  const p = clamp((t - c.at) / TRAVEL);
+                  const p = ease((t - c.at - 0.4) / (TRAVEL - 0.4));
                   const done = t >= c.at + TRAVEL;
-                  return <g key={`${c.at}`} opacity={done ? 1 - clamp((t - c.at - TRAVEL) / 0.6) : 1}>
+                  return <g key={`${c.at}`} opacity={done ? 1 - clamp((t - c.at - TRAVEL) / 1.0) : clamp((t - c.at) / 0.25)}>
                     <line x1={c.x} y1={c.y} x2={c.x + (tx - c.x) * p} y2={c.y + (ty - 8 - c.y) * p} className="tf-call-line" />
                     <circle cx={c.x} cy={c.y} r={5} className="tf-caller" />
-                    <circle cx={c.x} cy={c.y} r={5 + p * 9} className="tf-caller-ring" opacity={1 - p} />
+                    {t - c.at < 0.9 && (() => { const k = ((t - c.at) % 0.45) / 0.45; return <circle cx={c.x} cy={c.y} r={5 + k * 11} className="tf-caller-ring" opacity={1 - k} />; })()}
                     {!done && <circle cx={c.x + (tx - c.x) * p} cy={c.y + (ty - 8 - c.y) * p} r={3.4} className="tf-packet" />}
                   </g>;
                 })}

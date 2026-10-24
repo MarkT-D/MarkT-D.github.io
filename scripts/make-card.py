@@ -76,7 +76,7 @@ for row in ROWS:
     k, v = row
     out.append(line([(MUTED, f"{k:<7}"), (WHITE, v)]))
 out.append(line([]))
-out.append(line([(DIM + MUTED, "jarvis> "), (AMBER, "candidate verified. recommendation: "), (BOLD + BRIGHT, "hire.")]))
+out.append(line([(DIM + MUTED, "ultron> "), (AMBER, "I ran every possible future. In all of them, you "), (BOLD + BRIGHT, "hire him.")]))
 out.append(border(f"╰{'─' * W}╯"))
 out.append("")
 
