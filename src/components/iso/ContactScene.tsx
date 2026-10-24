@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Briefcase, Check, Cog } from "lucide-react";
 import { COS, iso, Prism, pts, facingX, facingY, type Box, type Point } from "./iso";
 import { Figure, headAt } from "./figure";
@@ -137,18 +137,24 @@ export function ContactScene() {
   }, [purr]);
   const purring = purr !== null && performance.now() - purr < 2200 ? (performance.now() - purr) / 2200 : null;
 
+  // Whether this thing's hint was already open when the press began. A tap
+  // focuses the thing (which opens its hint) before the click arrives, so the
+  // click alone cannot tell "open it" from "close it".
+  const openAtPress = useRef(false);
+
   /** Something in the room you can hover, focus or tap for what it is. */
   const egg = (key: TipKey, children: ReactNode, onClick?: () => void) => (
     <g className={cn("cs-egg", tip === key && "on")} tabIndex={0} role="button" aria-label={`${TIPS[key].title}: ${TIPS[key].text}`}
       onPointerEnter={(e) => { if (e.pointerType === "mouse") setTip(key); }} onPointerLeave={(e) => { if (e.pointerType === "mouse") setTip(null); }}
+      onPointerDown={(e) => { openAtPress.current = tip === key && e.pointerType !== "mouse"; }}
       onFocus={() => setTip(key)} onBlur={() => setTip(null)}
-      onClick={() => { setTip((k) => (k === key && !onClick ? null : key)); onClick?.(); }}>
+      onClick={() => { setTip(openAtPress.current && !onClick ? null : key); openAtPress.current = false; onClick?.(); }}>
       {children}
     </g>
   );
 
   if (!mounted) return <div ref={ref} className="cs" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }} />;
-  return <div ref={ref} className="cs" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }} onPointerLeave={() => setTip(null)}>
+  return <div ref={ref} className="cs" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }} onPointerLeave={(e) => { if (e.pointerType === "mouse") setTip(null); }}>
     <svg viewBox={`${BOUNDS.x} ${BOUNDS.y} ${BOUNDS.w} ${BOUNDS.h}`} role="group" aria-label="An isometric room: me at a desk in Barcelona, messages arriving, a visitor with a job offer. Things in the room say what they are when you hover or tap them.">
       <Prism b={FLOOR} className="cs-floor" />
       <polygon className="cs-rug" points={pts([iso(112, 92, 0), iso(226, 92, 0), iso(226, 200, 0), iso(112, 200, 0)])} />

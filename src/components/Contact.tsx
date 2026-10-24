@@ -62,18 +62,20 @@ export function Contact() {
             ))}
           </ul>
 
-          <div className="mt-4 overflow-hidden rounded-xl bg-term">
-            <div className="flex items-center gap-2 px-4 pt-3 text-[12px] font-semibold text-term-fg/70"><Terminal className="size-3.5" /> Or, from any terminal</div>
-            <div className="flex items-center gap-2 px-4 pb-3 pt-1.5">
+          <div className="mt-4 overflow-hidden rounded-xl bg-term max-sm:-mx-[9.6px]">
+            <div className="flex items-center gap-2 px-1.5 pt-3 text-[12px] sm:px-4 font-semibold text-term-fg/70"><Terminal className="size-3.5" /> Or, from any terminal</div>
+            <div className="flex items-center gap-2 px-1.5 pb-3 pt-1.5 sm:px-4">
               <code className="min-w-0 flex-1 truncate font-mono text-[13.5px] text-term-fg"><span className="text-term-ok">$</span> {CURL}</code>
               <CopyButton text={CURL} label="Copy the curl command" />
             </div>
-            <div className="overflow-x-auto border-t border-white/10 px-4 py-2.5">
-              <pre className="w-max font-mono text-[8.5px] leading-[1.12] sm:text-[9.5px]" aria-label="The card it prints">
+            <div className="overflow-x-auto border-t border-white/10 px-1.5 py-2.5 sm:px-4">
+              <div className="@container">
+              <pre className="w-max font-mono leading-[1.12] [font-size:min(9.5px,calc(100cqw/45.9))]" aria-label="The card it prints">
                 {(card as [string, string, boolean][][]).map((segs, i) => (
                   <div key={i}>{segs.map(([text, color, bold], j) => <span key={j} style={{ color, fontWeight: bold ? 700 : 400 }}>{text}</span>)}</div>
                 ))}
               </pre>
+              </div>
             </div>
           </div>
         </div>

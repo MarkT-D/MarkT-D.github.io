@@ -451,3 +451,7 @@
   .mo-behind { min-height: 300px; padding: 14px; }
   .mo-top { gap: 18px; }
 }
+.ah-slot { position: absolute; height: 168px; display: grid; place-items: center; border-radius: 14px; border: 1.5px dashed var(--gr-4); color: var(--muted-foreground); font-size: 12px; }
+.ah.tall .ah-out { display: flex; flex-wrap: wrap; gap: 6px; }
+.ah.tall .ah-out .ah-merged { width: auto; }
+.ah.tall .ah-out .ah-doc { flex-basis: 100%; }

@@ -30,12 +30,12 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
         </div>
         <h1 className="mt-4 font-display text-[34px] font-semibold leading-[1.15] sm:text-[42px]">{c.title}</h1>
         <p className="mt-3 text-[14px] text-muted-foreground">{c.role} · {c.period}</p>
-        <dl className="mt-8 grid grid-cols-3 gap-4">
+        <dl className="mt-8 grid grid-cols-3 gap-2 sm:gap-4">
           {c.stats.map((s) => (
-            <div key={s.label} className="border-l-2 border-acc-3 pl-3">
+            <div key={s.label} className="min-w-0 border-l-2 border-acc-3 pl-2.5 sm:pl-3">
               <dt className="sr-only">{s.label}</dt>
-              <dd className="font-display text-[26px] font-semibold leading-tight text-acc-7">{s.value}</dd>
-              <dd className="mt-1 text-[13px] leading-snug text-muted-foreground">{s.label}</dd>
+              <dd className="font-display text-[19px] font-semibold leading-tight text-acc-7 min-[400px]:text-[22px] sm:text-[26px]">{s.value}</dd>
+              <dd className="mt-1 hyphens-auto break-words text-[12px] leading-snug text-muted-foreground sm:text-[13px]">{s.label}</dd>
             </div>
           ))}
         </dl>
