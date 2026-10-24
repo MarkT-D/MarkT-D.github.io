@@ -92,20 +92,19 @@ export function MenuOnboarding({ time }: { time?: number } = {}) {
 }
 
 /**
- * One stage handing over to the next: the old screen, frozen where it ended,
- * lifts away, then the new one settles in, so a change of step reads as a
- * change and not a cut.
+ * One stage handing over to the next, the way a phone pushes a screen: the new
+ * one slides in over the old, which drifts back and fades. Never an empty
+ * frame between them, which read as a glitch.
  */
-const XF = 0.9;
+const XF = 0.6;
 function Crossfade({ t, segs, render }: { t: number; segs: Seg[]; render: (t: number) => React.ReactNode }) {
-  const b = segs.map((s) => s.from).concat(segs.map((s) => s.to)).filter((x) => x > 0 && x <= t && t - x < XF).sort((x, y) => y - x)[0];
+  const b = segs.map((s) => s.from).filter((x) => x > 0 && x <= t && t - x < XF).sort((x, y) => y - x)[0];
   if (b === undefined) return <div className="mo-xf"><div key="now">{render(t)}</div></div>;
-  // Out, then in: the two screens never show at once, which read as a double exposure.
   const p = (t - b) / XF;
-  const out = Math.min(1, p * 2), inn = Math.max(0, p * 2 - 1);
+  const q = 1 - (1 - p) ** 3;
   return <div className="mo-xf">
-    <div key={`was${b}`} style={{ opacity: 1 - out * out, transform: `translateY(${(-6 * out).toFixed(1)}px)` }} aria-hidden>{render(b - 0.001)}</div>
-    <div key="now" style={{ opacity: inn * (2 - inn), transform: `translateY(${(6 * (1 - inn)).toFixed(1)}px)` }}>{render(t)}</div>
+    <div key={`was${b}`} style={{ opacity: 1 - q, transform: `translateX(${(-25 * q).toFixed(1)}%)` }} aria-hidden>{render(b - 0.001)}</div>
+    <div key="now" className="mo-xf-in" style={{ transform: `translateX(${(100 * (1 - q)).toFixed(1)}%)` }}>{render(t)}</div>
   </div>;
 }
 
@@ -315,5 +314,6 @@ function Progress({ t }: { t: number }) {
   return <div className="mo-lanes" aria-hidden>
     {lane("Owner", OWNER)}
     {lane("AI", AI)}
+    <div className="mo-playhead-track"><span className="mo-playhead" style={{ left: `${((t / LOOP) * 100).toFixed(2)}%` }} /></div>
   </div>;
 }

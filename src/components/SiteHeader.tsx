@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { asset } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
+import { Cactus } from "./Cactus";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
       <div className="wrap flex h-14 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2.5 font-semibold">
-          <span className="grid size-7 place-items-center rounded-lg bg-acc-6 text-[12px] font-bold text-primary-foreground">MT</span>
+          <span className="grid size-8 place-items-center"><Cactus className="h-7" /></span>
           <span className="hidden sm:inline">Mark Temchenko</span>
         </Link>
         <nav className="flex items-center gap-1 text-[14px] font-medium text-gr-8">

@@ -1,83 +1,61 @@
+import Link from "next/link";
 import { Reveal } from "./Reveal";
+import type { Case } from "@/lib/cases";
 
+/**
+ * One project on the home page: a sentence, three numbers and the visual.
+ * The full write-up lives on the project's own page, linked as "Full story".
+ */
 export function CaseStudy({
-  id,
-  index,
-  org,
-  role,
-  period,
-  title,
-  lede,
-  points,
-  stack,
-  links,
-  label,
+  c,
   side,
-  tight,
   children,
 }: {
-  id: string;
-  index: string;
-  org: string;
-  role: string;
-  period: string;
-  title: string;
-  lede: string;
-  points: string[];
-  stack: string[];
-  links?: { href: string; label: string }[];
-  label?: string;
+  c: Case;
   /** Text on the left, the visual on the right, sized to fit one screen. */
   side?: boolean;
-  /** Text on top, visual under it, packed to fit one screen: the stack moves under the title. */
-  tight?: boolean;
   children: React.ReactNode;
 }) {
   const head = (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[12px] text-gr-6">{index}</span>
-        <span className="eyebrow">{org}</span>
-        {label && <span className="chip h-6 border-acc-3 bg-acc-1 text-acc-8">{label}</span>}
+        <span className="font-mono text-[12px] text-gr-6">{c.index}</span>
+        <span className="eyebrow">{c.org}</span>
+        {c.label && <span className="chip h-6 border-acc-3 bg-acc-1 text-acc-8">{c.label}</span>}
       </div>
-      <h3 className={side ? "font-display text-[26px] font-semibold leading-[1.15] tracking-[-0.01em] sm:text-[30px]" : "font-display text-[28px] font-semibold leading-[1.15] tracking-[-0.01em] sm:text-[34px]"}>{title}</h3>
-      <p className="mt-2 text-[14px] text-muted-foreground">
-        {role} · {period}
-      </p>
-      {tight && <div className="mt-4 flex flex-wrap gap-1.5">{stack.map((s) => <span key={s} className="chip">{s}</span>)}</div>}
+      <h3 className="font-display text-[26px] font-semibold leading-[1.15] tracking-[-0.01em] sm:text-[32px]">{c.title}</h3>
+      <p className="mt-2 text-[14px] text-muted-foreground">{c.role} · {c.period}</p>
     </div>
   );
   const body = (
     <div>
-      <p className={side ? "text-[16px] leading-[1.6] text-gr-9" : "text-[17px] leading-[1.65] text-gr-9"}>{lede}</p>
-      <ul className={side ? "mt-3 space-y-1.5" : "mt-4 space-y-2"}>
-        {points.map((p) => (
-          <li key={p} className={side ? "flex gap-3 text-[14px] leading-[1.55] text-gr-8" : "flex gap-3 text-[15px] leading-[1.6] text-gr-8"}>
-            <span className={side ? "dot mt-[8px]" : "dot mt-[9px]"} />
-            <span>{p}</span>
-          </li>
+      <p className="text-[17px] leading-[1.6] text-gr-9">{c.short}</p>
+      <dl className="mt-5 grid grid-cols-3 gap-3">
+        {c.stats.map((s) => (
+          <div key={s.label} className="border-l-2 border-acc-3 pl-3">
+            <dt className="sr-only">{s.label}</dt>
+            <dd className="font-display text-[22px] font-semibold leading-tight text-acc-7 sm:text-[26px]">{s.value}</dd>
+            <dd className="mt-1 text-[12.5px] leading-snug text-muted-foreground">{s.label}</dd>
+          </div>
         ))}
-      </ul>
-      <div className={tight ? "hidden" : "mt-5 flex flex-wrap gap-1.5"}>
-        {stack.map((s) => (
-          <span key={s} className="chip">{s}</span>
+      </dl>
+      <div className="mt-5 flex flex-wrap gap-1.5">
+        {c.stack.map((s) => <span key={s} className="chip h-6 text-[12px]">{s}</span>)}
+      </div>
+      <div className="mt-4 flex flex-wrap gap-4">
+        <Link href={`/work/${c.id}/`} className="text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6">Full story →</Link>
+        {c.links?.map((l) => (
+          <a key={l.href} href={l.href} className="text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6" target="_blank" rel="noreferrer">
+            {l.label} →
+          </a>
         ))}
       </div>
-      {links && (
-        <div className="mt-4 flex flex-wrap gap-4">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6" target="_blank" rel="noreferrer">
-              {l.label} →
-            </a>
-          ))}
-        </div>
-      )}
     </div>
   );
 
   if (side) {
     return (
-      <section id={id} className="scroll-mt-24 border-t border-border py-14 sm:py-16">
+      <section id={c.id} className="scroll-mt-24 border-t border-border py-14 sm:py-16">
         <div className="wrap grid items-center gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-10 [&>*]:min-w-0">
           <Reveal>
             <div className="space-y-5">
@@ -92,10 +70,10 @@ export function CaseStudy({
   }
 
   return (
-    <section id={id} className={tight ? "scroll-mt-14 border-t border-border py-8 sm:py-9" : "scroll-mt-24 border-t border-border py-16 sm:py-20"}>
+    <section id={c.id} className="scroll-mt-24 border-t border-border py-14 sm:py-16">
       <div className="wrap">
         <Reveal>
-          <div className={tight ? "mb-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8" : "mb-8 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]"}>
+          <div className="mb-8 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
             {head}
             {body}
           </div>

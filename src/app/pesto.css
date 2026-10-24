@@ -200,7 +200,7 @@
 .mo-seg.on em { background: transparent; }
 .mo-seg.on { background: transparent; }
 .mo-seg.on::before { content: ""; position: absolute; inset: 0 2px; border-radius: 6px; background: var(--acc-1); }
-.mo-playhead-track { position: absolute; top: -4px; bottom: -4px; left: 162px; right: 0; pointer-events: none; }
+.mo-playhead-track { position: absolute; top: -4px; bottom: -4px; left: 58px; right: 0; pointer-events: none; z-index: 2; }
 .mo-playhead { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--foreground); border-radius: 2px; }
 .mo-playhead::before { content: ""; position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; border-radius: 99px; background: var(--foreground); }
 
@@ -399,6 +399,9 @@
 .ah-doc span { display: block; margin-top: 2px; color: var(--muted-foreground); font-size: 11px; line-height: 1.35; }
 .mo-xf { display: grid; height: 100%; }
 .mo-xf > * { grid-area: 1 / 1; min-width: 0; min-height: 0; }
+.mo-phone .mo-xf, .mo-behind .mo-xf { overflow: hidden; }
+.mo-phone .mo-xf-in { background: var(--card); box-shadow: -12px 0 24px -12px rgb(0 0 0 / 0.35); }
+.mo-behind .mo-xf-in { background: var(--gr-2); box-shadow: -12px 0 24px -12px rgb(0 0 0 / 0.25); }
 
 /* The GPU in three steps: the node, coalescing, streams. */
 .gs { position: relative; }

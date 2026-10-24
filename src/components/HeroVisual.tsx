@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import cactus from "@/lib/cactus.json";
+import { Cactus } from "./Cactus";
 
 /**
  * A Konsole window (KDE Plasma on Arch, Breeze Dark): fastfetch, then an nmap
@@ -35,27 +35,7 @@ const port = (p: string, svc: string, ver: string): Line => ({
   segs: [[p.padEnd(10), C.fg], ["open  ", C.green2], [svc.padEnd(11), C.fg], [ver, C.fg]],
 });
 
-// fastfetch with an image logo (it prints images in Konsole): a cactus in its pot.
-const PIXELS: Record<string, string> = {
-  o: "#1f5a36", g: "#3fa96a", l: "#7fd8a2", s: "#e3f5ea",
-  f: "#f27d9b", y: "#f6c453", r: "#d9967a", R: "#a8654b", p: "#b9785c", P: "#8e5640",
-};
-
-/** The cactus as pixel art, one rect per run of a colour. */
-function Cactus() {
-  const rects: React.ReactNode[] = [];
-  cactus.forEach((row, y) => {
-    let x = 0;
-    while (x < row.length) {
-      const c = row[x];
-      let w = 1;
-      while (row[x + w] === c) w++;
-      if (PIXELS[c]) rects.push(<rect key={`${y}-${x}`} x={x} y={y} width={w + 0.04} height={1.04} fill={PIXELS[c]} />);
-      x += w;
-    }
-  });
-  return <svg viewBox={`0 0 ${cactus[0].length} ${cactus.length}`} className="h-full w-auto" shapeRendering="crispEdges" aria-hidden>{rects}</svg>;
-}
+// fastfetch with an image logo (it prints images in Konsole): the cactus in its pot, from ./Cactus.
 
 const INFO: Seg[][] = [
   [["mark", C.green], ["@", C.fg], [HOST, C.green]],
@@ -118,9 +98,10 @@ const HOLD_MS = 5200;
 
 /** How far into the script we are: whole lines shown, and characters typed of the next command. */
 function useScript(reduced: boolean) {
-  const [state, setState] = useState({ line: SCRIPT.length, chars: 0 });
+  // Starts on an empty prompt, so a refresh never flashes the finished script.
+  const [state, setState] = useState({ line: 0, chars: 0 });
   useEffect(() => {
-    if (reduced) return;
+    if (reduced) { setState({ line: SCRIPT.length, chars: 0 }); return; }
     let line = 0, chars = 0, timer = 0;
     const step = () => {
       if (line >= SCRIPT.length) {
