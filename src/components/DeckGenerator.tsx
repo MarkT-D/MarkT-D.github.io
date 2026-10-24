@@ -1,33 +1,47 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { Building2, Images, LineChart, Sparkles, Leaf, Wheat, Cookie } from "lucide-react";
+import { Building2, Images, Barcode, Sparkles, Leaf, MessageSquare } from "lucide-react";
 import { LaptopFrame } from "./LaptopFrame";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
 
 /**
- * The presentation generator: three sources outside the laptop wire into a
- * real slide inside it (laid out like Pesto's own deck), each filling the part
- * of the slide it feeds, then the model writes the pitch. The partner, the
- * products and every number are invented for the picture.
+ * The presentation generator, one product slide at a time. The partner's
+ * account in Salesforce says what they buy; the model picks the product to
+ * pitch; the catalogue supplies its SKU, EAN and price; Bynder supplies the
+ * approved shot. The speaker notes under the slide say why each choice was
+ * made, with the ids to check it by. Partner, products, ids and numbers are
+ * all invented for the picture.
  */
 
 const SOURCES = [
-  { key: "crm", icon: Building2, name: "Salesforce", detail: "Partner account: regions, channels, volumes" },
-  { key: "dam", icon: Images, name: "Bynder", detail: "Product shots and brand assets" },
-  { key: "mkt", icon: LineChart, name: "Market data", detail: "Category growth by region" },
+  { key: "dam", icon: Images, name: "Bynder", detail: "Approved product shots, with usage notes" },
+  { key: "pim", icon: Barcode, name: "Product catalogue", detail: "SKUs, EANs, pack sizes, prices" },
+  { key: "crm", icon: Building2, name: "Salesforce", detail: "The partner's account and order history" },
 ] as const;
 
-const LOOP = 11;
-const STILL = 9;
-const WIRE = (i: number) => ({ start: 0.7 + i * 1.5, end: 0.7 + i * 1.5 + 1.1 });
-const WRITE = { start: 5.4, end: 6.8 };
+const LOOP = 15;
+const STILL = 11;
+// Salesforce first (what the partner buys), then the product, then its picture.
+const WIRE = [
+  { start: 4.4, end: 5.4 },
+  { start: 3.0, end: 4.0 },
+  { start: 0.6, end: 1.6 },
+];
+const TITLE_AT = { start: 1.8, end: 3.0 };
+const NOTE_AT = (k: number) => ({ start: 5.8 + k * 1.7, end: 5.8 + k * 1.7 + 1.4 });
 
-const W = 960, H = 600;
-const TITLE = "Plant-based snacks for your eight regions";
+const W = 960, H = 690;
+const TITLE = "Oat & Berry Bar, for your better-for-you shelf";
 
-/** Scales the fixed-size slide to the width it is given. */
+const NOTES = [
+  { tag: "Product", text: "Picked Oat & Berry Bar: Nordway's oat-bar orders grow 9% a year and they list none of ours. Salesforce opp. 0065g00000QK7Lm." },
+  { tag: "Image", text: "BYN-48213, the shelf shot with the Dutch pack: approved for retail. The studio shot is tagged trade-fair only." },
+  { tag: "Numbers", text: "6 of 8 regions: Nordway's store list matched against where SKU GH-OB-640 already ships." },
+];
+
+/** Scales the fixed-size screen to the width it is given. */
 function useFit(width: number) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
@@ -41,7 +55,8 @@ function useFit(width: number) {
   return [ref, scale] as const;
 }
 
-type Wire = { d: string; len: number };
+type Wire = { d: string };
+const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
 export function DeckGenerator() {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
@@ -54,7 +69,7 @@ export function DeckGenerator() {
   const [wires, setWires] = useState<Wire[]>([]);
   const [box, setBox] = useState({ w: 0, h: 0 });
 
-  // Measure where each source and its slide card are, and draw a curve between them.
+  // From the foot of each source down into the top of the column it fills.
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap || !mounted) return;
@@ -64,11 +79,11 @@ export function DeckGenerator() {
       setWires(SOURCES.map((_, i) => {
         const s = srcRefs.current[i]?.getBoundingClientRect();
         const d = dstRefs.current[i]?.getBoundingClientRect();
-        if (!s || !d) return { d: "", len: 0 };
-        const x1 = s.left + s.width / 2 - o.left, y1 = s.top - o.top;
-        const x2 = d.left + d.width / 2 - o.left, y2 = d.bottom - o.top - 6;
-        const path = `M ${x1} ${y1} C ${x1} ${y1 - (y1 - y2) * 0.5}, ${x2} ${y2 + (y1 - y2) * 0.5}, ${x2} ${y2}`;
-        return { d: path, len: Math.hypot(x2 - x1, y2 - y1) * 1.25 };
+        if (!s || !d) return { d: "" };
+        const x1 = s.left + s.width / 2 - o.left, y1 = s.bottom - o.top;
+        const x2 = d.left + d.width / 2 - o.left, y2 = d.top - o.top + 4;
+        const mid = (y2 - y1) * 0.5;
+        return { d: `M ${x1} ${y1} C ${x1} ${y1 + mid}, ${x2} ${y2 - mid}, ${x2} ${y2}` };
       }));
     };
     measure();
@@ -78,26 +93,16 @@ export function DeckGenerator() {
   }, [mounted, scale]);
 
   const fade = t > LOOP - 0.6 ? (LOOP - t) / 0.6 : 1;
-  const arrived = (i: number) => t >= WIRE(i).end;
-  const flowing = (i: number) => t >= WIRE(i).start && t < WIRE(i).end;
-  const progress = (i: number) => Math.min(1, Math.max(0, (t - WIRE(i).start) / (WIRE(i).end - WIRE(i).start)));
-  const writing = t >= WRITE.start;
-  const typed = Math.round(TITLE.length * Math.min(1, Math.max(0, (t - WRITE.start) / (WRITE.end - WRITE.start))));
+  const arrived = (i: number) => t >= WIRE[i].end;
+  const flowing = (i: number) => t >= WIRE[i].start && t < WIRE[i].end;
+  const progress = (i: number) => clamp((t - WIRE[i].start) / (WIRE[i].end - WIRE[i].start));
+  // A wire shows while its data travels, then lets go so it never sits over the slide.
+  const wireOpacity = (i: number) => clamp((t - WIRE[i].start + 0.5) / 0.4) * clamp((WIRE[i].end + 0.7 - t) / 0.5);
 
   return (
     <div ref={ref}>
       <div ref={wrapRef} className="dg relative">
-        <div className="mx-auto max-w-[860px]">
-          <LaptopFrame>
-            <div ref={fitRef} className="relative aspect-[16/10] w-full overflow-hidden">
-              <div className="dg-slide absolute left-0 top-0" style={{ width: W, height: H, transform: `scale(${scale})` } as CSSProperties}>
-                {mounted && <SlideBody t={t} fade={fade} arrived={arrived} writing={writing} typed={typed} dstRefs={dstRefs} />}
-              </div>
-            </div>
-          </LaptopFrame>
-        </div>
-
-        <ul className="relative z-[1] mx-auto mt-12 grid max-w-[860px] grid-cols-3 gap-2 sm:gap-4">
+        <ul className="relative z-[1] mx-auto mb-12 grid max-w-[860px] grid-cols-3 gap-2 sm:gap-4">
           {SOURCES.map(({ key, icon: Icon, name, detail }, i) => (
             <li
               key={key}
@@ -112,13 +117,22 @@ export function DeckGenerator() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-center text-[12.5px] text-muted-foreground">4 to 5 hours by hand, now generated on demand. Partner, products and figures invented for this picture.</p>
 
-        {/* The wires, over everything, from each source into its card on the slide. */}
+        <div className="mx-auto max-w-[860px]">
+          <LaptopFrame>
+            <div ref={fitRef} className="relative w-full overflow-hidden" style={{ aspectRatio: `${W} / ${H}` }}>
+              <div className="dg-screen absolute left-0 top-0" style={{ width: W, height: H, transform: `scale(${scale})` } as CSSProperties}>
+                {mounted && <Screen t={t} fade={fade} arrived={arrived} dstRefs={dstRefs} />}
+              </div>
+            </div>
+          </LaptopFrame>
+        </div>
+        <p className="mt-4 text-center text-[12.5px] text-muted-foreground">4 to 5 hours by hand, now generated on demand and checked by the account manager. Partner, products and ids invented for this picture.</p>
+
         {mounted && box.w > 0 && (
           <svg className="pointer-events-none absolute inset-0 z-[2] overflow-visible" width={box.w} height={box.h} aria-hidden>
             {wires.map((w, i) => w.d && (
-              <g key={i} className={cn("dg-wire", (flowing(i) || arrived(i)) && "on")} opacity={fade}>
+              <g key={i} className="dg-wire on" opacity={wireOpacity(i) * fade}>
                 <path d={w.d} className="base" />
                 <FlowPath d={w.d} p={progress(i)} moving={flowing(i)} />
               </g>
@@ -146,48 +160,96 @@ function FlowPath({ d, p, moving }: { d: string; p: number; moving: boolean }) {
   </>;
 }
 
-function SlideBody({ fade, arrived, writing, typed, dstRefs }: {
-  t: number; fade: number; arrived: (i: number) => boolean; writing: boolean; typed: number;
+function Screen({ t, fade, arrived, dstRefs }: {
+  t: number; fade: number; arrived: (i: number) => boolean;
   dstRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
 }) {
-  return <div className="dg-inner" style={{ opacity: fade }}>
-    <div className="dg-top">
-      <span className="dg-eyebrow">Partnership proposal{arrived(0) && <> · <b>Nordway Retail</b></>}</span>
-      <span className="dg-brand"><Leaf /> Green Harvest Foods</span>
-    </div>
-    <h2 className={cn("dg-title", !writing && "empty")}>
-      {writing ? <>{TITLE.slice(0, typed)}{typed < TITLE.length && <i className="dg-caret" />}</> : <><span /><span /></>}
-    </h2>
-    {writing && <span className="dg-ai"><Sparkles /> Products and talking points picked by the model</span>}
+  const typed = Math.round(TITLE.length * clamp((t - TITLE_AT.start) / (TITLE_AT.end - TITLE_AT.start)));
+  const writing = t >= TITLE_AT.start;
+  return <div className="dg-frame" style={{ opacity: fade }}>
+    <div className="dg-slide">
+      <div className="dg-top">
+        <span className="dg-eyebrow">Proposal{arrived(2) && <> · <b>Nordway Retail</b></>}</span>
+        <span className="dg-brand"><Leaf /> Green Harvest Foods</span>
+      </div>
+      <h2 className={cn("dg-title", !writing && "empty")}>
+        {writing ? <>{TITLE.slice(0, typed)}{typed < TITLE.length && <i className="dg-caret" />}</> : <><span /></>}
+      </h2>
+      <div className="dg-grid">
+        {/* Bynder: the picture, and why this one */}
+        <div ref={(el) => { dstRefs.current[0] = el; }} className={cn("dg-card pic", arrived(0) && "in")}>
+          <div className="dg-shot">
+            <ProductShot />
+            <span className="dg-asset">Bynder · BYN-48213</span>
+          </div>
+          <div className="dg-comment"><MessageSquare /><span><b>Usage:</b> retail approved · NL pack · shelf context</span></div>
+        </div>
 
-    <div className="dg-grid">
-      <div ref={(el) => { dstRefs.current[0] = el; }} className={cn("dg-card", arrived(0) && "in")}>
-        <div className="dg-pic regions">
-          {["N", "NE", "E", "C", "S", "SW", "W", "NW"].map((r, k) => <b key={r} className={k < 6 ? "on" : ""} style={{ "--k": k } as CSSProperties}>{r}</b>)}
+        {/* The catalogue: what exactly is being pitched */}
+        <div ref={(el) => { dstRefs.current[1] = el; }} className={cn("dg-card", arrived(1) && "in")}>
+          <span className="dg-label">Recommended product</span>
+          <h3>Oat &amp; Berry Bar</h3>
+          <p className="dg-sub">Multipack, 6 × 40 g</p>
+          <dl className="dg-ids">
+            <div><dt>SKU</dt><dd>GH-OB-640</dd></div>
+            <div><dt>EAN</dt><dd>8714221006403</dd></div>
+            <div><dt>List price</dt><dd>€3.10</dd></div>
+            <div><dt>RRP</dt><dd>€4.49</dd></div>
+            <div><dt>Case</dt><dd>12 × 6 packs</dd></div>
+            <div><dt>Shelf life</dt><dd>9 months</dd></div>
+          </dl>
         </div>
-        <div className="dg-metric"><strong>6 of 8</strong><span>regions where you already sell our category</span></div>
-        <h3>Strong regional fit</h3>
-        <p>Your discounters carry plant-based lines in six regions. We start there.</p>
-      </div>
-      <div ref={(el) => { dstRefs.current[1] = el; }} className={cn("dg-card", arrived(1) && "in")}>
-        <div className="dg-pic packs">
-          {[{ c: "#2f8a52", i: Wheat, n: "Oat bar" }, { c: "#c27a1a", i: Cookie, n: "Lentil crisps" }, { c: "#5b6b3a", i: Leaf, n: "Hummus" }].map(({ c, i: I, n }, k) => (
-            <span key={n} className="pack" style={{ "--c": c, "--k": k } as CSSProperties}><I /><small>{n}</small></span>
-          ))}
+
+        {/* Salesforce: why this partner, why now */}
+        <div ref={(el) => { dstRefs.current[2] = el; }} className={cn("dg-card", arrived(2) && "in")}>
+          <span className="dg-label">Why Nordway</span>
+          <div className="dg-fact"><strong>+9%</strong><span>oat-bar sales a year in your stores</span></div>
+          <div className="dg-fact"><strong>6/8</strong><span>regions with a better-for-you shelf</span></div>
+          <div className="dg-fact"><strong>0</strong><span>Green Harvest bars listed today</span></div>
+          <span className="dg-acct">Account 0015g00000NWR42</span>
         </div>
-        <div className="dg-metric"><strong>3</strong><span>products to pitch first</span></div>
-        <h3>Oat bars, lentil crisps, hummus</h3>
-        <p>Best sellers with retailers your size, with shelf-ready shots.</p>
       </div>
-      <div ref={(el) => { dstRefs.current[2] = el; }} className={cn("dg-card", arrived(2) && "in")}>
-        <div className="dg-pic chart">
-          <svg viewBox="0 0 120 56"><path pathLength={100} d="M4 48 L20 40 L34 44 L50 30 L66 34 L82 20 L98 24 L114 10" /><circle cx="114" cy="10" r="4" /></svg>
-        </div>
-        <div className="dg-metric"><strong>+11%</strong><span>category growth a year</span></div>
-        <h3>Why now</h3>
-        <p>Plant-based snacking is the fastest-growing shelf in your stores.</p>
-      </div>
+      <div className="dg-foot"><span>Generated from partner data · checked before sending</span><span>4 / 9</span></div>
     </div>
-    <div className="dg-foot"><span>Generated from partner data · reviewed before sending</span><span>3 / 12</span></div>
+
+    <div className="dg-notes">
+      <div className="dg-notes-head">
+        <span>Speaker notes</span>
+        {t >= NOTE_AT(0).start && <span className="dg-ai"><Sparkles /> Why the model chose each part</span>}
+      </div>
+      {NOTES.map((n, k) => {
+        const at = NOTE_AT(k);
+        if (t < at.start) return <div key={n.tag} className="dg-note empty"><i /></div>;
+        const shown = Math.round(n.text.length * clamp((t - at.start) / (at.end - at.start)));
+        return <div key={n.tag} className="dg-note">
+          <b>{n.tag}</b>
+          <span>{n.text.slice(0, shown)}{shown < n.text.length && <i className="dg-caret" />}</span>
+        </div>;
+      })}
+    </div>
   </div>;
+}
+
+/** A shelf, and on it the pack the slide is about. Drawn, not photographed. */
+function ProductShot() {
+  return <svg viewBox="0 0 280 200" preserveAspectRatio="xMidYMid slice" className="dg-svg" aria-hidden>
+    <rect width="280" height="200" fill="#e7ede8" />
+    <rect y="128" width="280" height="10" fill="#c9d3cb" />
+    <rect y="138" width="280" height="62" fill="#dfe6e0" />
+    {/* the rest of the shelf, out of focus */}
+    {[[14, "#b9c7bc"], [58, "#cdb89a"], [196, "#b7c2d6"], [238, "#c9b2b2"]].map(([x, c]) => (
+      <rect key={x as number} x={x as number} y="62" width="36" height="66" rx="5" fill={c as string} opacity="0.75" />
+    ))}
+    {/* the pack */}
+    <g transform="translate(140 98) rotate(-6)">
+      <rect x="-62" y="-46" width="124" height="86" rx="10" fill="#2f8a52" />
+      <path d="M -62 -26 L -70 -22 L -70 22 L -62 26 Z M 62 -26 L 70 -22 L 70 22 L 62 26 Z" fill="#256e41" />
+      <rect x="-52" y="-36" width="104" height="22" rx="5" fill="#fff" opacity="0.95" />
+      <text x="0" y="-21" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1f5a36" letterSpacing="0.06em">OAT &amp; BERRY</text>
+      <text x="-50" y="30" fontSize="9" fontWeight="700" fill="#e3f1e7">6 × 40 g</text>
+      <circle cx="18" cy="8" r="9" fill="#b3263a" /><circle cx="32" cy="2" r="8" fill="#7a2a6a" /><circle cx="28" cy="18" r="7.5" fill="#c23a4e" />
+      {[[-30, 4], [-18, 12], [-36, 18], [-8, 2]].map(([x, y]) => <ellipse key={`${x}${y}`} cx={x} cy={y} rx="7" ry="3.6" fill="#e9d6a6" transform={`rotate(-30 ${x} ${y})`} />)}
+    </g>
+    <text x="232" y="160" fontSize="10" fontWeight="700" fill="#4b5a50">€4.49</text>
+  </svg>;
 }

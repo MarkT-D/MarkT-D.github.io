@@ -3,6 +3,7 @@ import "@fontsource-variable/manrope";
 import "@fontsource-variable/playfair-display";
 import "./globals.css";
 import "./iso.css";
+import "./pesto.css";
 
 export const metadata: Metadata = {
   title: "Mark Temchenko · AI Engineer",

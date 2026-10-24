@@ -4,16 +4,17 @@ import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { HeroVisual } from "@/components/HeroVisual";
 import { CaseStudy } from "@/components/CaseStudy";
 import { GrantFactory } from "@/components/iso/GrantFactory";
-import { AskScene } from "@/components/iso/ask-scene";
 import { DeckGenerator } from "@/components/DeckGenerator";
-import { MenuPipeline } from "@/components/MenuPipeline";
-import { AttentionDemo } from "@/components/AttentionDemo";
-import { TracPipeline } from "@/components/TracPipeline";
-import { ModelBars } from "@/components/ModelBars";
+import { MenuOnboarding } from "@/components/MenuOnboarding";
+import { TaskGraph } from "@/components/TaskGraph";
+import { QuotaShots } from "@/components/QuotaShots";
+import { TracScene } from "@/components/TracScene";
+import { OceansScene } from "@/components/OceansScene";
 import { GpuSpeedup } from "@/components/GpuSpeedup";
 import { GpuNode } from "@/components/iso/GpuNode";
-import { LaptopFrame } from "@/components/LaptopFrame";
 import { Reveal } from "@/components/Reveal";
+import { Fit } from "@/components/Fit";
+import { Contact } from "@/components/Contact";
 import { NOTES } from "@/lib/notes";
 import { asset } from "@/lib/utils";
 
@@ -54,11 +55,6 @@ const COURSES = [
   },
   { name: "Advanced Calculus", body: "The analysis under optimisation and gradient-based learning." },
   { name: "Probability Theory", body: "Stochastic processes and sampling distributions, the base for evaluation and uncertainty." },
-];
-
-const PARALLEL_FACTS = [
-  { value: "2.6 s", label: "a 10-million-point wave equation, 1,000 steps, on one GPU" },
-  { value: "7× slower", label: "a 1,000-point wave split over 8 MPI nodes vs one: messages cost more than the maths" },
 ];
 
 const TOOLBOX = [
@@ -131,17 +127,18 @@ export default function Home() {
             role="AI Automation Engineer"
             period="Mar – Oct 2025"
             title="Grant applications in two minutes, not days"
-            lede="Enterprise clients had grant writers drafting by hand for days. I built the LLM platform that writes submission-ready applications from the grant's own rules and the client's documents, with an expert review as the only manual step."
+            lede="Enterprise clients had grant writers drafting by hand for days. We built an LLM platform that writes submission-ready applications from the grant's own rules and the client's documents. An expert review is the only manual step."
             points={[
-              "Owned the pipeline end to end: parse the grant call, split it into its sections, draft each one with its own prompt.",
-              "Context from two sides: the grant's guidelines and EU or scheme rules, and RAG over the client's documents through whatever they used, plus partner sources when there were any.",
-              "Added an LLM-as-judge stage that scores every section 1 to 10 against the grant rules and the company's internal metrics, and flags where company guidelines pull against a grant requirement.",
-              "Model-agnostic: GPT variants per stage, or Azure-hosted EU models for clients with data-residency needs. Live with 4 enterprise clients, and reused for HR screening on a client's ATS.",
+              "The pipeline parses the grant call, splits it into its sections and drafts each one with its own prompt.",
+              "Context from two sides: the grant's guidelines and EU rules, and RAG over the client's own documents, plus partner sources when there were any.",
+              "An LLM judge scores every section 1 to 10 and flags where company guidelines pull against a grant rule. The expert settles those, then approves.",
+              "Model-agnostic, with Azure-hosted EU models for data residency. Live with 4 enterprise clients, and reused for HR screening on a client's ATS.",
             ]}
             stack={["Python", "TypeScript", "OpenAI / Claude / Gemini APIs", "Azure OpenAI (EU)", "RAG"]}
+            side
           >
-            <div className="card overflow-hidden p-3 sm:p-6">
-              <div className="overflow-x-auto"><div className="min-w-[600px] sm:min-w-0"><GrantFactory /></div></div>
+            <div className="card overflow-hidden p-3 sm:p-5">
+              <Fit width={600}><GrantFactory /></Fit>
             </div>
           </CaseStudy>
 
@@ -154,7 +151,8 @@ export default function Home() {
             title="A pitch deck from partner data, on demand"
             lede="Embedded with a major international food producer selling in 100+ countries, I owned a presentation generator from discovery to build as the client's primary technical contact."
             points={[
-              "Turned a 4 to 5 hour manual workflow into on-demand generation: partner data from the CRM and brand assets from the DAM, the model picks the products to pitch and the key points, the template fills itself.",
+              "Turned a 4 to 5 hour manual workflow into on-demand generation. The model picks what to pitch from the partner's account and orders in Salesforce, pulls the SKU, EAN and price from the catalogue and an approved shot from Bynder.",
+              "Every slide carries speaker notes saying why each part was chosen, with the record ids to check it by, so the account manager can trust it or fix it fast.",
               "Made the build-vs-extend call: prototyped on Twin's workflow engine, found where its grant assumptions broke, rebuilt standalone as sole developer.",
               "Ran weekly releases and client demos, and onboarded the engineer who took over my previous role.",
             ]}
@@ -172,22 +170,20 @@ export default function Home() {
             label="Side project"
             role="Full-stack developer"
             period="2026 – now"
-            title="From a photo of a paper menu to a menu in any language"
-            lede="Pesto is a restaurant platform I build with a small team. Its first step is the one guests never see: a restaurant photographs the menu it already has, and gets a structured, translated digital menu back."
+            title="One system for everything a restaurant runs, and AI for the typing"
+            lede="Restaurants juggle a menu tool, a till, a kitchen printer, a payment terminal and a fiscal register, and still type the menu in by hand. Pesto is a restaurant platform I build with a small team that puts all of it in one system. My focus is the AI that does the typing."
             points={[
-              "Google Vision OCR, then Claude with structured output to a strict schema: sections, dishes, prices, allergens, nutrition.",
-              "The OCR stage and the LLM stage are each tested on their own against expected JSON for a set of menu photos.",
-              "Translation into any language, up to 10 per menu, batched through structured output and tested on awkward names: quotes, Cyrillic, accents.",
+              "A photo of the paper menu becomes a structured menu: Google Vision OCR, then Claude with structured output to a strict schema, with sections, prices, allergens and nutrition.",
+              "Parsing starts with the first photographed page and runs while the owner goes through onboarding. Translations run while they check the dishes, and an edited dish is translated again.",
+              "Each stage is tested on its own against expected JSON for real menu photos. Translation is tested on awkward names: quotes, Cyrillic, accents.",
             ]}
             stack={["Next.js 16", "TypeScript", "Supabase / Postgres", "Google Vision", "Claude API", "Playwright"]}
           >
-            <MenuPipeline />
-            <div className="card mt-6 overflow-hidden p-3 sm:p-6">
-              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
-                <span className="text-[15px] font-semibold">One evening on Pesto</span>
-                <span className="text-[12.5px] text-muted-foreground">Order from the table, at the register or to take away. The kitchen screen, the waiter, the receipt filed.</span>
-              </div>
-              <div className="overflow-x-auto"><div className="min-w-[600px] sm:min-w-0"><AskScene /></div></div>
+            <div className="card p-4 sm:p-7">
+              <TaskGraph />
+            </div>
+            <div className="card mt-6 p-4 sm:p-7">
+              <MenuOnboarding />
             </div>
           </CaseStudy>
 
@@ -199,23 +195,17 @@ export default function Home() {
             role="Technical Lead & ML Engineer"
             period="Feb – Jun 2026"
             title="How 781 outlets frame the climate crisis"
-            lede="QuotaClimat, a French media watchdog, files evidence with the regulator ARCOM. I led a team of five building the tool behind that evidence: a scraper, a classifier pipeline and a dashboard."
+            lede="QuotaClimat, a French media watchdog, files evidence with the regulator ARCOM. I led a team of five building the tool behind it: a scraper, a classifier pipeline and a dashboard."
             points={[
-              "Set targets with the partner, and beat the keyword classifier they used before.",
-              "GPT-5-mini labelled the corpus. We validated those labels against human annotators and distilled them into multilingual XLM-RoBERTa classifiers.",
-              "Macro F1 0.82 in French, and within ~11% of that in the other languages tested.",
+              "GPT-5-mini labelled the corpus. We checked those labels against human annotators and distilled them into multilingual XLM-RoBERTa classifiers that beat the partner's keyword baseline.",
+              "Macro F1 0.82 in French, within ~11% of that in the other languages tested. Calibrated per frame, so a score means what it says.",
               "Owned the architecture: a session-parallel scraper (~2k articles/hr), Postgres, FastAPI, a Next.js dashboard, Docker. 2nd place, Environmental Award.",
             ]}
             stack={["Python", "PyTorch", "XLM-RoBERTa", "FastAPI", "Next.js", "PostgreSQL", "Docker"]}
             links={[{ href: "https://github.com/MarkT-D/quotaclimat-media-framing", label: "Code on GitHub" }]}
+            side
           >
-            <div className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-              <LaptopFrame>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={asset("/img/dashboard.png")} alt="QuotaClimat dashboard with frame distribution and sector charts" className="block w-full" />
-              </LaptopFrame>
-              <AttentionDemo />
-            </div>
+            <QuotaShots />
           </CaseStudy>
 
           <CaseStudy
@@ -234,7 +224,9 @@ export default function Home() {
             ]}
             stack={["Whisper", "FFmpeg", "WebRTC VAD", "Embeddings + HDBSCAN", "LLM translation", "React", "Docker"]}
           >
-            <TracPipeline />
+            <div className="card p-4 sm:p-6">
+              <TracScene />
+            </div>
           </CaseStudy>
 
           <CaseStudy
@@ -254,12 +246,8 @@ export default function Home() {
             stack={["PyTorch", "Hugging Face", "scikit-learn", "Whisper", "LIME", "SHAP"]}
             links={[{ href: "https://github.com/MarkT-D/XplorIT", label: "Code on GitHub" }]}
           >
-            <div className="card grid gap-6 p-5 sm:grid-cols-2 sm:p-6">
-              <ModelBars />
-              <div className="rounded-xl bg-gr-2 p-4 text-[13.5px] leading-relaxed text-gr-8">
-                <div className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">Pipeline</div>
-                YouTube search → audio → Whisper transcripts → keyword filters → labelled corpus → BERT · SVM · Random Forest → LIME / SHAP
-              </div>
+            <div className="card p-4 sm:p-6">
+              <OceansScene />
             </div>
           </CaseStudy>
         </div>
@@ -267,11 +255,11 @@ export default function Home() {
         {/* Foundations */}
         <section id="foundations" className="scroll-mt-16 border-t border-border py-16 sm:py-20">
           <div className="wrap">
-            <p className="eyebrow">Beyond the degree</p>
-            <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
-            <div className="mt-10 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] [&>*]:min-w-0">
+            <div className="grid items-center gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-10 [&>*]:min-w-0">
               <Reveal>
-                <ul className="space-y-5">
+                <p className="eyebrow">Beyond the degree</p>
+                <h2 className="mt-2 font-display text-[30px] font-semibold leading-tight sm:text-[34px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
+                <ul className="mt-7 space-y-5">
                   {COURSES.map((c) => (
                     <li key={c.name} className="border-l-2 border-acc-3 pl-4">
                       <div className="text-[16px] font-semibold">{c.name}</div>
@@ -279,20 +267,15 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <dl className="mt-8 grid grid-cols-2 gap-3">
-                  {PARALLEL_FACTS.map((f) => (
-                    <div key={f.label} className="card p-4">
-                      <dd className="font-display text-[22px] font-semibold">{f.value}</dd>
-                      <dt className="mt-1 text-[12.5px] leading-snug text-muted-foreground">{f.label}</dt>
-                    </div>
-                  ))}
-                </dl>
+                <p className="mt-6 text-[14.5px] leading-[1.6] text-gr-8">
+                  The lesson I kept from the GPU labs: the kernel was 83× faster than the CPU, but copying the data over PCIe ate most of that. End to end it was about 15×, and below roughly 40 KB the CPU won.
+                </p>
               </Reveal>
               <Reveal delay={120}>
                 <div className="card p-3 sm:p-5">
                   <div className="mb-1 px-1 text-[15px] font-semibold">One DAS-5 node, a 525 MB job</div>
                   <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Data crosses PCIe, the GPU&apos;s thread blocks run the kernel, the result comes back. Timed like the real run.</p>
-                  <div className="overflow-x-auto"><div className="min-w-[600px] sm:min-w-0"><GpuNode /></div></div>
+                  <Fit width={600}><GpuNode /></Fit>
                 </div>
               </Reveal>
             </div>
@@ -371,6 +354,7 @@ export default function Home() {
             </p>
           </div>
         </section>
+        <Contact />
       </main>
       <SiteFooter />
     </>

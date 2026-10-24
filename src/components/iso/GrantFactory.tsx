@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Check, Flag } from "lucide-react";
 import { iso, Prism, pts, facingY, type Box, type Point } from "./iso";
+import { Figure } from "./figure";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
 
@@ -12,16 +13,17 @@ import { cn } from "@/lib/utils";
  * sections, each section is drafted by the LLM with the grant's rules on one
  * side and the client's own documents on the other, then the judge scores
  * every section and flags where company guidelines pull against a grant
- * requirement. Every name and number is invented for the picture.
+ * requirement. Then a person decides: the expert resolves the flag, approves
+ * and the application goes out. Every name and number is invented.
  */
 
-const LOOP = 13;
-const STILL = 10.9;
+const LOOP = 17;
+const STILL = 13.1;
 
 // ── the line ──
 const BELT_Y = 125, BELT_D = 30, BELT_TOP = 14;
 const CY = BELT_Y + BELT_D / 2;
-const FLOOR: Box = { x: -24, y: -6, w: 500, d: 286, z0: -10, z1: 0 };
+const FLOOR: Box = { x: -24, y: -6, w: 540, d: 286, z0: -10, z1: 0 };
 const BELT: Box = { x: -10, y: BELT_Y, w: 400, d: BELT_D, z0: 0, z1: BELT_TOP };
 const LLM: Box = { x: 218, y: BELT_Y - 12, w: 50, d: BELT_D + 24, z0: 0, z1: 50 };
 const RULES: Box = { x: 140, y: 8, w: 54, d: 50, z0: 0, z1: 40 };
@@ -74,8 +76,13 @@ function cardAt(i: number, t: number) {
   if (t < 9.6) return { x: lead - i * GAP, z: BELT_TOP };
   const p = ease(span(t, 9.6, 10.5));
   const fromX = lead - i * GAP * (1 - p);
-  return { x: Math.min(fromX, 420), z: lerp(BELT_TOP, TRAY.z1 + i * 3.2, p) };
+  const out = ease(span(t, SUBMIT, SUBMIT + 1.1));
+  return { x: Math.min(fromX, 420) + out * 46, z: lerp(BELT_TOP, TRAY.z1 + i * 3.2, p) + out * 70 };
 }
+
+/** The expert's part: read the stack, settle the flag, approve, send. */
+const REVIEW = 10.8, RESOLVE = 12.6, APPROVE = 13.6, SUBMIT = 14.4;
+const REVIEWER = { x: 446, y: BELT_Y - 34 };
 
 /** Has card i been judged yet. */
 const judged = (i: number, t: number) => cardAt(i, t).x >= JUDGE_X + 5 || t >= 9.6;
@@ -126,7 +133,9 @@ export function GrantFactory() {
 
   const writing = t >= 4.3 && t < 6.1;
   const scanning = t >= 1.2 && t < 1.9;
-  const fade = t > 12.2 ? 1 - span(t, 12.2, LOOP) : t < 0.3 ? span(t, 0, 0.3) : 1;
+  const fade = t > 16.2 ? 1 - span(t, 16.2, LOOP) : t < 0.3 ? span(t, 0, 0.3) : 1;
+  const resolved = t >= RESOLVE;
+  const sent = Math.min(1, Math.max(0, span(t, SUBMIT, SUBMIT + 1.1)));
   const split = t >= 2.6;
   const g1 = gate(PARSE_X), g2 = gate(SPLIT_X), g3 = gate(JUDGE_X);
   const belt = (t * 22) % 20;
@@ -146,13 +155,14 @@ export function GrantFactory() {
     const hidden = c.x > LLM.x + 4 && c.x < LLM.x + LLM.w - 4;
     if (hidden) return null;
     const done = judged(c.i, t);
-    return <g key={c.i}>
-      <Sheet x={c.x} z={c.z} w={15} d={20} className={cn("gp-card", `s${c.i}`, done && c.s.flag && "flagged")} />
+    const flagged = done && c.s.flag && !resolved;
+    return <g key={c.i} opacity={onTray(c) ? 1 - sent : 1}>
+      <Sheet x={c.x} z={c.z} w={15} d={20} className={cn("gp-card", `s${c.i}`, flagged && "flagged")} />
       {done && (() => {
         const head = iso(c.x, CY, c.z + 3);
-        return <g className={cn("gp-badge", c.s.flag && "bad")} transform={`translate(${head.x.toFixed(1)} ${(head.y - 13).toFixed(1)})`}>
+        return <g className={cn("gp-badge", flagged && "bad")} transform={`translate(${head.x.toFixed(1)} ${(head.y - 13).toFixed(1)})`}>
           <circle r={6.5} />
-          {c.s.flag ? <Flag x={-3.6} y={-3.6} width={7.2} height={7.2} strokeWidth={2.6} /> : <Check x={-4} y={-4} width={8} height={8} strokeWidth={3} />}
+          {flagged ? <Flag x={-3.6} y={-3.6} width={7.2} height={7.2} strokeWidth={2.6} /> : <Check x={-4} y={-4} width={8} height={8} strokeWidth={3} />}
         </g>;
       })()}
     </g>;
@@ -160,7 +170,7 @@ export function GrantFactory() {
 
   if (!mounted) return <div ref={ref} className="gp" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }} />;
 
-  return <div ref={ref} className="gp" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }}>
+  return <div><div ref={ref} className="gp" style={{ aspectRatio: `${BOUNDS.w} / ${BOUNDS.h}` }}>
     <svg viewBox={`${BOUNDS.x} ${BOUNDS.y} ${BOUNDS.w} ${BOUNDS.h}`} aria-hidden="true">
       <Prism b={FLOOR} className="gp-floor" />
 
@@ -193,6 +203,9 @@ export function GrantFactory() {
 
       <Prism b={LLM} className={cn("gp-llm", writing && "on")} />
       {writing && (() => { const top = iso(LLM.x + LLM.w / 2, LLM.y + LLM.d / 2, LLM.z1); return <circle className="gp-glow" cx={top.x} cy={top.y} r={14 + Math.sin(t * 8) * 3} />; })()}
+      {/* The expert stands behind the tray: the one manual step. */}
+      <Figure x={REVIEWER.x} y={REVIEWER.y} tone="waiter" hair="short" face={-1} scale={1.1} t={t}
+        pose={t >= RESOLVE && t < APPROVE + 0.6 ? "point" : t >= REVIEW && t < SUBMIT ? "hold" : "idle"} />
       <Prism b={TRAY} className="gp-module" />
 
       <g opacity={fade}>
@@ -219,15 +232,46 @@ export function GrantFactory() {
     <Label p={iso(SPLIT_X + 5, BELT_Y - 10, 72)}>Sections</Label>
     <Label p={iso(RULES.x + 27, RULES.y + 10, 64)}>Grant &amp; EU rules</Label>
     <Label p={iso(LLM.x + 25, LLM.y + 27, 74)} strong>LLM drafts</Label>
-    <Label p={iso(JUDGE_X + 6, BELT_Y - 12, 112)} strong>LLM-as-judge</Label>
+    <Label p={iso(JUDGE_X - 6, BELT_Y - 12, 104)} strong>LLM-as-judge</Label>
     <Label p={iso(DOCS.x + 26, DOCS.y + DOCS.d, -22)}>Client docs · RAG</Label>
-    <Label p={iso(PARTNER.x + 40, PARTNER.y + PARTNER.d, -14)}>Partner sources, sometimes</Label>
-    <Label p={iso(TRAY.x + 34, TRAY.y + TRAY.d, -16)}>Expert review</Label>
+    <Label p={iso(PARTNER.x + 20, PARTNER.y + PARTNER.d, -16)}>Partner sources, sometimes</Label>
+
+    {t >= REVIEW - 0.2 && t < SUBMIT + 1.2 && (
+      <div className="gp-review" style={{ opacity: Math.min(1, (SUBMIT + 1.2 - t) / 0.3) }}>
+        <div className="gp-review-head">Expert review <span>{resolved ? "0 flags" : "1 flag"}</span></div>
+        {SECTIONS.map((sec) => (
+          <div key={sec.name} className={cn("gp-review-row", sec.flag && !resolved && "bad")}>
+            <span>{sec.name}</span>
+            <span className="score">{sec.score}/10</span>
+            {sec.flag && !resolved ? <Flag className="size-3" strokeWidth={2.6} /> : <Check className="size-3" strokeWidth={3} />}
+            {sec.flag && <div className="gp-review-choice">
+              {resolved ? <em>Kept the grant rule, client told</em> : <>
+                <span className="q">Guidelines vs grant rule</span>
+                <span className={cn("opt", t >= RESOLVE - 0.45 && "press")}>Keep grant rule</span>
+                <span className="opt">Fix source doc</span>
+              </>}
+            </div>}
+          </div>
+        ))}
+        <div className={cn("gp-review-go", t >= APPROVE - 0.35 && "press", t >= APPROVE && "done")}>{t >= APPROVE ? "Approved" : "Approve & submit"}</div>
+      </div>
+    )}
+    {t >= APPROVE && t < SUBMIT + 0.4 && <span className="gp-stamp" style={at(iso(TRAY.x + 30, TRAY.y + TRAY.d / 2, 48))}>Approved</span>}
+    {t >= SUBMIT + 0.5 && t < 16.3 && <span className="gp-sent" style={at(iso(TRAY.x + 40, TRAY.y + TRAY.d, 64))}><Check className="size-3.5" strokeWidth={3} /> Submitted</span>}
 
     {showScore && (
       <span key={lastJudged} className={cn("gp-score", current.flag && "bad")} style={at(iso(JUDGE_X + 34, BELT_Y - 12, 70))}>
         <b>{current.name}</b> {current.score}/10 · {current.note}
       </span>
     )}
+    </div>
+    <ol className="gp-steps" aria-hidden>
+      {STEPS.map(([name, from], i) => {
+        const next = STEPS[i + 1]?.[1] ?? LOOP;
+        return <li key={name} className={cn(t >= from && t < next && "on", t >= next && "done")}>{name}</li>;
+      })}
+    </ol>
   </div>;
 }
+
+const STEPS: [string, number][] = [["Parse", 0], ["Split", 1.8], ["Draft", 3.1], ["Judge", 6.6], ["Expert review", REVIEW], ["Submit", SUBMIT]];
