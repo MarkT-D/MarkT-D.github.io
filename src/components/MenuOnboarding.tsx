@@ -93,17 +93,24 @@ export function MenuOnboarding({ time }: { time?: number } = {}) {
 
 /**
  * One stage handing over to the next: the old screen, frozen where it ended,
- * fades out as the new one fades in over it.
+ * fades out as the new one fades in over it. Each layer is keyed by its stage,
+ * so the outgoing screen is the same element that was on show a frame ago and
+ * never remounts (a remount would replay its entrance and blink).
  */
 const XF = 0.5;
 function Crossfade({ t, segs, render }: { t: number; segs: Seg[]; render: (t: number) => React.ReactNode }) {
-  const b = segs.map((s) => s.from).filter((x) => x > 0 && x <= t && t - x < XF).sort((x, y) => y - x)[0];
-  if (b === undefined) return <div className="mo-xf"><div key="now">{render(t)}</div></div>;
-  const p = (t - b) / XF;
-  const q = p * p * (3 - 2 * p);
+  const stageOf = (x: number) => segs.find((s) => x >= s.from && x < s.to)?.key ?? "after";
+  const edges = [...new Set(segs.flatMap((s) => [s.from, s.to]))];
+  const b = edges.filter((x) => x > 0 && x <= t && t - x < XF).sort((x, y) => y - x)[0];
+  const layers = [{ k: stageOf(t), tt: t, o: 1 }];
+  if (b !== undefined) {
+    const p = (t - b) / XF;
+    const q = p * p * (3 - 2 * p);
+    layers[0].o = q;
+    layers.unshift({ k: stageOf(b - 0.001), tt: b - 0.001, o: 1 - q });
+  }
   return <div className="mo-xf">
-    <div key={`was${b}`} style={{ opacity: 1 - q }} aria-hidden>{render(b - 0.001)}</div>
-    <div key="now" className="mo-xf-in" style={{ opacity: q }}>{render(t)}</div>
+    {layers.map((l) => <div key={l.k} style={{ opacity: l.o }} aria-hidden={l.o < 0.5 || undefined}>{render(l.tt)}</div>)}
   </div>;
 }
 

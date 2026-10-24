@@ -77,3 +77,19 @@ export function useSceneClock(loop: number, running: boolean, still: number) {
   }, [running, reduced, loop]);
   return reduced ? still : t;
 }
+
+/** True while the media query matches. False on the server and the first render. */
+export function useMedia(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    setMatches(mq.matches);
+    const on = () => setMatches(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [query]);
+  return matches;
+}
+
+/** Phone and small tablet: scenes reflow instead of shrinking. */
+export const useNarrow = () => useMedia("(max-width: 767px)");

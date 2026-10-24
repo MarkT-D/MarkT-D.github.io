@@ -62,7 +62,7 @@ export function OceansScene() {
 
   return (
     <div ref={ref}>
-      <Fit width={W} minScale={0.6}>
+      <Fit width={W} minScale={0.6} follow="instant" focus={W / 2 - 250 * Math.cos((2 * Math.PI * t) / LOOP)}>
         <div className="ox" style={{ width: W, height: H }}>
           {mounted && <>
             <svg className="ox-lines" width={W} height={H} aria-hidden>

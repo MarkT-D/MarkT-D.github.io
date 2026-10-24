@@ -73,7 +73,7 @@ export default function Home() {
         {/* Hero */}
         <section className="relative overflow-hidden">
           <div className="grid-backdrop" />
-          <div className="wrap grid items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[0.9fr_1.1fr] lg:pb-24">
+          <div className="wrap grid items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[0.9fr_1.1fr] lg:pb-24 [&>*]:min-w-0">
             <div className="animate-rise-in">
               <div className="mb-5 flex flex-wrap items-center gap-2">
                 <span className="chip"><span className="dot" /> Open to AI Engineer roles</span>

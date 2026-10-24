@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { TaskGraph, TG_LOOP } from "./TaskGraph";
 import { MenuOnboarding, MO_LOOP } from "./MenuOnboarding";
-import { useInView, useReducedMotion } from "@/lib/use-in-view";
+import { useInView, useNarrow, useReducedMotion } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
 import { Fit } from "./Fit";
 
@@ -16,13 +16,14 @@ import { Fit } from "./Fit";
 const SLOW = 1.8;
 const A = TG_LOOP, B = MO_LOOP * SLOW, TOTAL = A + B;
 const PARTS = [
-  { name: "The problem", from: 0, to: A },
-  { name: "The algorithms behind onboarding", from: A, to: TOTAL },
+  { name: "The problem", short: "The problem", from: 0, to: A },
+  { name: "The algorithms behind onboarding", short: "The AI behind it", from: A, to: TOTAL },
 ];
 
 export function PestoStory() {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const reduced = useReducedMotion();
+  const narrow = useNarrow();
   const [t, setT] = useState(A + 13.5 * SLOW);
   const offset = useRef(0);
   const seekTo = useRef<number | null>(null);
@@ -44,6 +45,17 @@ export function PestoStory() {
   const part = t < A ? 0 : 1;
   const fadeIn = (from: number) => Math.min(1, Math.max(0, (t - from) / 0.4));
 
+  const stage = (
+    <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 [&>*]:min-w-0">
+      <div className={cn("transition-opacity duration-300", part === 0 ? "opacity-100" : "pointer-events-none opacity-0")} aria-hidden={part !== 0} style={{ opacity: part === 0 ? fadeIn(0) : 0 }}>
+        <TaskGraph time={part === 0 ? t : A - 0.6} />
+      </div>
+      <div className={cn("transition-opacity duration-300", part === 1 ? "opacity-100" : "pointer-events-none opacity-0")} aria-hidden={part !== 1} style={{ opacity: part === 1 ? fadeIn(A) : 0 }}>
+        <MenuOnboarding time={part === 1 ? (t - A) / SLOW : 0} />
+      </div>
+    </div>
+  );
+
   return (
     <div ref={ref}>
       <div className="mb-3 flex flex-wrap gap-2" role="tablist" aria-label="Pesto, in two parts">
@@ -52,22 +64,20 @@ export function PestoStory() {
           return (
             <button key={p.name} role="tab" aria-selected={part === i} onClick={() => seek(p.from)}
               className={cn("relative h-9 overflow-hidden rounded-lg px-3.5 text-[13px] font-semibold transition-colors", part === i ? "bg-acc-1 text-acc-8" : "bg-gr-2 text-gr-7 hover:text-foreground")}>
-              <span className="relative z-[1]">{i + 1} · {p.name}</span>
+              <span className="relative z-[1]">{i + 1} · <span className="sm:hidden">{p.short}</span><span className="max-sm:hidden">{p.name}</span></span>
               {part === i && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] origin-left bg-acc-6" style={{ transform: `scaleX(${progress})` }} />}
             </button>
           );
         })}
       </div>
-      <Fit width={1280}>
-      <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 [&>*]:min-w-0">
-        <div className={cn("transition-opacity duration-300", part === 0 ? "opacity-100" : "pointer-events-none opacity-0")} aria-hidden={part !== 0} style={{ opacity: part === 0 ? fadeIn(0) : 0 }}>
-          <TaskGraph time={part === 0 ? t : A - 0.6} />
+      {narrow ? (
+        // A phone reflows each part instead of shrinking the desktop picture to a stamp.
+        <div key={part} className="animate-rise-in">
+          {part === 0 ? <TaskGraph time={t} /> : <MenuOnboarding time={(t - A) / SLOW} />}
         </div>
-        <div className={cn("transition-opacity duration-300", part === 1 ? "opacity-100" : "pointer-events-none opacity-0")} aria-hidden={part !== 1} style={{ opacity: part === 1 ? fadeIn(A) : 0 }}>
-          <MenuOnboarding time={part === 1 ? (t - A) / SLOW : 0} />
-        </div>
-      </div>
-      </Fit>
+      ) : (
+        <Fit width={1280}>{stage}</Fit>
+      )}
     </div>
   );
 }

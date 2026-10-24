@@ -103,7 +103,7 @@ export function AgentHarness() {
 
   return (
     <div ref={ref}>
-      <Fit width={W} minScale={0.6}>
+      <Fit width={W} minScale={0.6} focus={t < 2.8 ? 230 : t < 7.2 ? 640 : t < 13.8 ? 360 : 900}>
         <div className="ah" style={{ width: W, height: H }}>
           {mounted && <div style={{ opacity: fade }}>
             <svg className="ah-wires" width={W} height={H} aria-hidden>

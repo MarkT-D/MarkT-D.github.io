@@ -193,7 +193,7 @@ export function HeroVisual() {
           ))}
         </div>
         {/* Terminal */}
-        <div ref={bodyRef} className="flex h-[340px] flex-col justify-end overflow-hidden px-3.5 py-2.5 font-mono text-[10px] leading-[1.45] sm:h-[400px] sm:text-[11.5px]">
+        <div ref={bodyRef} className="flex h-[300px] flex-col justify-end overflow-hidden px-3 py-2.5 font-mono text-[8.6px] leading-[1.45] min-[400px]:text-[9.2px] sm:h-[400px] sm:px-3.5 sm:text-[11.5px]">
           {visible.map((l, i) => {
             const current = i === line && typing;
             return (

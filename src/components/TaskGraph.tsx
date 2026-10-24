@@ -115,7 +115,7 @@ export function TaskGraph({ time }: { time?: number } = {}) {
         <p className={cn("tg-line", folded && "dim")}>Instead, they&apos;re buried in <em>{shown || 43} tasks</em> of software, compliance and paperwork.</p>
         <p className={cn("tg-line accent", !folded && "hide")}>Pesto puts them in <em>one system</em>, and lets AI do the typing.</p>
       </div>
-      <Fit width={1100} minScale={0.62}>
+      <Fit width={1100} minScale={0.62} follow="instant" focus={t < FOLD ? 550 + 300 * Math.sin((2 * Math.PI * t) / FOLD) : 550}>
       <div className="tg-stage" style={{ opacity: fadeOut }}>
         {mounted && (
           <svg viewBox="20 140 1260 545" role="img" aria-label="A graph of 43 restaurant tasks under menu, management software and payments, folding into one Pesto system">
