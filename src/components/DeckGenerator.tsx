@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
  */
 
 const SOURCES = [
-  { key: "dam", icon: Images, name: "Bynder", detail: "Approved shots, usage notes" },
-  { key: "pim", icon: Barcode, name: "Product catalogue", detail: "SKUs, EANs, prices" },
-  { key: "crm", icon: Building2, name: "Salesforce", detail: "Partner account, orders" },
+  { key: "dam", icon: Images, name: "Bynder", detail: "Approved shots" },
+  { key: "pim", icon: Barcode, name: "Product catalogue", detail: "SKUs and prices" },
+  { key: "crm", icon: Building2, name: "Salesforce", detail: "Partner orders" },
 ] as const;
 
 const LOOP = 15;
@@ -118,7 +118,7 @@ export function DeckGenerator() {
           ))}
         </ul>
 
-        <div className="mx-auto max-w-[430px]">
+        <div className="mx-auto max-w-[640px]">
           <LaptopFrame>
             <div ref={fitRef} className="relative w-full overflow-hidden" style={{ aspectRatio: `${W} / ${H}` }}>
               <div className="dg-screen absolute left-0 top-0" style={{ width: W, height: H, transform: `scale(${scale})` } as CSSProperties}>

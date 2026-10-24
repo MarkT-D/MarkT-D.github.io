@@ -16,7 +16,7 @@ const SLOW = 1.4;
 const A = TG_LOOP, B = MO_LOOP * SLOW, TOTAL = A + B;
 const PARTS = [
   { name: "The problem", from: 0, to: A },
-  { name: "The AI behind onboarding", from: A, to: TOTAL },
+  { name: "The algorithms behind onboarding", from: A, to: TOTAL },
 ];
 
 export function PestoStory() {

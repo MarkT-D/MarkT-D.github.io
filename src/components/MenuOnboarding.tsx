@@ -20,7 +20,7 @@ const STILL = 14.6;
 
 type Seg = { key: string; from: number; to: number; label: string };
 const OWNER: Seg[] = [
-  { key: "shoot", from: 0, to: 3.2, label: "Photographs 3 pages" },
+  { key: "shoot", from: 0, to: 3.2, label: "Photographs the menu" },
   { key: "onboard", from: 3.2, to: 9.6, label: "Onboarding: name, hours, tables, payments" },
   { key: "edit", from: 9.6, to: 16.8, label: "Checks the dishes: reorders, renames, picks a style" },
   { key: "live", from: 16.8, to: 19.8, label: "Publishes" },
@@ -28,7 +28,7 @@ const OWNER: Seg[] = [
 const AI: Seg[] = [
   { key: "upload", from: 0.4, to: 3.2, label: "Upload" },
   { key: "ocr", from: 3.2, to: 6.3, label: "Vision OCR" },
-  { key: "parse", from: 6.3, to: 9.4, label: "Claude → structured menu" },
+  { key: "parse", from: 6.3, to: 9.4, label: "Claude parse" },
   { key: "translate", from: 9.6, to: 16.4, label: "Translations, while you edit" },
 ];
 const at = (segs: Seg[], t: number) => segs.find((s) => t >= s.from && t < s.to)?.key ?? null;
@@ -296,7 +296,7 @@ function Lanes({ t }: { t: number }) {
   );
   return <div className="mo-lanes" aria-hidden>
     {lane("Owner", OWNER)}
-    {lane("AI, in the background", AI)}
+    {lane("Algorithms, behind it", AI)}
     <div className="mo-playhead-track"><span className="mo-playhead" style={{ left: `${(t / LOOP) * 100}%` }} /></div>
   </div>;
 }

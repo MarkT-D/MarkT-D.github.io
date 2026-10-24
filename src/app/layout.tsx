@@ -18,14 +18,13 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfcfb" },
-    { media: "(prefers-color-scheme: dark)", color: "#1b1e1c" },
+    { color: "#1b1e1c" },
   ],
   colorScheme: "light dark",
 };
 
 // Runs before first paint so a dark-mode visitor never sees a white flash.
-const THEME_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("theme")}catch(e){}var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light"})()`;
+const THEME_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("theme")}catch(e){}var d=t?t==="dark":true;document.documentElement.dataset.theme=d?"dark":"light"})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

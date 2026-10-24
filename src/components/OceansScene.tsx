@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  * the three F1 scores are the project's.
  */
 
-const W = 1080, H = 380;
+const W = 1080, H = 370;
 const LOOP = 16;
 const EVERY = 0.62, DUR = 4.6;
 const MODELS = [["BERT", 0.89], ["SVM", 0.86], ["Random forest", 0.77]] as const;
@@ -113,7 +113,7 @@ export function OceansScene() {
             </div>
 
             <div className="ox-desk" style={{ left: 850, top: 26 }}>
-              <div className="ox-person"><UserRound className="size-5" /><div><b>Our supervisor</b><span>a professor of wellbeing research, gets the corpus and the reasons</span></div></div>
+              <div className="ox-person"><UserRound className="size-5" /><div><b>Our supervisor</b><span>Full Professor of Genetics and Wellbeing, on XplorIT&apos;s board</span></div></div>
               <div key={explain} className="ox-lime">
                 <div className="ox-lime-head"><Sparkles className="size-3.5" /> LIME · why it said well-being</div>
                 <p>{EXPLAINS[explain].map(([w, s], i) => <span key={i} style={s ? { background: `color-mix(in oklab, var(--acc-5) ${Math.round(s * 45)}%, transparent)` } : undefined}>{w} </span>)}</p>

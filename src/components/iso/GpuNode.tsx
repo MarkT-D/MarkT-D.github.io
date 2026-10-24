@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { iso, Prism, pts, facingY, type Box, type Point } from "./iso";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
@@ -8,10 +8,8 @@ import { cn } from "@/lib/utils";
 /**
  * A GPU node in a cluster, opened up, its neighbours in a row behind it: the
  * host CPU sends the data over PCIe, the GTX Titan X's thread blocks light up
- * for the kernel, the result comes back. A slider picks the input size, and
- * every phase takes the share of the time it took in the measured run (one CPU
- * core against the GPU, 5 trials each, on DAS-5). Small inputs are all copy,
- * which is why below ~40 KB the CPU wins.
+ * for the kernel, the result comes back. Each phase takes its share of the
+ * time it took in a measured run on DAS-5.
  */
 
 const RUNS = [
@@ -24,7 +22,6 @@ const RUNS = [
   { bytes: 52428800, seq: 0.133828, kernel: 0.00173, mem: 0.011382 },
   { bytes: 524857600, seq: 1.328992, kernel: 0.015969, mem: 0.075343 },
 ];
-const SIZE = (b: number) => (b >= 1e6 ? `${Math.round(b / 1e6)} MB` : `${Math.round(b / 1e3)} KB`);
 const MS = (sec: number) => { const ms = sec * 1000; return ms >= 100 ? `${Math.round(ms).toLocaleString("en-GB")} ms` : ms >= 1 ? `${ms.toFixed(1)} ms` : `${Math.round(ms * 1000)} µs`; };
 
 const LOOP = 9.6;
@@ -86,12 +83,9 @@ export function GpuNode() {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const mounted = useMounted();
   const t = useSceneClock(LOOP, inView, STILL);
-  const [size, setSize] = useState(RUNS.length - 1);
+  const size = RUNS.length - 1;
   const run = RUNS[size];
   const { phase, p } = phaseAt(t, timing(size));
-  const gpuTime = run.mem + run.kernel;
-  const scale = Math.max(gpuTime, run.seq);
-  const gpuWins = gpuTime < run.seq;
 
   // Packets in flight: eight per copy, evenly spaced, each taking 40% of the phase.
   const packets: number[] = [];
@@ -149,31 +143,6 @@ export function GpuNode() {
       <Label p={iso(CPU.x + 32, CPU.y, 44)}>Host CPU</Label>
       <Label p={iso(GPU.x + 100, GPU.y, 62)} strong>GTX Titan X · {COLS * ROWS} blocks</Label>
       <span className={cn("gn-phase", phase === "kernel" && "kernel")} style={at(iso((BUS.a[0] + BUS.b[0]) / 2, BUS.a[1] + 70, 0))}>{phaseText}</span>
-    </div>
-    <div className="mt-3 px-1">
-      <label className="flex items-center gap-3 text-[13px] font-semibold">
-        <span className="shrink-0">Input size</span>
-        <input type="range" min={0} max={RUNS.length - 1} step={1} value={size} onChange={(e) => setSize(Number(e.target.value))}
-          className="gn-range min-w-0 flex-1" aria-valuetext={SIZE(run.bytes)} />
-        <span className="w-16 shrink-0 text-right tabular-nums">{SIZE(run.bytes)}</span>
-      </label>
-      <div className="mt-3 grid grid-cols-[96px_minmax(0,1fr)_70px] items-center gap-x-3 gap-y-2 text-[12px]">
-        <span className="text-muted-foreground">GPU, end to end</span>
-        <div className="flex h-3 overflow-hidden rounded-full bg-gr-2" style={{ width: `${Math.max(2, (gpuTime / scale) * 100)}%` }} aria-hidden>
-          <span className={cn("gn-seg copy", phase === "in" && "now")} style={{ flex: run.mem / 2 }} />
-          <span className={cn("gn-seg kernel", phase === "kernel" && "now")} style={{ flex: run.kernel }} />
-          <span className={cn("gn-seg copy", phase === "out" && "now")} style={{ flex: run.mem / 2 }} />
-        </div>
-        <span className="text-right tabular-nums">{MS(gpuTime)}</span>
-        <span className="text-muted-foreground">One CPU core</span>
-        <div className="h-3 rounded-full bg-gr-5" style={{ width: `${Math.max(2, (run.seq / scale) * 100)}%` }} aria-hidden />
-        <span className="text-right tabular-nums">{MS(run.seq)}</span>
-      </div>
-      <p className={cn("mt-3 rounded-lg px-3 py-2 text-[13px]", gpuWins ? "bg-acc-1 text-acc-8" : "bg-gr-2 text-gr-8")}>
-        {gpuWins
-          ? <><b>GPU wins, {(run.seq / gpuTime).toFixed(gpuTime * 10 > run.seq ? 1 : 0)}× faster.</b> The kernel alone is {Math.round(run.seq / run.kernel)}× faster; the copies over PCIe take {Math.round((run.mem / gpuTime) * 100)}% of the GPU&apos;s time.</>
-          : <><b>CPU wins.</b> At {SIZE(run.bytes)}, moving the data to the GPU and back costs more than doing the work on one core.</>}
-      </p>
     </div>
   </div>;
 }

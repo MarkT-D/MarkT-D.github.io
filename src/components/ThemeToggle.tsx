@@ -23,21 +23,12 @@ function apply(theme: Theme) {
   requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
 }
 
-/** Light/dark switch. Follows the system until the visitor picks, then remembers the pick. */
+/** Light/dark switch. Dark until the visitor picks, then it remembers the pick. */
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      if (stored()) return;
-      const next: Theme = mq.matches ? "dark" : "light";
-      apply(next);
-      setTheme(next);
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    setTheme(stored() ?? (document.documentElement.dataset.theme === "light" ? "light" : "dark"));
   }, []);
 
   const toggle = () => {

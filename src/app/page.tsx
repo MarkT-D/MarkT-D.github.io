@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Bot, FlaskConical, ShieldCheck, TestTubes } from "lucide-react";
+import { ArrowRight, FlaskConical, ShieldCheck, TestTubes } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { HeroVisual } from "@/components/HeroVisual";
 import { CaseStudy } from "@/components/CaseStudy";
@@ -10,15 +10,17 @@ import { QuotaShots } from "@/components/QuotaShots";
 import { TracScene } from "@/components/TracScene";
 import { OceansScene } from "@/components/OceansScene";
 import { GpuNode } from "@/components/iso/GpuNode";
+import { Roofline } from "@/components/Roofline";
 import { Reveal } from "@/components/Reveal";
 import { Fit } from "@/components/Fit";
 import { Contact } from "@/components/Contact";
+import { AgentHarness } from "@/components/AgentHarness";
 import { NOTES } from "@/lib/notes";
 import { asset } from "@/lib/utils";
 
 const STATS = [
   { value: "1.5 yrs", label: "shipping LLM systems at an AI startup, promoted to FDE" },
-  { value: "~€360k/yr", label: "labour saved for clients by my grant platform (est.)" },
+  { value: "8.0 / 9 GPA", label: "BSc Computational Social Science, University of Amsterdam" },
   { value: "Teams of 5 and 4", label: "led on partner projects, both awarded" },
   { value: "EU citizen", label: "based in Barcelona, no visa or sponsorship needed" },
 ];
@@ -28,11 +30,6 @@ const HOW = [
     icon: FlaskConical,
     title: "Evals come with the feature",
     body: "An LLM judge scoring each grant section against criteria, expected-JSON fixtures for every menu photo, gold sets from domain experts. If I cannot measure it, I do not ship it.",
-  },
-  {
-    icon: Bot,
-    title: "Agents do the typing, I do the design",
-    body: "I work with Claude Code: issues trigger agents, parallel tasks run in separate git worktrees, a review agent triages tickets, CI runs the tests. I plan the architecture and review every change.",
   },
   {
     icon: ShieldCheck,
@@ -154,7 +151,7 @@ export default function Home() {
               "Made the build-vs-extend call: prototyped on Twin's workflow engine, then rebuilt it standalone as sole developer, with weekly releases and demos.",
             ]}
             stack={["Next.js", "TypeScript", "Salesforce API", "Bynder API", "LLM pipelines", "Client discovery"]}
-            tight
+            side
           >
             <div className="card overflow-visible p-4 sm:p-5">
               <DeckGenerator />
@@ -232,7 +229,7 @@ export default function Home() {
             role="Machine Learning Engineer"
             period="Sep 2024 – Feb 2025"
             title="What well-being sounds like, in 600 hours of interviews"
-            lede="Supervised by a professor of wellbeing research, my team of four turned ~600 hours of interviews, mostly with sailors, into a labelled corpus and compared three model families on it."
+            lede="Supervised by a Full Professor of Genetics and Wellbeing on XplorIT's board, my team of four turned ~600 hours of interviews, mostly with sailors, into a labelled corpus and compared three model families on it."
             points={[
               "Scraping and transcription pipeline: BeautifulSoup, Selenium, OpenAI Whisper.",
               "LIME and SHAP to show which expressions the models tied to well-being, the deliverable our supervisor needed.",
@@ -248,29 +245,30 @@ export default function Home() {
         </div>
 
         {/* Foundations */}
-        <section id="foundations" className="scroll-mt-16 border-t border-border py-16 sm:py-20">
+        <section id="foundations" className="scroll-mt-14 border-t border-border py-12 sm:py-14">
           <div className="wrap">
-            <div className="grid items-center gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-10 [&>*]:min-w-0">
+            <div className="grid items-start gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10 [&>*]:min-w-0">
               <Reveal>
                 <p className="eyebrow">Beyond the degree</p>
-                <h2 className="mt-2 font-display text-[30px] font-semibold leading-tight sm:text-[34px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
-                <ul className="mt-7 space-y-5">
+                <h2 className="mt-2 font-display text-[26px] font-semibold leading-tight sm:text-[30px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
+                <ul className="mt-5 space-y-3.5">
                   {COURSES.map((c) => (
                     <li key={c.name} className="border-l-2 border-acc-3 pl-4">
-                      <div className="text-[16px] font-semibold">{c.name}</div>
-                      <p className="mt-1 text-[14.5px] leading-[1.6] text-gr-8">{c.body}</p>
+                      <div className="text-[15px] font-semibold">{c.name}</div>
+                      <p className="mt-0.5 text-[14px] leading-[1.55] text-gr-8">{c.body}</p>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-6 text-[14.5px] leading-[1.6] text-gr-8">
-                  The lesson I kept from the GPU labs: the kernel was 83× faster than the CPU, but copying the data over PCIe ate most of that. End to end it was about 15×, and below roughly 40 KB the CPU won.
-                </p>
+                <div className="card mt-6 p-3 sm:p-4">
+                  <div className="px-1 text-[14px] font-semibold">A GPU node in a cluster <span className="font-normal text-muted-foreground">· host, PCIe, thread blocks, MPI</span></div>
+                  <div className="mx-auto max-w-[420px]"><Fit width={600}><GpuNode /></Fit></div>
+                </div>
               </Reveal>
               <Reveal delay={120}>
-                <div className="card p-3 sm:p-5">
-                  <div className="mb-1 px-1 text-[15px] font-semibold">A GPU node in a cluster</div>
-                  <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Host memory, PCIe, the GPU&apos;s thread blocks, MPI between nodes. Pick an input size: each phase plays for its share of the measured time.</p>
-                  <Fit width={600}><GpuNode /></Fit>
+                <div className="card p-4 sm:p-6">
+                  <div className="text-[16px] font-semibold">Where a kernel hits the ceiling</div>
+                  <p className="mb-4 mt-1 text-[13px] leading-[1.5] text-muted-foreground">A roofline for the GTX Titan X I ran on. Pick a kernel: it lands where its FLOPs per byte put it, under memory or under compute. The ones marked lab are mine; the matrix multiply is the textbook case for tiling.</p>
+                  <Roofline />
                 </div>
               </Reveal>
             </div>
@@ -292,8 +290,12 @@ export default function Home() {
         <section id="how" className="scroll-mt-16 border-t border-border bg-gr-2 py-16 sm:py-20">
           <div className="wrap">
             <p className="eyebrow">How I build</p>
-            <h2 className="mt-2 max-w-2xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">Four habits that make AI features hold up in production</h2>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">AI-native: I design and review, agents do the typing</h2>
+            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">Every change starts as an issue I write. A harness hands it to an agent in its own git worktree, Claude Code or Codex, several at once. CI runs the tests, and nothing reaches main until I have read the diff.</p>
+            <Reveal className="mt-8">
+              <div className="card p-4 sm:p-6"><AgentHarness /></div>
+            </Reveal>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
               {HOW.map(({ icon: Icon, title, body }, i) => (
                 <Reveal key={title} delay={i * 80}>
                   <div className="card h-full p-6">
