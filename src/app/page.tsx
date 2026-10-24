@@ -127,7 +127,7 @@ export default function Home() {
           </CaseStudy>
 
           <CaseStudy c={caseById("menu")}>
-            <div className="card p-4 sm:p-7">
+            <div className="card p-4">
               <PestoStory />
             </div>
           </CaseStudy>
@@ -137,7 +137,7 @@ export default function Home() {
           </CaseStudy>
 
           <CaseStudy c={caseById("tracfm")}>
-            <div className="card p-4 sm:p-6">
+            <div className="card p-4 sm:p-5">
               <TracScene />
             </div>
           </CaseStudy>

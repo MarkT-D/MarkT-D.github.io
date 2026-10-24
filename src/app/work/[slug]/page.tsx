@@ -40,7 +40,8 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
           ))}
         </dl>
         <p className="mt-10 text-[18px] leading-[1.7] text-gr-9">{c.lede}</p>
-        <ul className="mt-6 space-y-3">
+        <h2 className="mt-10 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">At a glance</h2>
+        <ul className="mt-4 space-y-3">
           {c.points.map((p) => (
             <li key={p} className="flex gap-3 text-[16px] leading-[1.7] text-gr-8">
               <span className="dot mt-[11px]" />
@@ -48,6 +49,16 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
             </li>
           ))}
         </ul>
+        {c.story && (
+          <article className="mt-12 space-y-5 border-t border-border pt-10 text-[17px] leading-[1.75] text-gr-9">
+            {c.story.map((sec) => (
+              <section key={sec.h} className="space-y-4">
+                <h2 className="pt-2 text-[21px] font-semibold text-foreground">{sec.h}</h2>
+                {sec.p.map((para) => <p key={para}>{para}</p>)}
+              </section>
+            ))}
+          </article>
+        )}
         <div className="mt-8 flex flex-wrap gap-1.5">{c.stack.map((s) => <span key={s} className="chip">{s}</span>)}</div>
         {c.links && (
           <div className="mt-6 flex flex-wrap gap-4">

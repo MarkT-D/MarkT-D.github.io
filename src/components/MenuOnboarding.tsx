@@ -92,19 +92,18 @@ export function MenuOnboarding({ time }: { time?: number } = {}) {
 }
 
 /**
- * One stage handing over to the next, the way a phone pushes a screen: the new
- * one slides in over the old, which drifts back and fades. Never an empty
- * frame between them, which read as a glitch.
+ * One stage handing over to the next: the old screen, frozen where it ended,
+ * fades out as the new one fades in over it.
  */
-const XF = 0.6;
+const XF = 0.5;
 function Crossfade({ t, segs, render }: { t: number; segs: Seg[]; render: (t: number) => React.ReactNode }) {
   const b = segs.map((s) => s.from).filter((x) => x > 0 && x <= t && t - x < XF).sort((x, y) => y - x)[0];
   if (b === undefined) return <div className="mo-xf"><div key="now">{render(t)}</div></div>;
   const p = (t - b) / XF;
-  const q = 1 - (1 - p) ** 3;
+  const q = p * p * (3 - 2 * p);
   return <div className="mo-xf">
-    <div key={`was${b}`} style={{ opacity: 1 - q, transform: `translateX(${(-25 * q).toFixed(1)}%)` }} aria-hidden>{render(b - 0.001)}</div>
-    <div key="now" className="mo-xf-in" style={{ transform: `translateX(${(100 * (1 - q)).toFixed(1)}%)` }}>{render(t)}</div>
+    <div key={`was${b}`} style={{ opacity: 1 - q }} aria-hidden>{render(b - 0.001)}</div>
+    <div key="now" className="mo-xf-in" style={{ opacity: q }}>{render(t)}</div>
   </div>;
 }
 

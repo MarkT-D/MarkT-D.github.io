@@ -61,7 +61,8 @@ const IN = { start: 0.6, end: 3.4 }, OUT = { start: 9.4, end: 12.2 };
 const ASK = 3.7, ANSWER = 5.0, COFFEE = 6.2;
 
 /** What each thing in the room says when you hover or tap it. */
-const TIPS: Record<string, { title: string; text: string; credit?: string; at: Point }> = {
+const TIPS: Record<string, { title: string; text: string; credit?: string; at: Point; below?: boolean }> = {
+  window: { title: "Where I've lived", text: "Moscow, where I grew up. Amsterdam, for university and my first AI work. Kleve and Düsseldorf in Germany. Now Barcelona, by the sea.", at: iso(112, 0, 48), below: true },
   jars: { title: "Cooking", text: "I cook most days, usually from a cuisine I haven't tried yet. These are the spices.", at: iso(36, 6, 98) },
   server: { title: "My homelab, being built", text: "A home for my own cloud: storage with my Obsidian vault synced, files, music I host myself, and the agents I run.", at: iso(297, 21, 120) },
   cat: { title: "The cat", text: "Asleep on the warmest box in the room. Go on, pet it.", at: iso(297, 21, 118) },
@@ -167,10 +168,12 @@ export function ContactScene() {
             </g>;
         })}
       </>)}
-      <polygon className="cs-window" points={pts(facingY(74, 150, 0, 50, 104))} />
-      <polygon className="cs-sea" points={pts(facingY(78, 146, 0, 54, 70))} />
-      <polygon className="cs-frame" points={pts(facingY(110, 114, 0, 54, 100))} />
-      <Painted at={iso(112, 0, 36)} on="back" className="cs-wall-text">BARCELONA</Painted>
+      {egg("window", <>
+        <polygon className="cs-window" points={pts(facingY(74, 150, 0, 50, 104))} />
+        <polygon className="cs-sea" points={pts(facingY(78, 146, 0, 54, 70))} />
+        <polygon className="cs-frame" points={pts(facingY(110, 114, 0, 54, 100))} />
+        <Painted at={iso(112, 0, 36)} on="back" className="cs-wall-text">BARCELONA</Painted>
+      </>)}
       {egg("factorio", <>
         <polygon className="cs-poster factorio" points={pts(facingY(158, 200, 0, 64, 104))} />
         {(() => { const c = iso(179, 0, 84); return <g transform={`translate(${c.x.toFixed(1)} ${c.y.toFixed(1)}) rotate(${((t * 40) % 360).toFixed(1)})`}><Cog x={-9} y={-9} width={18} height={18} className="cs-gear" /></g>; })()}
@@ -280,7 +283,7 @@ export function ContactScene() {
       {t >= ANSWER && t < OUT.start + 0.6 && <Bubble p={headAt(ME.x, ME.y, 26, 1.15, true)} done pop={popAt(t, ANSWER)}><Check x={-7} y={-7} width={14} height={14} strokeWidth={3} /></Bubble>}
     </svg>
     {t >= ANSWER && t < OUT.start + 0.6 && <span className="cs-say" style={at(headAt(ME.x, ME.y, 26, 1.15, true))}>Let&apos;s talk.</span>}
-    {tip && <div key={tip} className={cn("cs-hint", side(TIPS[tip].at))} style={at(TIPS[tip].at)} role="status"><b>{TIPS[tip].title}</b><span>{TIPS[tip].text}</span>{TIPS[tip].credit && <small>{TIPS[tip].credit}</small>}</div>}
+    {tip && <div key={tip} className={cn("cs-hint", side(TIPS[tip].at), TIPS[tip].below && "below")} style={at(TIPS[tip].at)} role="status"><b>{TIPS[tip].title}</b><span>{TIPS[tip].text}</span>{TIPS[tip].credit && <small>{TIPS[tip].credit}</small>}</div>}
     <p className="cs-help">Hover or tap things in the room.</p>
   </div>;
 }

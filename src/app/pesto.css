@@ -1,13 +1,13 @@
 /* Pesto: the 43-task problem graph, folding into one system. */
 .tg { position: relative; }
 .tg-head { display: grid; gap: 4px; }
-.tg-line { margin: 0; font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 28px); line-height: 1.25; font-weight: 600; color: var(--foreground); transition: opacity 400ms, color 400ms; }
+.tg-line { margin: 0; font-family: var(--font-display); font-size: clamp(18px, 2vw, 23px); line-height: 1.25; font-weight: 600; color: var(--foreground); transition: opacity 400ms, color 400ms; }
 .tg-line em { font-style: normal; color: var(--acc-6); }
 .tg-line.dim { color: var(--gr-6); }
 .tg-line.dim em { color: var(--gr-6); }
 .tg-line.accent { transition: opacity 500ms, transform 500ms; }
 .tg-line.hide { opacity: 0; transform: translateY(6px); }
-.tg-stage { position: relative; margin-top: 8px; aspect-ratio: 1260 / 545; }
+.tg-stage { position: relative; max-width: 900px; margin: 6px auto 0; aspect-ratio: 1260 / 545; }
 .tg-stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; font-family: var(--font-sans), system-ui, sans-serif; user-select: none; }
 .tg-edges line { stroke: var(--acc-3); stroke-width: 1.5; stroke-linecap: round; }
 .tg-node rect { stroke-width: 1.2; transition: fill 300ms, stroke 300ms; }
@@ -44,7 +44,7 @@
 .mo-cap { display: inline-flex; align-items: center; gap: 7px; color: var(--muted-foreground); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 .mo-cap svg { color: var(--acc-6); }
 .mo-dot { width: 7px; height: 7px; border-radius: 99px; background: var(--acc-6); }
-.mo-phone { height: 430px; overflow: hidden; font-size: 12.5px; color: var(--foreground); }
+.mo-phone { height: 390px; overflow: hidden; font-size: 12.5px; color: var(--foreground); }
 .mo-caret { display: inline-block; width: 1.5px; height: 1em; margin-left: 1px; vertical-align: -2px; background: var(--acc-6); animation: caret 0.9s steps(1) infinite; }
 .mo-spin { animation: mo-spin 1s linear infinite; }
 @keyframes mo-spin { to { transform: rotate(360deg); } }
@@ -147,8 +147,8 @@
 .mo-live > span { margin-top: 4px; color: var(--muted-foreground); }
 
 /* behind */
-.mo-behind { min-height: 430px; border-radius: 22px; background: var(--gr-2); padding: 18px; }
-.mo-stage { display: flex; flex-direction: column; height: 100%; min-height: 394px; animation: rc-rise 320ms backwards; }
+.mo-behind { min-height: 390px; border-radius: 22px; background: var(--gr-2); padding: 18px; }
+.mo-stage { display: flex; flex-direction: column; height: 100%; min-height: 354px; animation: rc-rise 320ms backwards; }
 .mo-stage-head { display: flex; align-items: center; gap: 8px; font-size: 15px; }
 .mo-stage-head svg { color: var(--acc-6); }
 .mo-stage-body { flex: 1; display: grid; place-items: center; padding: 14px 0; }
@@ -187,7 +187,7 @@
 .mo-done span { color: var(--muted-foreground); font-size: 13px; }
 
 /* lanes */
-.mo-lanes { position: relative; display: grid; gap: 6px; margin-top: 16px; }
+.mo-lanes { position: relative; display: grid; gap: 5px; margin-top: 10px; }
 .mo-lane { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: center; gap: 10px; }
 .mo-lane-name { color: var(--muted-foreground); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
 .mo-lane-track { position: relative; height: 22px; }
@@ -400,8 +400,8 @@
 .mo-xf { display: grid; height: 100%; }
 .mo-xf > * { grid-area: 1 / 1; min-width: 0; min-height: 0; }
 .mo-phone .mo-xf, .mo-behind .mo-xf { overflow: hidden; }
-.mo-phone .mo-xf-in { background: var(--card); box-shadow: -12px 0 24px -12px rgb(0 0 0 / 0.35); }
-.mo-behind .mo-xf-in { background: var(--gr-2); box-shadow: -12px 0 24px -12px rgb(0 0 0 / 0.25); }
+.mo-phone .mo-xf-in { background: var(--card); }
+.mo-behind .mo-xf-in { background: var(--gr-2); }
 
 /* The GPU in three steps: the node, coalescing, streams. */
 .gs { position: relative; }

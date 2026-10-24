@@ -87,10 +87,11 @@ export function TracScene() {
             </button>
           ))}
         </div>
-        <span className="text-[12.5px] text-muted-foreground">{held ? "Paused on this view. Press it again to play both." : "Plays both, one after the other."}</span>
+        <span className="text-[12.5px] text-muted-foreground">{held ? "Paused here. Press again to play both." : "Plays both in turn."}</span>
+        <span className="ml-auto hidden text-[12.5px] text-muted-foreground sm:inline">Proof-of-concept design. Stations, calls and scores are illustrative.</span>
       </div>
-      <Fit width={W} minScale={0.6}>
-        <div className="tf" style={{ width: W, height: H }}>
+      <Fit width={W + 150} minScale={0.6}>
+        <div className="tf" style={{ width: W, height: H, margin: "0 auto" }}>
           {mounted && <>
             {/* The map, which steps aside rather than disappearing: the calls keep coming. */}
             <div className="tf-map" style={{ transform: `translate(${mapX}px, ${mapY}px) scale(${mapS})` }}>
@@ -188,7 +189,7 @@ export function TracScene() {
           </>}
         </div>
       </Fit>
-      <p className="mt-3 text-[12.5px] text-muted-foreground">Proof-of-concept design. Stations, calls, themes and scores are illustrative.</p>
+      <p className="mt-2 text-[12px] text-muted-foreground sm:hidden">Proof-of-concept design. Stations, calls and scores are illustrative.</p>
     </div>
   );
 }

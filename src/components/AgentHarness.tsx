@@ -29,7 +29,7 @@ type Lane = {
 const LANES: Lane[] = [
   {
     tree: "wt/212a-ledger", agent: "Claude Code", ticket: "212a", issue: 212,
-    hand: 2.3, work: [2.8, 6.4], ci: [6.4, 7.2], review: [7.4, 9.6],
+    hand: 2.3, work: [2.8, 6.4], ci: [6.4, 7.2], review: [7.2, 9.6],
     report: {
       shots: ["Ledger, two phones", "Test run"],
       decisions: [
@@ -41,7 +41,7 @@ const LANES: Lane[] = [
   },
   {
     tree: "wt/212b-share-sheet", agent: "Codex", ticket: "212b", issue: 212,
-    hand: 2.3, work: [2.8, 7.2], ci: [7.2, 9.0], fail: [7.2, 8.0], review: [9.8, 12.0],
+    hand: 2.3, work: [2.8, 7.2], ci: [7.2, 9.0], fail: [7.2, 8.0], review: [9.6, 11.8],
     report: {
       shots: ["Share sheet", "Dark mode"],
       decisions: [
@@ -52,7 +52,7 @@ const LANES: Lane[] = [
   },
   {
     tree: "wt/214-receipt-retry", agent: "Claude Code", ticket: "214", issue: 214,
-    hand: 4.2, work: [4.7, 8.2], ci: [8.2, 9.0], review: [12.2, 14.2],
+    hand: 4.2, work: [4.7, 8.2], ci: [8.2, 9.0], review: [11.8, 13.8],
     report: {
       shots: ["Retry timeline", "Delivery log"],
       decisions: [
@@ -68,7 +68,7 @@ const ISSUES = [
   { id: 214, title: "Retry a receipt after a timeout", plan: [3.0, 4.2] as [number, number] },
 ];
 /** When each issue's spec lands in the repo: once every piece of it has merged. */
-const SPEC_AT = { 212: 12.3, 214: 14.5 } as Record<number, number>;
+const SPEC_AT = { 212: 11.8, 214: 13.8 } as Record<number, number>;
 const SPECS = { 212: "specs/212-split-bill.md", 214: "specs/214-receipt-retry.md" } as Record<number, string>;
 
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
@@ -143,7 +143,7 @@ export function AgentHarness() {
               const s = laneState(ln, t);
               const work = s === "work" ? clamp((t - ln.work[0]) / (ln.work[1] - ln.work[0])) : ["ci", "waiting", "review", "merged"].includes(s) ? 1 : 0;
               const failing = ln.fail && t >= ln.fail[0] && t < ln.fail[1];
-              const fixing = ln.fail && t >= ln.fail[1] && t < ln.fail[1] + 0.5;
+              const fixing = ln.fail && t >= ln.fail[1];
               return <div key={ln.tree} className={cn("ah-lane", (s === "work" || s === "ci") && "on")} style={{ left: 470, top: LANE_Y(k) }}>
                 <div className="ah-lane-head">
                   <span className="ah-tree"><GitBranch className="size-3.5" /> {ln.tree}</span>

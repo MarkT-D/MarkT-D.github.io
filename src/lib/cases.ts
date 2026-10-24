@@ -19,6 +19,8 @@ export type Case = {
   points: string[];
   stack: string[];
   links?: { href: string; label: string }[];
+  /** The long version, for the project's own page. */
+  story?: { h: string; p: string[] }[];
 };
 
 export const CASES: Case[] = [
@@ -42,6 +44,39 @@ export const CASES: Case[] = [
       "An LLM judge scores every section 1 to 10 and flags where company guidelines pull against a grant rule. The expert settles those, then approves.",
       "Model-agnostic, with Azure-hosted EU models for data residency. Live with 4 enterprise clients, and reused for HR screening on a client's ATS.",
     ],
+    story: [
+      {
+        h: "The problem",
+        p: [
+          "Our enterprise clients applied for EU and national grants all the time. Each application meant days of work: reading the call, finding the right company data, and writing every section to fit the scheme's rules.",
+          "Most of that is structured work with a lot of reading. That made it a good fit for an LLM pipeline, as long as the output could be trusted.",
+        ],
+      },
+      {
+        h: "How it works",
+        p: [
+          "The pipeline parses the grant call, splits it into its sections and drafts each section with its own prompt.",
+          "Every section gets context from two sides. One module injects the grant's guidelines and the EU or scheme rules. The other is RAG over the client's own documents: Salesforce and Bynder for one client, shared drives and APIs for others, plus partner sources when there were any.",
+          "We kept it model-agnostic. Each stage can use a different GPT variant, and clients with data-residency needs ran on Azure-hosted EU models.",
+        ],
+      },
+      {
+        h: "The hard part: two good sources that disagree",
+        p: [
+          "Sometimes a company's own guidelines pulled against a grant requirement. The model never said so. It quietly picked a side and wrote a fluent section, so reviewers could not tell why a draft felt off.",
+          "We added an LLM judge after drafting. Its criteria come from both the grant rules and the company's internal metrics. It scores every section from 1 to 10, names the weak spots, and flags the sections where the two sides conflict. The flag goes to the expert, who decides: keep the draft or fix the source.",
+          "The criteria themselves come from a separate eval workflow, so they can change without touching the drafting prompts.",
+        ],
+      },
+      {
+        h: "Where it ended up",
+        p: [
+          "Live with 4 enterprise clients. A first draft takes about two minutes instead of days, and an expert review is the only manual step.",
+          "Our rough estimate of the labour saved across clients is around €360k a year: teams that needed several grant writers now need one person working with the product.",
+          "The same pipeline was later reused for HR screening on a client's applicant tracking system.",
+        ],
+      },
+    ],
     stack: ["Python", "TypeScript", "OpenAI / Claude / Gemini APIs", "Azure OpenAI (EU)", "RAG"],
   },
   {
@@ -63,6 +98,41 @@ export const CASES: Case[] = [
       "Speaker notes give the reason for every choice, with the record ids, so the account manager can check it in a minute.",
       "Made the build-vs-extend call: prototyped on Twin's workflow engine, then rebuilt it standalone as sole developer, with weekly releases and demos.",
     ],
+    story: [
+      {
+        h: "The problem",
+        p: [
+          "The client is a major international food producer that sells in more than 100 countries. Its account managers built a pitch deck for each retail partner by hand: pull the partner's numbers from Salesforce, pick products, find approved images in Bynder, write the slides. Four to five hours per deck.",
+        ],
+      },
+      {
+        h: "Discovery",
+        p: [
+          "I was embedded with the client as the main technical contact. I sat with the account team to learn what a good deck looks like, which data they trust, and where the time actually goes.",
+          "The answer was not the writing. It was the choosing: which products fit this partner, and which image is approved for this use.",
+        ],
+      },
+      {
+        h: "Build or extend",
+        p: [
+          "Twin already had a workflow engine, built for grants. I prototyped the generator on it first. It broke on the assumptions underneath: grants are long documents in sections, decks are structured slides with assets and a choice on every slide.",
+          "So I rebuilt it standalone, as the sole developer, in Next.js and TypeScript.",
+        ],
+      },
+      {
+        h: "How it works",
+        p: [
+          "The model reads the partner's account and order history in Salesforce and picks the products to pitch. The catalogue supplies each product's SKU, EAN and price. Bynder supplies an approved shot, with its usage notes. The template fills itself.",
+          "Every slide carries speaker notes that give the reason for each choice, with the record ids behind it. An account manager can check a deck in a minute instead of trusting it blind.",
+        ],
+      },
+      {
+        h: "Delivery",
+        p: [
+          "Weekly releases and client demos. Along the way I onboarded the engineer who took over my previous role.",
+        ],
+      },
+    ],
     stack: ["Next.js", "TypeScript", "Salesforce API", "Bynder API", "LLM pipelines", "Client discovery"],
   },
   {
@@ -72,7 +142,7 @@ export const CASES: Case[] = [
     label: "Side project",
     role: "Full-stack developer",
     period: "2026 – now",
-    title: "One system for everything a restaurant runs, and AI for the typing",
+    title: "One system for a whole restaurant, and AI for the typing",
     short: "A restaurant platform that puts menu, till, kitchen and payments in one system. I build the AI that does the typing.",
     stats: [
       { value: "1 photo", label: "of the paper menu becomes a structured menu" },
@@ -84,6 +154,44 @@ export const CASES: Case[] = [
       "A photo of the paper menu becomes a structured menu: Google Vision OCR, then Claude with structured output to a strict schema, with sections, prices, allergens and nutrition.",
       "Parsing starts with the first photographed page and runs while the owner goes through onboarding. Translations run while they check the dishes, and an edited dish is translated again.",
       "Each stage is tested on its own against expected JSON for real menu photos. Translation is tested on awkward names: quotes, Cyrillic, accents.",
+    ],
+    story: [
+      {
+        h: "The problem",
+        p: [
+          "A restaurant should be about food and guests. In practice it runs a menu tool, a till, a kitchen printer, a payment terminal and a fiscal register, and someone still types the menu in by hand. We counted 43 separate tasks.",
+          "Pesto puts them in one system: the menu and QR ordering, the till, floor and kitchen screens, stock, payments and receipts. It is a side project I build with a small team. My focus is the AI that does the typing.",
+        ],
+      },
+      {
+        h: "A menu from a photo",
+        p: [
+          "The owner photographs the paper menu. Google Vision reads the text with its position on the page, so a price stays with its dish. Claude turns that into a structured menu through structured output to a strict schema: sections, dishes, prices, allergens and nutrition.",
+          "Parsing starts with the first page and runs while the owner goes through onboarding. By the time they reach the dishes, the menu is there.",
+        ],
+      },
+      {
+        h: "Translations, and a bug worth telling",
+        p: [
+          "Translations run in batches while the owner checks the dishes. An edited dish is sent again; the others stay as they are.",
+          "One dish name in quotes broke every batch: in German the model opened the quote with „ and closed it with a straight quote, which ended the JSON string early. Moving to structured output fixed the parsing, but curly quotes still reached the decoder as bare quotes. Now the prompt asks for « » and a test fails if anyone makes it typographically nicer again.",
+        ],
+      },
+      {
+        h: "AI that drafts, people who decide",
+        p: [
+          "Claude drafts a recipe card for every dish the first time the menu is reviewed, so stock can follow sales. It never guesses a price: a guessed cost is a guessed margin.",
+          "A photographed delivery note is read by the model and shown as a form. Nothing is written until a person confirms it.",
+        ],
+      },
+      {
+        h: "Testing the real thing",
+        p: [
+          "Each AI stage is tested on its own against expected JSON for real menu photos.",
+          "The end-to-end suite runs a whole restaurant shift in a real browser against the real database: sign up, upload a menu, order at a table, cook it, serve it, take the money. Only Vision and Claude are faked, at the network boundary. The app has no test mode.",
+          "Order totals, payment state and permissions are database triggers and policies, not app code, so every way into the data obeys them. Parity tests fail if the SQL and the TypeScript copies drift apart.",
+        ],
+      },
     ],
     stack: ["Next.js 16", "TypeScript", "Supabase / Postgres", "Google Vision", "Claude API", "Playwright"],
   },

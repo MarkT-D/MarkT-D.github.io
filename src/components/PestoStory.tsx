@@ -5,6 +5,7 @@ import { TaskGraph, TG_LOOP } from "./TaskGraph";
 import { MenuOnboarding, MO_LOOP } from "./MenuOnboarding";
 import { useInView, useReducedMotion } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
+import { Fit } from "./Fit";
 
 /**
  * Pesto in one place: the problem first (43 tasks folding into one system),
@@ -45,7 +46,7 @@ export function PestoStory() {
 
   return (
     <div ref={ref}>
-      <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Pesto, in two parts">
+      <div className="mb-3 flex flex-wrap gap-2" role="tablist" aria-label="Pesto, in two parts">
         {PARTS.map((p, i) => {
           const progress = Math.min(1, Math.max(0, (t - p.from) / (p.to - p.from)));
           return (
@@ -57,6 +58,7 @@ export function PestoStory() {
           );
         })}
       </div>
+      <Fit width={1280}>
       <div className="grid [&>*]:col-start-1 [&>*]:row-start-1 [&>*]:min-w-0">
         <div className={cn("transition-opacity duration-300", part === 0 ? "opacity-100" : "pointer-events-none opacity-0")} aria-hidden={part !== 0} style={{ opacity: part === 0 ? fadeIn(0) : 0 }}>
           <TaskGraph time={part === 0 ? t : A - 0.6} />
@@ -65,6 +67,7 @@ export function PestoStory() {
           <MenuOnboarding time={part === 1 ? (t - A) / SLOW : 0} />
         </div>
       </div>
+      </Fit>
     </div>
   );
 }

@@ -30,7 +30,7 @@ export function CaseStudy({
   const body = (
     <div>
       <p className="text-[17px] leading-[1.6] text-gr-9">{c.short}</p>
-      <dl className="mt-5 grid grid-cols-3 gap-3">
+      <dl className="mt-4 grid grid-cols-3 gap-3">
         {c.stats.map((s) => (
           <div key={s.label} className="border-l-2 border-acc-3 pl-3">
             <dt className="sr-only">{s.label}</dt>
@@ -39,13 +39,11 @@ export function CaseStudy({
           </div>
         ))}
       </dl>
-      <div className="mt-5 flex flex-wrap gap-1.5">
+      <div className="mt-4 flex flex-wrap items-center gap-1.5">
         {c.stack.map((s) => <span key={s} className="chip h-6 text-[12px]">{s}</span>)}
-      </div>
-      <div className="mt-4 flex flex-wrap gap-4">
-        <Link href={`/work/${c.id}/`} className="text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6">Full story →</Link>
+        <Link href={`/work/${c.id}/`} className="ml-2 text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6">Full story →</Link>
         {c.links?.map((l) => (
-          <a key={l.href} href={l.href} className="text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6" target="_blank" rel="noreferrer">
+          <a key={l.href} href={l.href} className="ml-2 text-[14px] font-semibold text-acc-7 underline decoration-acc-3 underline-offset-4 hover:decoration-acc-6" target="_blank" rel="noreferrer">
             {l.label} →
           </a>
         ))}
@@ -70,10 +68,10 @@ export function CaseStudy({
   }
 
   return (
-    <section id={c.id} className="scroll-mt-24 border-t border-border py-14 sm:py-16">
+    <section id={c.id} className="scroll-mt-14 border-t border-border py-10">
       <div className="wrap">
         <Reveal>
-          <div className="mb-8 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="mb-5 grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
             {head}
             {body}
           </div>
