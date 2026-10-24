@@ -68,6 +68,8 @@ const BOUNDS = (() => {
   return { x: Math.min(...xs) - 6, y: Math.min(...ys) - 6, w: Math.max(...xs) - Math.min(...xs) + 12, h: Math.max(...ys) - Math.min(...ys) + 12 };
 })();
 const at = (p: Point) => ({ left: `${((p.x - BOUNDS.x) / BOUNDS.w) * 100}%`, top: `${((p.y - BOUNDS.y) / BOUNDS.h) * 100}%` });
+export const GPU_NODE_ASPECT = BOUNDS.w / BOUNDS.h;
+export const GPU_NODE_LOOP = LOOP;
 
 function Label({ p, children, strong }: { p: Point; children: ReactNode; strong?: boolean }) {
   return <span className={cn("gp-label", strong && "strong")} style={at(p)}>{children}</span>;
@@ -79,10 +81,11 @@ function Packet({ s }: { s: number }) {
   return <Prism b={{ x: x - 5, y: BUS.a[1] - 5, w: 10, d: 10, z0: BUS_Z, z1: BUS_Z + 9 }} className="gn-packet" />;
 }
 
-export function GpuNode() {
+export function GpuNode({ time }: { time?: number } = {}) {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const mounted = useMounted();
-  const t = useSceneClock(LOOP, inView, STILL);
+  const own = useSceneClock(LOOP, inView && time === undefined, STILL);
+  const t = time ?? own;
   const size = RUNS.length - 1;
   const run = RUNS[size];
   const { phase, p } = phaseAt(t, timing(size));

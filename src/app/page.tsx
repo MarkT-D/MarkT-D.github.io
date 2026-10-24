@@ -9,7 +9,7 @@ import { PestoStory } from "@/components/PestoStory";
 import { QuotaShots } from "@/components/QuotaShots";
 import { TracScene } from "@/components/TracScene";
 import { OceansScene } from "@/components/OceansScene";
-import { GpuNode } from "@/components/iso/GpuNode";
+import { GpuStory } from "@/components/GpuStory";
 import { Reveal } from "@/components/Reveal";
 import { Fit } from "@/components/Fit";
 import { Contact } from "@/components/Contact";
@@ -261,9 +261,8 @@ export default function Home() {
               </Reveal>
               <Reveal delay={120}>
                 <div className="card p-3 sm:p-5">
-                  <div className="mb-1 px-1 text-[15px] font-semibold">A GPU node in a cluster</div>
-                  <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Host memory, PCIe, the GPU&apos;s thread blocks and MPI between nodes, as I programmed them on <span className="whitespace-nowrap">DAS-5</span>.</p>
-                  <Fit width={600}><GpuNode /></Fit>
+                  <div className="mb-3 px-1 text-[15px] font-semibold">What I programmed on DAS-5</div>
+                  <GpuStory />
                 </div>
               </Reveal>
             </div>
@@ -286,7 +285,7 @@ export default function Home() {
           <div className="wrap">
             <p className="eyebrow">How I build</p>
             <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">AI-native: I design and review, agents do the typing</h2>
-            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">Every feature starts as an issue and a spec I write. I split it into pieces that can be built apart, and each goes to an agent, Claude Code or Codex, in its own git worktree. What comes back is a report: screenshots and the key decisions, with open questions flagged for me. Nothing merges until I have read it, and the spec lands in the repo with the code, so the team can catch up without a meeting.</p>
+            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">I write the spec and split the work. Agents build each piece in its own worktree and report back. I review, and the spec ships with the code.</p>
             <Reveal className="mt-8">
               <div className="card p-4 sm:p-6"><AgentHarness /></div>
             </Reveal>

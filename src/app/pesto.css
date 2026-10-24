@@ -187,14 +187,19 @@
 .mo-done span { color: var(--muted-foreground); font-size: 13px; }
 
 /* lanes */
-.mo-lanes { position: relative; display: grid; gap: 8px; margin-top: 22px; }
-.mo-lane { display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: center; gap: 12px; }
-.mo-lane-name { color: var(--muted-foreground); font-size: 12px; font-weight: 700; }
-.mo-lane-track { position: relative; height: 30px; }
+.mo-lanes { position: relative; display: grid; gap: 6px; margin-top: 16px; }
+.mo-lane { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: center; gap: 10px; }
+.mo-lane-name { color: var(--muted-foreground); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.mo-lane-track { position: relative; height: 22px; }
 .mo-seg { position: absolute; top: 0; bottom: 0; padding: 0 2px; }
-.mo-seg em { display: flex; align-items: center; height: 100%; padding: 0 10px; border-radius: 8px; background: var(--gr-2); color: var(--gr-7); font-size: 11.5px; font-style: normal; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 250ms, color 250ms; }
+.mo-seg { overflow: hidden; }
+.mo-seg em { position: relative; z-index: 1; display: flex; align-items: center; height: 100%; padding: 0 9px; border-radius: 6px; background: var(--gr-2); color: var(--gr-7); font-size: 11.5px; font-style: normal; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 250ms, color 250ms; }
 .mo-seg.done em { background: var(--acc-1); color: var(--acc-8); }
-.mo-seg.on em { background: var(--acc-6); color: #fff; }
+.mo-seg.on em { background: var(--acc-1); color: var(--acc-8); }
+.mo-seg i { position: absolute; z-index: 0; left: 2px; top: 0; bottom: 0; max-width: calc(100% - 4px); border-radius: 6px; background: var(--acc-6); opacity: 0.55; }
+.mo-seg.on em { background: transparent; }
+.mo-seg.on { background: transparent; }
+.mo-seg.on::before { content: ""; position: absolute; inset: 0 2px; border-radius: 6px; background: var(--acc-1); }
 .mo-playhead-track { position: absolute; top: -4px; bottom: -4px; left: 162px; right: 0; pointer-events: none; }
 .mo-playhead { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--foreground); border-radius: 2px; }
 .mo-playhead::before { content: ""; position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; border-radius: 99px; background: var(--foreground); }
@@ -394,3 +399,32 @@
 .ah-doc span { display: block; margin-top: 2px; color: var(--muted-foreground); font-size: 11px; line-height: 1.35; }
 .mo-xf { display: grid; height: 100%; }
 .mo-xf > * { grid-area: 1 / 1; min-width: 0; min-height: 0; }
+
+/* The GPU in three steps: the node, coalescing, streams. */
+.gs { position: relative; }
+.gs-view { position: absolute; inset: 0; animation: rc-rise 350ms ease-out backwards; }
+.gs-svg { display: block; overflow: visible; }
+.gs-cap { fill: var(--muted-foreground); font-size: 11.5px; font-weight: 600; }
+.gs-cap.strong { fill: var(--foreground); font-weight: 700; }
+.gs-mode { display: inline-flex; gap: 4px; margin: 4px 0 0 44px; padding: 3px; border-radius: 9px; background: var(--gr-2); }
+.gs-mode span { padding: 3px 10px; border-radius: 7px; color: var(--muted-foreground); font-family: var(--font-mono, ui-monospace), monospace; font-size: 12px; font-weight: 600; transition: background 200ms, color 200ms; }
+.gs-mode span.on { background: var(--card); color: var(--foreground); box-shadow: inset 0 0 0 1px var(--border); }
+.gs-thread { fill: var(--gr-3); transition: fill 150ms; }
+.gs-thread.on { fill: var(--acc-6); }
+.gs-seg { fill: var(--gr-2); stroke: var(--gr-4); stroke-width: 1; transition: fill 150ms; }
+.gs-seg.hit { fill: var(--acc-4); stroke: var(--acc-6); }
+.gs-load { stroke: var(--acc-5); stroke-width: 1.2; opacity: 0.8; }
+.gs-stats { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: -26px 0 0 44px; align-items: center; transition: opacity 200ms; }
+.gs-stats > div { display: flex; align-items: baseline; gap: 6px; }
+.gs-stats b { font-family: var(--font-display); font-size: 22px; color: var(--acc-6); }
+.gs-stats span { color: var(--gr-8); font-size: 12.5px; }
+.gs-stats .wide { flex-basis: 100%; align-items: center; }
+.gs-eff { display: inline-block; width: 120px; height: 8px; border-radius: 99px; background: var(--gr-2); overflow: hidden; }
+.gs-eff i { display: block; height: 100%; border-radius: 99px; background: var(--acc-6); transition: width 500ms; }
+.gs-lane { fill: var(--gr-2); }
+.gs-block.r0, .gs-block.r2 { fill: var(--acc-5); }
+.gs-block.r1 { fill: var(--acc-7); }
+.gs-block.c1 { opacity: 0.7; }
+.gs-playhead { stroke: var(--foreground); stroke-width: 1.5; opacity: 0.5; }
+.gs-result { margin: -18px 0 0 90px; color: var(--gr-8); font-size: 13px; transition: opacity 300ms; }
+.gs-result b { color: var(--acc-7); }

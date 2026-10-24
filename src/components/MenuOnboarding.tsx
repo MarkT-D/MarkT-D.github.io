@@ -20,16 +20,16 @@ const STILL = 14.6;
 
 type Seg = { key: string; from: number; to: number; label: string };
 const OWNER: Seg[] = [
-  { key: "shoot", from: 0, to: 3.2, label: "Photographs the menu" },
-  { key: "onboard", from: 3.2, to: 9.6, label: "Onboarding: name, hours, tables, payments" },
-  { key: "edit", from: 9.6, to: 16.8, label: "Checks the dishes: reorders, renames, picks a style" },
-  { key: "live", from: 16.8, to: 19.8, label: "Publishes" },
+  { key: "shoot", from: 0, to: 3.2, label: "Shoot" },
+  { key: "onboard", from: 3.2, to: 9.6, label: "Onboarding" },
+  { key: "edit", from: 9.6, to: 16.8, label: "Edit dishes" },
+  { key: "live", from: 16.8, to: 19.8, label: "Live" },
 ];
 const AI: Seg[] = [
   { key: "upload", from: 0, to: 3.2, label: "Upload" },
-  { key: "ocr", from: 3.2, to: 6.3, label: "Vision OCR" },
+  { key: "ocr", from: 3.2, to: 6.3, label: "OCR" },
   { key: "parse", from: 6.3, to: 9.6, label: "Claude parse" },
-  { key: "translate", from: 9.6, to: 16.8, label: "Translations, while you edit" },
+  { key: "translate", from: 9.6, to: 16.8, label: "Translate" },
 ];
 const at = (segs: Seg[], t: number) => segs.find((s) => t >= s.from && t < s.to)?.key ?? null;
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
@@ -85,6 +85,7 @@ export function MenuOnboarding({ time }: { time?: number } = {}) {
           </div>
         </div>
       ) : <div className="mo-top" style={{ minHeight: 520 }} />}
+      <Progress t={t} />
 
     </div>
   );
@@ -296,4 +297,23 @@ function Stage({ icon, title, note, children }: { icon: ReactNode; title: string
   </div>;
 }
 
-
+/** Where the run is: what the owner is doing, and what runs behind it. */
+function Progress({ t }: { t: number }) {
+  const lane = (name: string, segs: Seg[]) => (
+    <div className="mo-lane">
+      <span className="mo-lane-name">{name}</span>
+      <div className="mo-lane-track">
+        {segs.map((s) => (
+          <span key={s.key} className={cn("mo-seg", t >= s.from && t < s.to && "on", t >= s.to && "done")} style={{ left: `${(s.from / LOOP) * 100}%`, width: `${((s.to - s.from) / LOOP) * 100}%` }}>
+            <em>{s.label}</em>
+            {t >= s.from && t < s.to && <i style={{ width: `${(((t - s.from) / (s.to - s.from)) * 100).toFixed(1)}%` }} />}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+  return <div className="mo-lanes" aria-hidden>
+    {lane("Owner", OWNER)}
+    {lane("AI", AI)}
+  </div>;
+}

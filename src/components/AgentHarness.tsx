@@ -15,14 +15,15 @@ import { cn } from "@/lib/utils";
  * are the kind of thing Pesto's backlog holds; the run is illustrative.
  */
 
-const W = 1080, H = 452;
+const W = 1080, H = 400;
 const LOOP = 18;
+const SLOW = 1.5;
 
 type Lane = {
   tree: string; agent: "Claude Code" | "Codex"; ticket: string; issue: number;
   hand: number; work: [number, number]; ci: [number, number]; review: [number, number];
   fail?: [number, number];
-  report: { shots: string[]; decisions: { text: string; why: string; ask?: boolean }[] };
+  report: { shots: string[]; decisions: { text: string; ask?: boolean }[] };
 };
 
 const LANES: Lane[] = [
@@ -32,9 +33,9 @@ const LANES: Lane[] = [
     report: {
       shots: ["Ledger, two phones", "Test run"],
       decisions: [
-        { text: "Lock the order row while summing", why: "two phones can pay at the same second" },
-        { text: "A charge names its dishes", why: "so a refund knows what it undoes" },
-        { text: "Refund order on a split bill?", why: "newest first, or yours to pick", ask: true },
+        { text: "Lock the order row" },
+        { text: "Charges name their dishes" },
+        { text: "Refund order? Your call", ask: true },
       ],
     },
   },
@@ -44,8 +45,8 @@ const LANES: Lane[] = [
     report: {
       shots: ["Share sheet", "Dark mode"],
       decisions: [
-        { text: "Start a share at the phone's own dishes", why: "most people pay for what they ordered" },
-        { text: "½ ⅓ ¼, not free amounts", why: "no cents left over to argue about" },
+        { text: "Share starts at your dishes" },
+        { text: "½ ⅓ ¼ presets" },
       ],
     },
   },
@@ -55,8 +56,8 @@ const LANES: Lane[] = [
     report: {
       shots: ["Retry timeline", "Delivery log"],
       decisions: [
-        { text: "Back off and retry, six times", why: "the vendor's 403 means busy, not no" },
-        { text: "One idempotency key per receipt", why: "a retry never files twice" },
+        { text: "Retry 6× with backoff" },
+        { text: "One key per receipt" },
       ],
     },
   },
@@ -91,13 +92,14 @@ const SPOT = { me: { x: 262, y: 150 }, issue: (k: number) => ({ x: 14, y: 54 + k
 export function AgentHarness() {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const mounted = useMounted();
-  const t = useSceneClock(LOOP, inView, 8.6);
+  // Played at two thirds of the speed it is written in, so each step can be read.
+  const t = useSceneClock(LOOP * SLOW, inView, 8.6 * SLOW) / SLOW;
   const fade = t > LOOP - 0.6 ? (LOOP - t) / 0.6 : 1;
 
   const planning = ISSUES.find((is) => t >= is.plan[0] && t < is.plan[1]);
   const reviewing = LANES.find((l) => t >= l.review[0] && t < l.review[1]);
-  const meText = planning ? (planning.split ? `Splitting #${planning.id} into two worktrees` : `Writing the spec for #${planning.id}`)
-    : reviewing ? `Reading the report from ${reviewing.ticket}` : "Writing the next issue";
+  const meText = planning ? (planning.split ? `Splitting #${planning.id} in two` : `Spec for #${planning.id}`)
+    : reviewing ? `Reviewing ${reviewing.ticket}` : "Next issue";
 
   return (
     <div ref={ref}>
@@ -121,16 +123,16 @@ export function AgentHarness() {
 
             <div className="ah-me" style={{ left: ME.x, top: ME.y }}>
               <span className="ah-avatar">MT</span>
-              <div><b>Me</b><span>The spec, the split, and every review</span></div>
+              <div><b>Me</b><span>Spec, split, review</span></div>
               <div key={meText} className="ah-doing">{meText}</div>
             </div>
 
             {/* The split: one feature becomes two pieces that can be built apart. */}
             {planning?.split && t > planning.plan[0] + 0.7 && (
               <div className="ah-split" style={{ left: ME.x, top: 168 }}>
-                <div className="ah-split-head"><FileText className="size-3.5" /> spec: #212, in two parts</div>
-                <div className="ah-split-row"><b>212a</b> ledger: shares, locks, refunds</div>
-                <div className="ah-split-row"><b>212b</b> the guest&apos;s share sheet</div>
+                <div className="ah-split-head"><FileText className="size-3.5" /> #212 in two parts</div>
+                <div className="ah-split-row"><b>212a</b> ledger</div>
+                <div className="ah-split-row"><b>212b</b> share sheet</div>
               </div>
             )}
 
@@ -148,18 +150,18 @@ export function AgentHarness() {
                   <span className={cn("ah-agent", ln.agent === "Codex" && "codex")}>{ln.agent}</span>
                 </div>
                 <div className="ah-lane-body">
-                  {s === "idle" || s === "hand" ? <span className="ah-idle">waiting for a piece of work</span>
-                    : s === "merged" ? <span className="ah-done"><GitMerge className="size-3.5" /> merged, worktree removed</span>
-                    : s === "review" ? <span className="ah-done"><GitPullRequest className="size-3.5" /> report and diff with me</span>
-                    : s === "waiting" ? <span className="ah-step muted"><GitPullRequest className="size-3.5" /> report ready, in my queue</span>
-                    : s === "ci" ? <span className={cn("ah-ci", failing && "bad")}>{failing ? <X className="size-3.5" /> : <Check className="size-3.5" />} {failing ? "1 test failed" : fixing ? "Agent fixed it" : "CI: vitest, playwright"}</span>
-                    : <span className="ah-step">{work < 0.3 ? "Reading the spec and the code" : work < 0.75 ? "Building it" : "Screenshots and report"}</span>}
+                  {s === "idle" || s === "hand" ? <span className="ah-idle">idle</span>
+                    : s === "merged" ? <span className="ah-done"><GitMerge className="size-3.5" /> merged</span>
+                    : s === "review" ? <span className="ah-done"><GitPullRequest className="size-3.5" /> in review</span>
+                    : s === "waiting" ? <span className="ah-step muted"><GitPullRequest className="size-3.5" /> in my queue</span>
+                    : s === "ci" ? <span className={cn("ah-ci", failing && "bad")}>{failing ? <X className="size-3.5" /> : <Check className="size-3.5" />} {failing ? "1 test failed" : fixing ? "fixed" : "CI passing"}</span>
+                    : <span className="ah-step">{work < 0.3 ? "Reading the spec" : work < 0.75 ? "Building" : "Writing the report"}</span>}
                   <div className="ah-bar"><i style={{ width: `${Math.round(work * 100)}%` }} /></div>
                 </div>
               </div>;
             })}
 
-            <div className="ah-col" style={{ left: 880, top: 0, width: 200 }}><div className="ah-head"><GitMerge className="size-3.5" /> Main, with the spec</div></div>
+            <div className="ah-col" style={{ left: 880, top: 0, width: 200 }}><div className="ah-head"><GitMerge className="size-3.5" /> Main + specs</div></div>
             <div className="ah-out" style={{ left: 880, top: 32 }}>
               {LANES.map((ln) => t >= ln.review[1] && (
                 <div key={ln.ticket} className="ah-merged"><Check className="size-3.5" /> {ln.ticket} merged</div>
@@ -167,7 +169,7 @@ export function AgentHarness() {
               {ISSUES.map((is) => t >= SPEC_AT[is.id] && (
                 <div key={`spec${is.id}`} className="ah-doc">
                   <FileText className="size-3.5" />
-                  <div><b>{SPECS[is.id]}</b><span>decisions, screenshots, open questions: for the team, async</span></div>
+                  <div><b>{SPECS[is.id]}</b><span>for the team, async</span></div>
                 </div>
               ))}
             </div>
@@ -200,7 +202,7 @@ export function AgentHarness() {
 function Report({ lane, t }: { lane: Lane; t: number }) {
   const shown = (i: number) => t > lane.review[0] + 0.4 + i * 0.25;
   return <div className="ah-report" style={{ left: ME.x, top: 168 }}>
-    <div className="ah-report-head"><GitPullRequest className="size-3.5" /> Report from {lane.ticket} <span>{lane.agent}</span></div>
+    <div className="ah-report-head"><GitPullRequest className="size-3.5" /> Report · {lane.ticket}</div>
     <div className="ah-shots">
       {lane.report.shots.map((s, i) => (
         <figure key={s} className={cn("ah-shot", i === 1 && "b", shown(i) && "in")}>
@@ -213,7 +215,7 @@ function Report({ lane, t }: { lane: Lane; t: number }) {
       {lane.report.decisions.map((d, i) => (
         <li key={d.text} className={cn(d.ask && "ask", shown(i + 2) && "in")}>
           {d.ask ? <HelpCircle className="size-3.5" /> : <Check className="size-3.5" />}
-          <div><b>{d.text}</b><span>{d.why}</span></div>
+          <b>{d.text}</b>
         </li>
       ))}
     </ul>

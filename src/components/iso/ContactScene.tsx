@@ -61,7 +61,7 @@ const IN = { start: 0.6, end: 3.4 }, OUT = { start: 9.4, end: 12.2 };
 const ASK = 3.7, ANSWER = 5.0, COFFEE = 6.2;
 
 /** What each thing in the room says when you hover or tap it. */
-const TIPS: Record<string, { title: string; text: string; at: Point }> = {
+const TIPS: Record<string, { title: string; text: string; credit?: string; at: Point }> = {
   jars: { title: "Cooking", text: "I cook most days, usually from a cuisine I haven't tried yet. These are the spices.", at: iso(36, 6, 98) },
   server: { title: "My homelab, being built", text: "A home for my own cloud: storage with my Obsidian vault synced, files, music I host myself, and the agents I run.", at: iso(297, 21, 120) },
   cat: { title: "The cat", text: "Asleep on the warmest box in the room. Go on, pet it.", at: iso(297, 21, 118) },
@@ -72,7 +72,7 @@ const TIPS: Record<string, { title: string; text: string; at: Point }> = {
   skis: { title: "Skiing", text: "The other main thing I do outside work.", at: iso(270, 2, 100) },
   minecraft: { title: "Minecraft", text: "Since forever.", at: iso(51, 81, 62) },
   cactus: { title: "The cactus", text: "Same one as in the terminal up top.", at: iso(50, 156, 72) },
-  lizard: { title: "A lizard plushie", text: "From Space Station 14, where I play on the Goob fork and mod. Sprite: tgstation / SS14, CC BY-SA 3.0.", at: iso(290, 132, 52) },
+  lizard: { title: "A lizard plushie", text: "Weh!", credit: "Sprite: tgstation / Space Station 14, CC BY-SA 3.0", at: iso(290, 132, 52) },
   belt: { title: "Judo", text: "I trained for years and competed at regional level in Moscow.", at: iso(276, 196, 40) },
   mail: { title: "Email", text: "mstemchenko.dev@gmail.com. Click the sign.", at: iso(0, 36, 116) },
   in: { title: "LinkedIn", text: "in/mark-the-artichoke. Click the sign.", at: iso(0, 92, 116) },
@@ -280,7 +280,7 @@ export function ContactScene() {
       {t >= ANSWER && t < OUT.start + 0.6 && <Bubble p={headAt(ME.x, ME.y, 26, 1.15, true)} done pop={popAt(t, ANSWER)}><Check x={-7} y={-7} width={14} height={14} strokeWidth={3} /></Bubble>}
     </svg>
     {t >= ANSWER && t < OUT.start + 0.6 && <span className="cs-say" style={at(headAt(ME.x, ME.y, 26, 1.15, true))}>Let&apos;s talk.</span>}
-    {tip && <div key={tip} className={cn("cs-hint", side(TIPS[tip].at))} style={at(TIPS[tip].at)} role="status"><b>{TIPS[tip].title}</b><span>{TIPS[tip].text}</span></div>}
+    {tip && <div key={tip} className={cn("cs-hint", side(TIPS[tip].at))} style={at(TIPS[tip].at)} role="status"><b>{TIPS[tip].title}</b><span>{TIPS[tip].text}</span>{TIPS[tip].credit && <small>{TIPS[tip].credit}</small>}</div>}
     <p className="cs-help">Hover or tap things in the room.</p>
   </div>;
 }
