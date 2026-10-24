@@ -339,9 +339,9 @@
 .ah-issue.taken { opacity: 0.35; }
 .ah-issue.more { opacity: 0.6; }
 .ah-me { position: absolute; width: 196px; padding: 12px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow-card), inset 0 0 0 1.5px var(--acc-4); display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; }
-.ah-avatar { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: var(--acc-6); color: var(--primary-foreground); font-weight: 800; font-size: 13px; }
+.ah-me .ah-avatar { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: var(--acc-6); color: var(--primary-foreground); font-weight: 800; font-size: 13px; }
 .ah-me b { display: block; font-size: 14px; }
-.ah-me span { display: block; color: var(--muted-foreground); font-size: 11.5px; line-height: 1.35; }
+.ah-me div > span { display: block; color: var(--muted-foreground); font-size: 11.5px; line-height: 1.35; }
 .ah-doing { grid-column: 1 / -1; margin-top: 6px; padding: 5px 8px; border-radius: 8px; background: var(--acc-1); color: var(--acc-8); font-weight: 700; font-size: 12px; animation: rc-rise 250ms backwards; }
 .ah-lane { position: absolute; width: 380px; height: 88px; padding: 10px 12px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--border); transition: box-shadow 250ms; }
 .ah-lane.on { box-shadow: var(--shadow-card), inset 0 0 0 1.5px var(--acc-5); }
