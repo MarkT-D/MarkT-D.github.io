@@ -46,13 +46,13 @@ export function Contact() {
         <div>
           <p className="eyebrow">Contact</p>
           <h2 className="mt-2 font-display text-[34px] font-semibold leading-tight sm:text-[40px]">Let&apos;s talk.</h2>
-          <p className="mt-3 max-w-md text-[16px] leading-[1.6] text-gr-8">
+          <p className="mt-2 max-w-md text-[15.5px] leading-[1.55] text-gr-8">
             I&apos;m looking for AI Engineer and Forward Deployed Engineer roles. Based in Barcelona, EU citizen, no visa needed.
           </p>
-          <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {CHANNELS.map((c) => (
-              <li key={c.name} className="card flex items-center gap-3 p-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-acc-1 text-acc-7">{c.icon}</span>
+              <li key={c.name} className="card flex items-center gap-3 p-2.5">
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-acc-1 text-acc-7">{c.icon}</span>
                 <a href={c.href === "cv" ? asset("/Mark_Temchenko_CV.pdf") : c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="min-w-0 flex-1 hover:text-acc-7">
                   <div className="text-[14px] font-semibold">{c.name}</div>
                   <div className="truncate text-[12.5px] text-muted-foreground">{c.value}</div>
@@ -62,24 +62,19 @@ export function Contact() {
             ))}
           </ul>
 
-          <div className="mt-5 overflow-hidden rounded-xl bg-term">
+          <div className="mt-4 overflow-hidden rounded-xl bg-term">
             <div className="flex items-center gap-2 px-4 pt-3 text-[12px] font-semibold text-term-fg/70"><Terminal className="size-3.5" /> Or, from any terminal</div>
             <div className="flex items-center gap-2 px-4 pb-3 pt-1.5">
               <code className="min-w-0 flex-1 truncate font-mono text-[13.5px] text-term-fg"><span className="text-term-ok">$</span> {CURL}</code>
               <CopyButton text={CURL} label="Copy the curl command" />
             </div>
-            <details className="group border-t border-white/10">
-              <summary className="cursor-pointer list-none px-4 py-2 text-[12px] font-semibold text-term-fg/70 hover:text-term-fg">
-                <span className="group-open:hidden">Show what it prints ↓</span><span className="hidden group-open:inline">Hide ↑</span>
-              </summary>
-              <div className="overflow-x-auto px-4 pb-3">
-                <pre className="w-max font-mono text-[9.5px] leading-[1.12] sm:text-[10.5px]" aria-label="The card it prints">
-                  {(card as [string, string, boolean][][]).map((segs, i) => (
-                    <div key={i}>{segs.map(([text, color, bold], j) => <span key={j} style={{ color, fontWeight: bold ? 700 : 400 }}>{text}</span>)}</div>
-                  ))}
-                </pre>
-              </div>
-            </details>
+            <div className="overflow-x-auto border-t border-white/10 px-4 py-2.5">
+              <pre className="w-max font-mono text-[8.5px] leading-[1.12] sm:text-[9.5px]" aria-label="The card it prints">
+                {(card as [string, string, boolean][][]).map((segs, i) => (
+                  <div key={i}>{segs.map(([text, color, bold], j) => <span key={j} style={{ color, fontWeight: bold ? 700 : 400 }}>{text}</span>)}</div>
+                ))}
+              </pre>
+            </div>
           </div>
         </div>
         <div className="card p-3 sm:p-6">

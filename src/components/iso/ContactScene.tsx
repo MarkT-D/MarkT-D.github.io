@@ -5,7 +5,7 @@ import { Briefcase, Check, Cog } from "lucide-react";
 import { COS, iso, Prism, pts, facingX, facingY, type Box, type Point } from "./iso";
 import { Figure, headAt } from "./figure";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
-import { cn } from "@/lib/utils";
+import { asset, cn } from "@/lib/utils";
 
 /**
  * The contact section's room, after Pesto's restaurant loop: me at a desk in
@@ -67,13 +67,12 @@ const TIPS: Record<string, { title: string; text: string; at: Point }> = {
   cat: { title: "The cat", text: "Asleep on the warmest box in the room. Go on, pet it.", at: iso(297, 21, 118) },
   plants: { title: "Plants", text: "My mom was a florist, so there are always plants around me.", at: iso(21, 221, 74) },
   factorio: { title: "Factorio", text: "The factory must grow.", at: iso(179, 0, 108) },
-  ss14: { title: "Space Station 14", text: "I play on the Goob fork and like modding it.", at: iso(179, 0, 60) },
-  deadlock: { title: "Deadlock", text: "For when the build is green.", at: iso(0, 214, 114) },
+  deadlock: { title: "Deadlock", text: "For when the build is green.", at: iso(179, 0, 60) },
   katana: { title: "Katana Zero", text: "Short, sharp, and the best soundtrack on this wall.", at: iso(246, 0, 104) },
   skis: { title: "Skiing", text: "The other main thing I do outside work.", at: iso(270, 2, 100) },
   minecraft: { title: "Minecraft", text: "Since forever.", at: iso(51, 81, 62) },
   cactus: { title: "The cactus", text: "Same one as in the terminal up top.", at: iso(50, 156, 72) },
-  lizard: { title: "A lizard plushie", text: "Space Station 14 players will know.", at: iso(290, 132, 44) },
+  lizard: { title: "A lizard plushie", text: "From Space Station 14, where I play on the Goob fork and mod. Sprite: tgstation / SS14, CC BY-SA 3.0.", at: iso(290, 132, 52) },
   belt: { title: "Judo", text: "I trained for years and competed at regional level in Moscow.", at: iso(276, 196, 40) },
   mail: { title: "Email", text: "mstemchenko.dev@gmail.com. Click the sign.", at: iso(0, 36, 116) },
   in: { title: "LinkedIn", text: "in/mark-the-artichoke. Click the sign.", at: iso(0, 92, 116) },
@@ -176,14 +175,11 @@ export function ContactScene() {
         <polygon className="cs-poster factorio" points={pts(facingY(158, 200, 0, 64, 104))} />
         {(() => { const c = iso(179, 0, 84); return <g transform={`translate(${c.x.toFixed(1)} ${c.y.toFixed(1)}) rotate(${((t * 40) % 360).toFixed(1)})`}><Cog x={-9} y={-9} width={18} height={18} className="cs-gear" /></g>; })()}
       </>)}
-      {egg("ss14", <>
-        <polygon className="cs-poster ss14" points={pts(facingY(158, 200, 0, 16, 56))} />
-        {(() => { const c = iso(179, 0, 40); return <g transform={`translate(${c.x.toFixed(1)} ${c.y.toFixed(1)}) rotate(${((t * 12) % 360).toFixed(1)})`}>
-          <rect x={-12} y={-1.6} width={24} height={3.2} rx={1} className="cs-station" />
-          <circle r={5.5} className="cs-station" />
-          <circle r={2.2} className="cs-station core" />
+      {egg("deadlock", <>
+        <polygon className="cs-poster deadlock" points={pts(facingY(158, 200, 0, 16, 56))} />
+        {(() => { const c = iso(179, 0, 36); return <g transform={`matrix(${COS} 0.5 0 1 ${c.x.toFixed(1)} ${c.y.toFixed(1)})`}>
+          <image href={asset("/img/deadlock-emblem.png")} x={-16} y={-16} width={32} height={32} />
         </g>; })()}
-        <Painted at={iso(179, 0, 21)} on="back" className="cs-poster-text light">SS14</Painted>
       </>)}
       <polygon className="cs-door" points={pts(facingY(222, 258, 0, 0, 84))} />
       {egg("katana", (() => { const a = iso(222, 0, 94), b = iso(250, 0, 97), c = iso(260, 0, 98); return <>
@@ -204,10 +200,6 @@ export function ContactScene() {
           <Painted at={{ x: s.at.x, y: s.at.y + 3 }} on="side" className="cs-sign-text">{s.label}</Painted>
         </a>
       ))}
-      {egg("deadlock", <>
-        <polygon className="cs-poster deadlock" points={pts(facingX(0, 190, 236, 64, 112))} />
-        <DeadlockMotif />
-      </>)}
 
       {/* the visitor, behind the server and the bed */}
       {v && <g opacity={v.o}><Figure x={v.x} y={v.y} tone="guest-c" hair="bun" face={v.face} scale={1.15} pose={v.walking ? "walk" : t > ASK && t < ANSWER ? "point" : "idle"} t={t} /></g>}
@@ -293,26 +285,14 @@ export function ContactScene() {
   </div>;
 }
 
-/** An original lock-and-key motif for the Deadlock poster: a ring, a shackle, a keyhole. Not the game's mark. */
-function DeadlockMotif() {
-  const c = iso(0, 213, 88);
-  return <g transform={`matrix(${COS} -0.5 0 1 ${c.x.toFixed(1)} ${c.y.toFixed(1)})`} className="cs-dl">
-    <path className="shackle" d="M -6 -4 V -9 A 6 6 0 0 1 6 -9 V -4" />
-    <rect x={-9} y={-4} width={18} height={15} rx={3} />
-    <circle className="hole" cx={0} cy={2} r={2.2} />
-    <path className="hole" d="M -1.2 3 L -1.8 8 H 1.8 L 1.2 3 Z" />
-  </g>;
-}
-
-/** A small green lizard plushie, sitting on the pillow. */
+/**
+ * The lizard plushie from Space Station 14, the game's own sprite
+ * (tgstation / SS14, CC BY-SA 3.0), sitting on the pillow.
+ */
 function Lizard() {
   const c = iso(292, 132, 28);
-  return <g transform={`translate(${c.x.toFixed(1)} ${c.y.toFixed(1)})`} className="cs-lizard">
-    <path className="tail" d="M -8 -2 q -8 2 -10 -4" />
-    <ellipse cx={0} cy={-4} rx={8} ry={5} />
-    <circle cx={7} cy={-8} r={4} />
-    <circle className="eye" cx={8.6} cy={-9} r={0.9} />
-    <path className="leg" d="M -4 0 l -1.5 3 M 4 0 l 1.5 3" />
+  return <g className="cs-lizard">
+    <image href={asset("/img/ss14-lizard.png")} x={(c.x - 12).toFixed(1)} y={(c.y - 23).toFixed(1)} width={24} height={24} style={{ imageRendering: "pixelated" }} />
   </g>;
 }
 

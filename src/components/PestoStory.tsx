@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * runs both; the tabs jump to either part.
  */
 
-const SLOW = 1.4;
+const SLOW = 1.8;
 const A = TG_LOOP, B = MO_LOOP * SLOW, TOTAL = A + B;
 const PARTS = [
   { name: "The problem", from: 0, to: A },

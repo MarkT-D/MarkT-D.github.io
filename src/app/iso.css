@@ -358,19 +358,11 @@
 .cs-pillow :is(.top, .front, .side) { fill: var(--iso-white); stroke: var(--gr-4); stroke-width: 0.8; }
 .cs-blanket .top { fill: var(--acc-4); } .cs-blanket :is(.front, .side) { fill: var(--acc-6); }
 .cs-belt { fill: none; stroke: #1c1f1d; stroke-width: 3; stroke-linecap: round; }
-.cs-lizard ellipse, .cs-lizard circle:not(.eye) { fill: #5fae4f; }
-.cs-lizard .tail { fill: none; stroke: #5fae4f; stroke-width: 3; stroke-linecap: round; }
-.cs-lizard .leg { stroke: #4b8f3d; stroke-width: 2; stroke-linecap: round; }
-.cs-lizard .eye { fill: #1c1f1d; }
-.cs-dl rect { fill: #b77a43; }
-.cs-dl .shackle { fill: none; stroke: #d9a35f; stroke-width: 2.6; }
-.cs-dl .hole { fill: #2a2420; }
 .cs-cat .heart { fill: #e0566b; }
 .cs-cat .purr { fill: var(--acc-7); font-size: 8px; font-weight: 800; font-style: italic; }
 .cs-rug { fill: var(--acc-1); stroke: var(--acc-2); stroke-width: 1.5; }
 .cs-poster { stroke: var(--gr-5); stroke-width: 1; }
 .cs-poster.factorio { fill: #3b3a35; }
-.cs-poster.ss14 { fill: #1e2c44; }
 .cs-poster.deadlock { fill: #2a2420; }
 .cs-poster-text { fill: #f0a24a; font-size: 6.5px; font-weight: 800; letter-spacing: 0.06em; }
 .cs-poster-text.light { fill: #dfe8f5; font-size: 7.5px; }

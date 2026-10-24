@@ -10,7 +10,6 @@ import { QuotaShots } from "@/components/QuotaShots";
 import { TracScene } from "@/components/TracScene";
 import { OceansScene } from "@/components/OceansScene";
 import { GpuNode } from "@/components/iso/GpuNode";
-import { Roofline } from "@/components/Roofline";
 import { Reveal } from "@/components/Reveal";
 import { Fit } from "@/components/Fit";
 import { Contact } from "@/components/Contact";
@@ -247,7 +246,7 @@ export default function Home() {
         {/* Foundations */}
         <section id="foundations" className="scroll-mt-14 border-t border-border py-12 sm:py-14">
           <div className="wrap">
-            <div className="grid items-start gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10 [&>*]:min-w-0">
+            <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 [&>*]:min-w-0">
               <Reveal>
                 <p className="eyebrow">Beyond the degree</p>
                 <h2 className="mt-2 font-display text-[26px] font-semibold leading-tight sm:text-[30px]">My BSc was light on maths and systems, so I added master&apos;s-level courses</h2>
@@ -259,16 +258,12 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <div className="card mt-6 p-3 sm:p-4">
-                  <div className="px-1 text-[14px] font-semibold">A GPU node in a cluster <span className="font-normal text-muted-foreground">· host, PCIe, thread blocks, MPI</span></div>
-                  <div className="mx-auto max-w-[420px]"><Fit width={600}><GpuNode /></Fit></div>
-                </div>
               </Reveal>
               <Reveal delay={120}>
-                <div className="card p-4 sm:p-6">
-                  <div className="text-[16px] font-semibold">Where a kernel hits the ceiling</div>
-                  <p className="mb-4 mt-1 text-[13px] leading-[1.5] text-muted-foreground">A roofline for the GTX Titan X I ran on. Pick a kernel: it lands where its FLOPs per byte put it, under memory or under compute. The ones marked lab are mine; the matrix multiply is the textbook case for tiling.</p>
-                  <Roofline />
+                <div className="card p-3 sm:p-5">
+                  <div className="mb-1 px-1 text-[15px] font-semibold">A GPU node in a cluster</div>
+                  <p className="mb-2 px-1 text-[12.5px] text-muted-foreground">Host memory, PCIe, the GPU&apos;s thread blocks and MPI between nodes, as I programmed them on <span className="whitespace-nowrap">DAS-5</span>.</p>
+                  <Fit width={600}><GpuNode /></Fit>
                 </div>
               </Reveal>
             </div>
@@ -291,7 +286,7 @@ export default function Home() {
           <div className="wrap">
             <p className="eyebrow">How I build</p>
             <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">AI-native: I design and review, agents do the typing</h2>
-            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">Every change starts as an issue I write. A harness hands it to an agent in its own git worktree, Claude Code or Codex, several at once. CI runs the tests, and nothing reaches main until I have read the diff.</p>
+            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">Every feature starts as an issue and a spec I write. I split it into pieces that can be built apart, and each goes to an agent, Claude Code or Codex, in its own git worktree. What comes back is a report: screenshots and the key decisions, with open questions flagged for me. Nothing merges until I have read it, and the spec lands in the repo with the code, so the team can catch up without a meeting.</p>
             <Reveal className="mt-8">
               <div className="card p-4 sm:p-6"><AgentHarness /></div>
             </Reveal>

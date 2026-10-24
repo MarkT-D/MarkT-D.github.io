@@ -1,63 +1,103 @@
 "use client";
 
-import { Check, CircleDot, GitBranch, GitMerge, GitPullRequest, X } from "lucide-react";
+import { Check, CircleDot, FileText, GitBranch, GitMerge, GitPullRequest, HelpCircle, Image as ImageIcon, X } from "lucide-react";
 import { Fit } from "./Fit";
 import { useInView, useMounted, useSceneClock } from "@/lib/use-in-view";
 import { cn } from "@/lib/utils";
 
 /**
- * How I work, as a loop: issues come in, I plan each one, the harness hands
- * them to agents in their own git worktrees (Claude Code and Codex), CI runs
- * the tests, and nothing merges until I have read the diff. Issue titles are
- * the kind of thing Pesto's backlog holds; the run itself is illustrative.
+ * How I work, as one run. I write the issue and split a feature into pieces
+ * that can be built apart; the harness gives each piece its own git worktree
+ * and agent (Claude Code or Codex); CI runs the tests. What comes back is not
+ * just a diff but a report: screenshots and the key decisions, with the ones
+ * that need me marked. I review one at a time, and every merge lands with its
+ * spec in the repo, so the team can catch up without a meeting. Issue titles
+ * are the kind of thing Pesto's backlog holds; the run is illustrative.
  */
 
-const W = 1080, H = 360;
-const LOOP = 17;
+const W = 1080, H = 452;
+const LOOP = 18;
+
+type Lane = {
+  tree: string; agent: "Claude Code" | "Codex"; ticket: string; issue: number;
+  hand: number; work: [number, number]; ci: [number, number]; review: [number, number];
+  fail?: [number, number];
+  report: { shots: string[]; decisions: { text: string; why: string; ask?: boolean }[] };
+};
+
+const LANES: Lane[] = [
+  {
+    tree: "wt/212a-ledger", agent: "Claude Code", ticket: "212a", issue: 212,
+    hand: 2.3, work: [2.8, 6.4], ci: [6.4, 7.2], review: [7.4, 9.6],
+    report: {
+      shots: ["Ledger, two phones", "Test run"],
+      decisions: [
+        { text: "Lock the order row while summing", why: "two phones can pay at the same second" },
+        { text: "A charge names its dishes", why: "so a refund knows what it undoes" },
+        { text: "Refund order on a split bill?", why: "newest first, or yours to pick", ask: true },
+      ],
+    },
+  },
+  {
+    tree: "wt/212b-share-sheet", agent: "Codex", ticket: "212b", issue: 212,
+    hand: 2.3, work: [2.8, 7.2], ci: [7.2, 9.0], fail: [7.2, 8.0], review: [9.8, 12.0],
+    report: {
+      shots: ["Share sheet", "Dark mode"],
+      decisions: [
+        { text: "Start a share at the phone's own dishes", why: "most people pay for what they ordered" },
+        { text: "½ ⅓ ¼, not free amounts", why: "no cents left over to argue about" },
+      ],
+    },
+  },
+  {
+    tree: "wt/214-receipt-retry", agent: "Claude Code", ticket: "214", issue: 214,
+    hand: 4.2, work: [4.7, 8.2], ci: [8.2, 9.0], review: [12.2, 14.2],
+    report: {
+      shots: ["Retry timeline", "Delivery log"],
+      decisions: [
+        { text: "Back off and retry, six times", why: "the vendor's 403 means busy, not no" },
+        { text: "One idempotency key per receipt", why: "a retry never files twice" },
+      ],
+    },
+  },
+];
 
 const ISSUES = [
-  { id: 212, title: "Split one bill across phones" },
-  { id: 214, title: "Retry a receipt after a timeout" },
-  { id: 218, title: "Translate allergen names" },
+  { id: 212, title: "Split one bill across phones", plan: [0.5, 2.3] as [number, number], split: true },
+  { id: 214, title: "Retry a receipt after a timeout", plan: [3.0, 4.2] as [number, number] },
 ];
-const LANES = [
-  { tree: "wt/212-split-bill", agent: "Claude Code", files: 7 },
-  { tree: "wt/214-receipt-retry", agent: "Codex", files: 3 },
-  { tree: "wt/218-allergens", agent: "Claude Code", files: 4 },
-];
-
-// Per issue: planned by me, worked by an agent, tested, reviewed by me, merged.
-const START = (k: number) => 0.5 + k * 1.7;
-const PLAN = 1.1, HAND = 0.5, WORK = 4.4, CI = 1.0, REVIEW = 1.2;
-/** Lane 1's first test run fails and the agent fixes it: CI goes red, then green. */
-const RETRY = (k: number) => (k === 1 ? 1.6 : 0);
-function stage(k: number, t: number) {
-  const s = START(k);
-  const a = s + PLAN, b = a + HAND, c = b + WORK, d = c + CI + RETRY(k), e = d + REVIEW;
-  if (t < s) return { name: "backlog" as const, p: 0 };
-  if (t < a) return { name: "plan" as const, p: (t - s) / PLAN };
-  if (t < b) return { name: "hand" as const, p: (t - a) / HAND };
-  if (t < c) return { name: "work" as const, p: (t - b) / WORK };
-  if (t < d) return { name: "ci" as const, p: (t - c) / (CI + RETRY(k)) };
-  if (t < e) return { name: "review" as const, p: (t - d) / REVIEW };
-  return { name: "merged" as const, p: 1 };
-}
+/** When each issue's spec lands in the repo: once every piece of it has merged. */
+const SPEC_AT = { 212: 12.3, 214: 14.5 } as Record<number, number>;
+const SPECS = { 212: "specs/212-split-bill.md", 214: "specs/214-receipt-retry.md" } as Record<number, string>;
 
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
 const ease = (x: number) => { const p = clamp(x); return p * p * (3 - 2 * p); };
+const lerp = (a: { x: number; y: number }, b: { x: number; y: number }, p: number) => ({ x: a.x + (b.x - a.x) * p, y: a.y + (b.y - a.y) * p });
 
-// Where a ticket sits at each stage.
-const SLOT = { backlog: (k: number) => ({ x: 14, y: 54 + k * 58 }), me: { x: 262, y: 244 }, lane: (k: number) => ({ x: 756, y: 62 + k * 104 }), done: (k: number) => ({ x: 892, y: 46 + k * 46 }) };
+function laneState(l: Lane, t: number) {
+  if (t < l.hand) return "idle" as const;
+  if (t < l.work[0]) return "hand" as const;
+  if (t < l.work[1]) return "work" as const;
+  if (t < l.ci[1]) return "ci" as const;
+  if (t < l.review[0]) return "waiting" as const;
+  if (t < l.review[1]) return "review" as const;
+  return "merged" as const;
+}
+
+const LANE_Y = (k: number) => 22 + k * 100;
+const ME = { x: 236, y: 22 };
+const SPOT = { me: { x: 262, y: 150 }, issue: (k: number) => ({ x: 14, y: 54 + k * 58 }), lane: (k: number) => ({ x: 768, y: LANE_Y(k) + 44 }) };
 
 export function AgentHarness() {
   const [ref, inView] = useInView<HTMLDivElement>("0px");
   const mounted = useMounted();
-  const t = useSceneClock(LOOP, inView, 9.2);
+  const t = useSceneClock(LOOP, inView, 8.6);
   const fade = t > LOOP - 0.6 ? (LOOP - t) / 0.6 : 1;
-  const st = ISSUES.map((_, k) => stage(k, t));
 
-  const me = st.map((s, k) => ({ s, k })).filter(({ s }) => s.name === "plan" || s.name === "review").pop();
-  const meText = me ? `${me.s.name === "plan" ? "Planning" : "Reviewing the diff of"} #${ISSUES[me.k].id}` : "Writing the next issue";
+  const planning = ISSUES.find((is) => t >= is.plan[0] && t < is.plan[1]);
+  const reviewing = LANES.find((l) => t >= l.review[0] && t < l.review[1]);
+  const meText = planning ? (planning.split ? `Splitting #${planning.id} into two worktrees` : `Writing the spec for #${planning.id}`)
+    : reviewing ? `Reading the report from ${reviewing.ticket}` : "Writing the next issue";
 
   return (
     <div ref={ref}>
@@ -65,74 +105,89 @@ export function AgentHarness() {
         <div className="ah" style={{ width: W, height: H }}>
           {mounted && <div style={{ opacity: fade }}>
             <svg className="ah-wires" width={W} height={H} aria-hidden>
-              <path d={`M 200 ${H / 2} L 236 ${H / 2}`} />
-              {LANES.map((_, k) => <path key={k} d={`M 420 ${H / 2} C 445 ${H / 2}, 445 ${66 + k * 104}, 470 ${66 + k * 104}`} />)}
-              {LANES.map((_, k) => <path key={`o${k}`} d={`M 850 ${66 + k * 104} C 872 ${66 + k * 104}, 872 ${H / 2}, 880 ${H / 2}`} className="faint" />)}
+              <path d={`M 200 90 L 236 90`} />
+              {LANES.map((_, k) => <path key={k} d={`M 432 90 C 452 90, 452 ${LANE_Y(k) + 44}, 470 ${LANE_Y(k) + 44}`} />)}
+              {LANES.map((_, k) => <path key={`o${k}`} d={`M 850 ${LANE_Y(k) + 44} C 866 ${LANE_Y(k) + 44}, 866 90, 880 90`} className="faint" />)}
             </svg>
 
-            <div className="ah-col" style={{ left: 0, top: 0, width: 200 }}>
-              <div className="ah-head"><CircleDot className="size-3.5" /> Issues</div>
-            </div>
+            <div className="ah-col" style={{ left: 0, top: 0, width: 200 }}><div className="ah-head"><CircleDot className="size-3.5" /> Issues</div></div>
             {ISSUES.map((is, k) => (
-              <div key={is.id} className={cn("ah-issue ghost", st[k].name !== "backlog" && "taken")} style={{ left: SLOT.backlog(k).x, top: SLOT.backlog(k).y }}>
+              <div key={is.id} className={cn("ah-issue ghost", t >= is.plan[0] && "taken")} style={{ left: SPOT.issue(k).x, top: SPOT.issue(k).y }}>
                 <b>#{is.id}</b> {is.title}
               </div>
             ))}
+            <div className="ah-issue ghost more" style={{ left: 14, top: 54 + 2 * 58 }}><b>#218</b> Translate allergen names</div>
             <div className="ah-issue ghost more" style={{ left: 14, top: 54 + 3 * 58 }}><b>#221</b> Floor plan: joined tables</div>
 
-            <div className="ah-me" style={{ left: 236, top: 96 }}>
+            <div className="ah-me" style={{ left: ME.x, top: ME.y }}>
               <span className="ah-avatar">MT</span>
-              <div><b>Me</b><span>Architecture, the issue spec, and every review</span></div>
+              <div><b>Me</b><span>The spec, the split, and every review</span></div>
               <div key={meText} className="ah-doing">{meText}</div>
             </div>
 
+            {/* The split: one feature becomes two pieces that can be built apart. */}
+            {planning?.split && t > planning.plan[0] + 0.7 && (
+              <div className="ah-split" style={{ left: ME.x, top: 168 }}>
+                <div className="ah-split-head"><FileText className="size-3.5" /> spec: #212, in two parts</div>
+                <div className="ah-split-row"><b>212a</b> ledger: shares, locks, refunds</div>
+                <div className="ah-split-row"><b>212b</b> the guest&apos;s share sheet</div>
+              </div>
+            )}
+
+            {/* What a worktree hands back: screenshots and the decisions it made, the open ones marked. */}
+            {reviewing && <Report key={reviewing.ticket} lane={reviewing} t={t} />}
+
             {LANES.map((ln, k) => {
-              const s = st[k];
-              const active = s.name === "work" || s.name === "ci";
-              const work = s.name === "work" ? s.p : ["ci", "review", "merged"].includes(s.name) ? 1 : 0;
-              const step = work < 0.25 ? "Reading the codebase" : work < 0.7 ? `Editing ${Math.max(1, Math.round(ln.files * clamp((work - 0.25) / 0.45)))} of ${ln.files} files` : "Writing tests";
-              const ciRed = k === 1 && s.name === "ci" && s.p < 0.45;
-              const ciFix = k === 1 && s.name === "ci" && s.p >= 0.45 && s.p < 0.62;
-              const ciText = s.name !== "ci" ? null : ciRed ? "1 test failed" : ciFix ? "Agent fixes it" : "CI: vitest, playwright";
-              return <div key={ln.tree} className={cn("ah-lane", active && "on")} style={{ left: 470, top: 20 + k * 104 }}>
+              const s = laneState(ln, t);
+              const work = s === "work" ? clamp((t - ln.work[0]) / (ln.work[1] - ln.work[0])) : ["ci", "waiting", "review", "merged"].includes(s) ? 1 : 0;
+              const failing = ln.fail && t >= ln.fail[0] && t < ln.fail[1];
+              const fixing = ln.fail && t >= ln.fail[1] && t < ln.fail[1] + 0.5;
+              return <div key={ln.tree} className={cn("ah-lane", (s === "work" || s === "ci") && "on")} style={{ left: 470, top: LANE_Y(k) }}>
                 <div className="ah-lane-head">
                   <span className="ah-tree"><GitBranch className="size-3.5" /> {ln.tree}</span>
                   <span className={cn("ah-agent", ln.agent === "Codex" && "codex")}>{ln.agent}</span>
                 </div>
                 <div className="ah-lane-body">
-                  {s.name === "backlog" || s.name === "plan" || s.name === "hand"
-                    ? <span className="ah-idle">waiting for an issue</span>
-                    : s.name === "merged" ? <span className="ah-done"><GitMerge className="size-3.5" /> merged, worktree removed</span>
-                    : s.name === "review" ? <span className="ah-done"><GitPullRequest className="size-3.5" /> PR open, waiting for me</span>
-                    : s.name === "ci" ? <span className={cn("ah-ci", ciRed && "bad")}>{ciRed ? <X className="size-3.5" /> : <Check className="size-3.5" />} {ciText}</span>
-                    : <span className="ah-step">{step}</span>}
+                  {s === "idle" || s === "hand" ? <span className="ah-idle">waiting for a piece of work</span>
+                    : s === "merged" ? <span className="ah-done"><GitMerge className="size-3.5" /> merged, worktree removed</span>
+                    : s === "review" ? <span className="ah-done"><GitPullRequest className="size-3.5" /> report and diff with me</span>
+                    : s === "waiting" ? <span className="ah-step muted"><GitPullRequest className="size-3.5" /> report ready, in my queue</span>
+                    : s === "ci" ? <span className={cn("ah-ci", failing && "bad")}>{failing ? <X className="size-3.5" /> : <Check className="size-3.5" />} {failing ? "1 test failed" : fixing ? "Agent fixed it" : "CI: vitest, playwright"}</span>
+                    : <span className="ah-step">{work < 0.3 ? "Reading the spec and the code" : work < 0.75 ? "Building it" : "Screenshots and report"}</span>}
                   <div className="ah-bar"><i style={{ width: `${Math.round(work * 100)}%` }} /></div>
                 </div>
               </div>;
             })}
 
-            <div className="ah-col" style={{ left: 880, top: 0, width: 200 }}>
-              <div className="ah-head"><GitMerge className="size-3.5" /> Merged to main</div>
+            <div className="ah-col" style={{ left: 880, top: 0, width: 200 }}><div className="ah-head"><GitMerge className="size-3.5" /> Main, with the spec</div></div>
+            <div className="ah-out" style={{ left: 880, top: 32 }}>
+              {LANES.map((ln) => t >= ln.review[1] && (
+                <div key={ln.ticket} className="ah-merged"><Check className="size-3.5" /> {ln.ticket} merged</div>
+              ))}
+              {ISSUES.map((is) => t >= SPEC_AT[is.id] && (
+                <div key={`spec${is.id}`} className="ah-doc">
+                  <FileText className="size-3.5" />
+                  <div><b>{SPECS[is.id]}</b><span>decisions, screenshots, open questions: for the team, async</span></div>
+                </div>
+              ))}
             </div>
-            {ISSUES.map((is, k) => st[k].name === "merged" && (
-              <div key={is.id} className="ah-merged" style={{ left: SLOT.done(k).x, top: SLOT.done(k).y }}>
-                <Check className="size-3.5" /> #{is.id} {is.title}
-              </div>
-            ))}
 
-            {/* The tickets themselves, moving between the columns. */}
+            {/* The tickets themselves. #212 reaches me as one and leaves as two. */}
             {ISSUES.map((is, k) => {
-              const s = st[k];
-              let x: number, y: number;
-              if (s.name === "backlog") return null;
-              if (s.name === "plan") { const a = SLOT.backlog(k), b = SLOT.me; const p = ease(s.p / 0.4); x = a.x + (b.x - a.x) * p; y = a.y + (b.y - a.y) * p; }
-              else if (s.name === "hand") { const a = SLOT.me, b = SLOT.lane(k); const p = ease(s.p); x = a.x + (b.x - a.x) * p; y = a.y + (b.y - a.y) * p; }
-              else if (s.name === "work" || s.name === "ci") { ({ x, y } = SLOT.lane(k)); }
-              else if (s.name === "review") { const a = SLOT.lane(k), b = SLOT.me; const p = ease(s.p / 0.35); x = a.x + (b.x - a.x) * p; y = a.y + (b.y - a.y) * p; if (s.p > 0.75) { const q = ease((s.p - 0.75) / 0.25); const d = SLOT.done(k); x = b.x + (d.x - b.x) * q; y = b.y + (d.y - b.y) * q; } }
+              if (t < is.plan[0] || t >= is.plan[1]) return null;
+              const p = ease((t - is.plan[0]) / 0.5);
+              const at = lerp(SPOT.issue(k), SPOT.me, p);
+              return <div key={is.id} className="ah-ticket" style={{ transform: `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px)` }}><CircleDot className="size-3.5" /> #{is.id}</div>;
+            })}
+            {LANES.map((ln, k) => {
+              const s = laneState(ln, t);
+              let at: { x: number; y: number };
+              if (s === "hand") at = lerp(SPOT.me, SPOT.lane(k), ease((t - ln.hand) / (ln.work[0] - ln.hand)));
+              else if (s === "work" || s === "ci" || s === "waiting") at = SPOT.lane(k);
+              else if (s === "review") at = lerp(SPOT.lane(k), { x: 400, y: 150 }, ease((t - ln.review[0]) / 0.5));
               else return null;
-              const inLane = s.name === "work" || s.name === "ci";
-              return <div key={is.id} className={cn("ah-ticket", inLane && "docked", s.name === "review" && "pr")} style={{ transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)` }}>
-                {s.name === "review" ? <GitPullRequest className="size-3.5" /> : <CircleDot className="size-3.5" />} #{is.id}
+              return <div key={ln.ticket} className={cn("ah-ticket", (s === "work" || s === "ci") && "docked", (s === "waiting" || s === "review") && "pr")} style={{ transform: `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px)`, opacity: s === "review" ? 1 - clamp((t - ln.review[0] - 0.5) / 0.3) : 1 }}>
+                {s === "waiting" || s === "review" ? <GitPullRequest className="size-3.5" /> : <CircleDot className="size-3.5" />} #{ln.ticket}
               </div>;
             })}
           </div>}
@@ -140,4 +195,27 @@ export function AgentHarness() {
       </Fit>
     </div>
   );
+}
+
+function Report({ lane, t }: { lane: Lane; t: number }) {
+  const shown = (i: number) => t > lane.review[0] + 0.4 + i * 0.25;
+  return <div className="ah-report" style={{ left: ME.x, top: 168 }}>
+    <div className="ah-report-head"><GitPullRequest className="size-3.5" /> Report from {lane.ticket} <span>{lane.agent}</span></div>
+    <div className="ah-shots">
+      {lane.report.shots.map((s, i) => (
+        <figure key={s} className={cn("ah-shot", i === 1 && "b", shown(i) && "in")}>
+          <div className="ah-shot-img"><i /><i /><i /></div>
+          <figcaption><ImageIcon className="size-3" /> {s}</figcaption>
+        </figure>
+      ))}
+    </div>
+    <ul className="ah-decisions">
+      {lane.report.decisions.map((d, i) => (
+        <li key={d.text} className={cn(d.ask && "ask", shown(i + 2) && "in")}>
+          {d.ask ? <HelpCircle className="size-3.5" /> : <Check className="size-3.5" />}
+          <div><b>{d.text}</b><span>{d.why}</span></div>
+        </li>
+      ))}
+    </ul>
+  </div>;
 }

@@ -26,10 +26,10 @@ const OWNER: Seg[] = [
   { key: "live", from: 16.8, to: 19.8, label: "Publishes" },
 ];
 const AI: Seg[] = [
-  { key: "upload", from: 0.4, to: 3.2, label: "Upload" },
+  { key: "upload", from: 0, to: 3.2, label: "Upload" },
   { key: "ocr", from: 3.2, to: 6.3, label: "Vision OCR" },
-  { key: "parse", from: 6.3, to: 9.4, label: "Claude parse" },
-  { key: "translate", from: 9.6, to: 16.4, label: "Translations, while you edit" },
+  { key: "parse", from: 6.3, to: 9.6, label: "Claude parse" },
+  { key: "translate", from: 9.6, to: 16.8, label: "Translations, while you edit" },
 ];
 const at = (segs: Seg[], t: number) => segs.find((s) => t >= s.from && t < s.to)?.key ?? null;
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
@@ -73,22 +73,39 @@ export function MenuOnboarding({ time }: { time?: number } = {}) {
             <div className="mo-cap"><span className="mo-dot" /> What the owner sees</div>
             <PhoneFrame width={244} screenClassName="bg-card">
               <div className="mo-phone">
-                <OwnerScreen step={owner} t={t} />
+                <Crossfade t={t} segs={OWNER} render={(tt) => <OwnerScreen step={at(OWNER, tt) ?? "live"} t={tt} />} />
               </div>
             </PhoneFrame>
           </div>
           <div className="mo-col grow">
             <div className="mo-cap"><Sparkles className="size-3.5" /> What runs behind it</div>
             <div className="mo-behind">
-              <BehindScreen key={ai ?? (t < 3.2 ? "upload" : "done")} step={ai} t={t} />
+              <Crossfade t={t} segs={AI} render={(tt) => { const a = at(AI, tt); return <BehindScreen key={a ?? (tt < 3.2 ? "upload" : "done")} step={a} t={tt} />; }} />
             </div>
           </div>
         </div>
       ) : <div className="mo-top" style={{ minHeight: 520 }} />}
 
-      <Lanes t={t} />
     </div>
   );
+}
+
+/**
+ * One stage handing over to the next: the old screen, frozen where it ended,
+ * lifts away, then the new one settles in, so a change of step reads as a
+ * change and not a cut.
+ */
+const XF = 0.9;
+function Crossfade({ t, segs, render }: { t: number; segs: Seg[]; render: (t: number) => React.ReactNode }) {
+  const b = segs.map((s) => s.from).concat(segs.map((s) => s.to)).filter((x) => x > 0 && x <= t && t - x < XF).sort((x, y) => y - x)[0];
+  if (b === undefined) return <div className="mo-xf"><div key="now">{render(t)}</div></div>;
+  // Out, then in: the two screens never show at once, which read as a double exposure.
+  const p = (t - b) / XF;
+  const out = Math.min(1, p * 2), inn = Math.max(0, p * 2 - 1);
+  return <div className="mo-xf">
+    <div key={`was${b}`} style={{ opacity: 1 - out * out, transform: `translateY(${(-6 * out).toFixed(1)}px)` }} aria-hidden>{render(b - 0.001)}</div>
+    <div key="now" style={{ opacity: inn * (2 - inn), transform: `translateY(${(6 * (1 - inn)).toFixed(1)}px)` }}>{render(t)}</div>
+  </div>;
 }
 
 // ───────────────────────────── the phone ─────────────────────────────
@@ -279,24 +296,4 @@ function Stage({ icon, title, note, children }: { icon: ReactNode; title: string
   </div>;
 }
 
-// ───────────────────────────── the clock ─────────────────────────────
 
-function Lanes({ t }: { t: number }) {
-  const lane = (name: string, segs: Seg[]) => (
-    <div className="mo-lane">
-      <span className="mo-lane-name">{name}</span>
-      <div className="mo-lane-track">
-        {segs.map((s) => (
-          <span key={s.key} className={cn("mo-seg", t >= s.from && t < s.to && "on", t >= s.to && "done")} style={{ left: `${(s.from / LOOP) * 100}%`, width: `${((s.to - s.from) / LOOP) * 100}%` }}>
-            <em>{s.label}</em>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-  return <div className="mo-lanes" aria-hidden>
-    {lane("Owner", OWNER)}
-    {lane("Algorithms, behind it", AI)}
-    <div className="mo-playhead-track"><span className="mo-playhead" style={{ left: `${(t / LOOP) * 100}%` }} /></div>
-  </div>;
-}

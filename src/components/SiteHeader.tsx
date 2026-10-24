@@ -28,7 +28,6 @@ export function SiteFooter() {
     <footer className="border-t border-border">
       <div className="wrap flex flex-wrap items-center justify-between gap-3 py-6 text-[13px] text-muted-foreground">
         <span>Mark Temchenko · Barcelona</span>
-        <span>Built with Next.js, in Pesto&apos;s design system. Demo data throughout is invented.</span>
       </div>
     </footer>
   );
