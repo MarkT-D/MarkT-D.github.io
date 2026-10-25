@@ -369,7 +369,7 @@
 .ah-ticket.docked { background: var(--gr-8); color: var(--card); }
 .ah-ticket.pr { background: var(--acc-7); color: var(--card); }
 .ah-step.muted { color: var(--muted-foreground); }
-.ah-split, .ah-report { position: absolute; width: 214px; padding: 10px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow-card), inset 0 0 0 1px var(--border); animation: rc-rise 300ms backwards; font-size: 12px; }
+.ah-split, .ah-report, .ah-grill { position: absolute; width: 214px; padding: 10px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow-card), inset 0 0 0 1px var(--border); animation: rc-rise 300ms backwards; font-size: 12px; }
 .ah-split-head, .ah-report-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--acc-7); font-weight: 700; }
 .ah-report-head span { margin-left: auto; color: var(--muted-foreground); font-weight: 600; font-size: 11px; }
 .ah-split-row { display: flex; gap: 8px; padding: 6px 8px; margin-top: 4px; border-radius: 8px; background: var(--gr-2); color: var(--gr-8); animation: rc-pop 300ms backwards; }
@@ -455,3 +455,25 @@
 .ah.tall .ah-out { display: flex; flex-wrap: wrap; gap: 6px; }
 .ah.tall .ah-out .ah-merged { width: auto; }
 .ah.tall .ah-out .ah-doc { flex-basis: 100%; }
+
+/* Grouping, grilling and the feature PR. */
+.ah-issue.picked { box-shadow: inset 0 0 0 1.5px var(--acc-5); opacity: 1; }
+.ah-issue.picked.taken { opacity: 0.6; }
+.ah-tag { position: absolute; top: -8px; right: 8px; padding: 1px 6px; border-radius: 6px; background: var(--acc-6); color: var(--primary-foreground); font-size: 10px; font-weight: 700; animation: rc-pop 260ms backwards; }
+.ah-split-head span { margin-left: auto; color: var(--muted-foreground); font-weight: 600; font-size: 10.5px; }
+.ah-q { width: fit-content; max-width: 88%; margin-top: 5px; padding: 5px 8px; border-radius: 10px 10px 10px 3px; background: var(--gr-2); color: var(--foreground); line-height: 1.35; animation: rc-pop 260ms backwards; }
+.ah-q.me { margin-left: auto; border-radius: 10px 10px 3px 10px; background: var(--acc-1); color: var(--acc-8); font-weight: 600; }
+.ah-split-note { margin: 8px 0 0; color: var(--muted-foreground); font-size: 11px; line-height: 1.35; }
+.ah-pr { position: absolute; display: grid; gap: 6px; padding: 10px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow-card), inset 0 0 0 1.5px var(--acc-4); animation: rc-rise 300ms backwards; }
+.ah-pr-head { display: flex; align-items: center; justify-content: space-between; }
+.ah-pr-head b { font-size: 13px; }
+.ah-pr-state { padding: 1px 7px; border-radius: 6px; background: var(--gr-2); color: var(--gr-8); font-size: 11px; font-weight: 700; }
+.ah-pr-state.ready { background: var(--acc-1); color: var(--acc-8); }
+.ah-pr-state.merged { background: var(--acc-6); color: var(--primary-foreground); }
+.ah-pr-branch { color: var(--muted-foreground); font-family: var(--font-mono, ui-monospace), monospace; font-size: 10.5px; }
+.ah-pr ul { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+.ah-pr li { display: flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: 8px; background: var(--gr-2); color: var(--gr-7); }
+.ah-pr li em { margin-left: auto; font-style: normal; color: var(--muted-foreground); font-size: 11px; }
+.ah-pr li.in { color: var(--foreground); }
+.ah-pr li.in svg { color: var(--acc-6); }
+.ah-pr .ah-merged { position: static; width: auto; }

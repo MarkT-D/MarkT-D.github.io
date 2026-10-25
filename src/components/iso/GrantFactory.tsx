@@ -269,7 +269,8 @@ export function GrantFactory() {
 
     {showScore && (
       <span key={lastJudged} className={cn("gp-score", current.flag && "bad")} style={at(iso(JUDGE_X + 34, BELT_Y - 12, 70))}>
-        <b>{current.name}</b> {current.score}/10 · {current.note}
+        <b>{current.name} {current.score}/10</b>
+        <span>{current.note}</span>
       </span>
     )}
     </div>

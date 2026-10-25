@@ -19,7 +19,7 @@ import { NOTES } from "@/lib/notes";
 
 const STATS = [
   { value: "1.5 yrs", label: "shipping LLM systems at an AI startup, promoted to FDE" },
-  { value: "8.0 / 9 GPA", label: "BSc Computational Social Science, University of Amsterdam" },
+  { value: "8 GPA", label: "BSc Computational Social Science, University of Amsterdam" },
   { value: "Teams of 5 and 4", label: "led on partner projects, both awarded" },
   { value: "EU citizen", label: "based in Barcelona, no visa or sponsorship needed" },
 ];
@@ -191,7 +191,7 @@ export default function Home() {
           <div className="wrap">
             <p className="eyebrow">How I build</p>
             <h2 className="mt-2 max-w-3xl font-display text-[34px] font-semibold leading-tight sm:text-[40px]">AI-native: I design and review, agents do the typing</h2>
-            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">I write the spec and split the work. Agents build each piece in its own worktree and report back. I review, and the spec ships with the code.</p>
+            <p className="mt-3 max-w-2xl text-[16px] leading-[1.6] text-gr-8">I group related tickets into one feature branch and PR, and let the agent grill me on the plan before anything is built. Then the work splits into worktrees that run in parallel, each agent reports back, I review, and the PR lands with its spec.</p>
             <Reveal className="mt-8">
               <div className="card p-4 sm:p-6"><AgentHarness /></div>
             </Reveal>
@@ -243,7 +243,7 @@ export default function Home() {
               ))}
             </ol>
             <p className="mt-8 text-[14px] text-muted-foreground">
-              BSc Computational Social Science, University of Amsterdam, 2026 · GPA 8.0/9 · Mathematics of ML, plus the master&apos;s-level courses above
+              BSc Computational Social Science, University of Amsterdam, 2026 · GPA 8 · Mathematics of ML, plus the master&apos;s-level courses above
             </p>
           </div>
         </section>

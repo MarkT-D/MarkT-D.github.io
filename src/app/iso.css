@@ -181,7 +181,8 @@
 .gp-label.paint { color: var(--card); }
 .gp-label.left { transform: translate(0, -50%); }
 .gp-score { position: absolute; transform: translate(10px, -50%); padding: 4px 9px; border-radius: 8px; background: var(--card); box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--acc-3); color: var(--foreground); font-size: 12px; line-height: 16px; white-space: nowrap; animation: rc-pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
-.gp-score b { font-weight: 700; }
+.gp-score b { display: block; font-weight: 700; }
+.gp-score span { display: block; opacity: 0.85; }
 .gp-score.bad { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--red-6); color: var(--red-8); }
 .gp-review { position: absolute; right: 0; top: 0; width: 176px; padding: 7px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--border); font-size: 11px; line-height: 14px; animation: rc-rise 300ms ease-out backwards; }
 .gp-review-head { display: flex; justify-content: space-between; padding: 0 2px 4px; font-weight: 700; }
