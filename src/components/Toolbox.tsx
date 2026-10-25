@@ -17,6 +17,7 @@ export function Toolbox() {
   const clear = () => { setTool(null); setProject(null); };
 
   const allTools = TOOL_GROUPS.flatMap((g) => g.tools);
+  const usedBy = tool ? allTools.find((t) => t.name === tool)!.used : [];
   const names = (ids: string[]) => ids.map((id) => TOOL_PROJECTS.find((p) => p.id === id)!.name).join(", ");
   const status = tool
     ? <><b>{tool}</b>: {names(allTools.find((t) => t.name === tool)!.used)}</>
@@ -28,7 +29,7 @@ export function Toolbox() {
     <div ref={ref} className={cn("tb", inView && "in")} onMouseLeave={clear}>
       <div className="tb-legend" role="list">
         {TOOL_PROJECTS.map((p) => (
-          <a key={p.id} href={p.href} role="listitem" className={cn("tb-proj", project === p.id && "on")}
+          <a key={p.id} href={p.href} role="listitem" className={cn("tb-proj", (project === p.id || usedBy.includes(p.id)) && "on")}
             onMouseEnter={() => { setProject(p.id); setTool(null); }} onFocus={() => { setProject(p.id); setTool(null); }}>
             <span>{p.index}</span>{p.name}
           </a>
@@ -42,7 +43,7 @@ export function Toolbox() {
               <tr>
                 <th scope="col" className="tb-group">{g.name}</th>
                 {TOOL_PROJECTS.map((p) => (
-                  <th key={p.id} scope="col" className={cn("tb-col", project === p.id && "on")} onMouseEnter={() => { setProject(p.id); setTool(null); }}>
+                  <th key={p.id} scope="col" className={cn("tb-col", (project === p.id || usedBy.includes(p.id)) && "on")} onMouseEnter={() => { setProject(p.id); setTool(null); }}>
                     <abbr title={p.name}>{p.index}</abbr>
                   </th>
                 ))}

@@ -24,7 +24,7 @@ export const TOOL_GROUPS: ToolGroup[] = [
     name: "AI and ML",
     tools: [
       { name: "OpenAI · Claude · Gemini APIs", used: ["grants", "decks", "menu", "quotaclimat", "tracfm"] },
-      { name: "Structured output", used: ["decks", "menu"] },
+      { name: "Structured output", used: ["grants", "decks", "menu"] },
       { name: "PyTorch", used: ["quotaclimat", "xplorit"] },
       { name: "Hugging Face", used: ["quotaclimat", "xplorit"] },
       { name: "Whisper", used: ["tracfm", "xplorit"] },
