@@ -15,6 +15,7 @@ import { Reveal } from "@/components/Reveal";
 import { Fit } from "@/components/Fit";
 import { Contact } from "@/components/Contact";
 import { AgentHarness } from "@/components/AgentHarness";
+import { Toolbox } from "@/components/Toolbox";
 import { NOTES } from "@/lib/notes";
 
 const STATS = [
@@ -49,14 +50,6 @@ const COURSES = [
   },
   { name: "Advanced Calculus", body: "The analysis under optimisation and gradient-based learning." },
   { name: "Probability Theory", body: "Stochastic processes and sampling distributions, the base for evaluation and uncertainty." },
-];
-
-const TOOLBOX = [
-  { group: "LLMs & ML", items: ["OpenAI · Claude · Gemini APIs", "Structured output", "LLM-as-judge", "PyTorch", "Hugging Face", "scikit-learn", "Whisper", "Google Vision OCR"] },
-  { group: "Product engineering", items: ["TypeScript", "React", "Next.js", "Node.js", "NestJS", "FastAPI", "Flask", "PostgreSQL", "Supabase"] },
-  { group: "Infrastructure", items: ["Docker", "AWS: S3, RDS, API Gateway", "Vercel", "CI pipelines", "Linux"] },
-  { group: "Parallel & systems", items: ["C", "CUDA", "OpenMP", "pthreads", "MPI", "Spark"] },
-  { group: "How I work", items: ["Claude Code agents", "git worktrees", "Playwright", "Vitest"] },
 ];
 
 const EARLIER = [
@@ -172,17 +165,15 @@ export default function Home() {
                 </div>
               </Reveal>
             </div>
-            <div className="mt-14">
-              <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Toolbox</h3>
-              <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-                {TOOLBOX.map((t) => (
-                  <div key={t.group}>
-                    <div className="mb-2 text-[14px] font-semibold">{t.group}</div>
-                    <div className="flex flex-wrap gap-1.5">{t.items.map((i) => <span key={i} className="chip">{i}</span>)}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          </div>
+        </section>
+
+        {/* Toolbox */}
+        <section id="toolbox" className="scroll-mt-14 border-t border-border py-12 sm:py-14">
+          <div className="wrap">
+            <p className="eyebrow">Toolbox</p>
+            <h2 className="mt-2 font-display text-[26px] font-semibold leading-tight sm:text-[30px]">Every tool, and the projects it shipped in</h2>
+            <div className="mt-5"><Toolbox /></div>
           </div>
         </section>
 
